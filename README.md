@@ -51,8 +51,8 @@ This function can be used to create files for use with CLUMPP. The function crea
 clumppExportStructure(files=flist)  
 clumppExportTess()
 ```
-[Folders created from clumpp export and the contents of each folder.](/Vignettes/Fig3.jpg).
-[Folder showing CLUMPP results: aligned file, merged file and misc file.](https://github.com/royfrancis/pophelper/blob/master/vignettes/Fig4.jpg).
+![Folders created from clumpp export and the contents of each folder.](/Vignettes/Fig3.jpg).
+![Folder showing CLUMPP results: aligned file, merged file and misc file.](https://github.com/royfrancis/pophelper/blob/master/vignettes/Fig4).
 
 #### Collect CLUMPP output files  
 The CLUMPP output files are created in multiple folders. This function helps to collect aligned files, merged files or both from multiple directories into a single directory.
