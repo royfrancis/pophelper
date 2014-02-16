@@ -38,14 +38,14 @@ evannoMethodStructure(df1)
 ![Evanno Method](vignettes/evannoMethodStructure.jpg)  
 __Fig 1.__ Evanno Method
 
-#### 4. Convert to dataframe  
+### 4. Convert to dataframe  
 STRUCTURE and TESS run files can be converted to R dataframes using this function.
 
 ```coffee
 runsToDfStructure(files=flist)
 runsToDfTess()
 ```
-#### 5. Generate CLUMPP output  
+### 5. Generate CLUMPP output  
 This function can be used to create files for use with CLUMPP. The function creates a combined file and paramfile in separate directories by K.
 
 ```coffee
@@ -58,14 +58,14 @@ __Fig 2.__ Folders created from CLUMPP export and the contents of each folder.
 ![CLUMPP results aligned file merged file and misc file](vignettes/Fig4.jpg)  
 __Fig 3.__ Folder showing CLUMPP results: aligned file, merged file and misc file.
 
-#### 6. Collect CLUMPP output files  
+### 6. Collect CLUMPP output files  
 The CLUMPP output files are created in multiple folders. This function helps to collect aligned files, merged files or both from multiple directories into a single directory.
 
 ```coffee
 collectClumppOutput(prefix="STRUCTUREpop", filetype="both")  
 collectClumppOutput(prefix="TESSpop", filetype="both")
 ```
-#### 7. Plot run files  
+### 7. Plot run files  
 This function is used to plot barplots from STRUCTURE files, TESS files, combined files, aligned files or merged files.
 
 * To plot separate files from STRUCTURE/TESS files  
@@ -95,7 +95,7 @@ __Fig 5.__ Left: Single run plotted separately with pop labels. Right: Two runs 
 ![PlotRuns example 3](vignettes/Fig7.jpg)  
 __Fig 6.__ Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).
 
-#### 8. Plot Multiline  
+### 8. Plot Multiline  
 This function is also used to create barplots from STRUCTURE, TESS or table files. The output is created as A4 format by default. The barplot is broken down to multiple rows to enable easier identification of individuals. The number of samples per line (`spl`) and number of lines per page (`lpp`) can be defined manually.
 
 ```coffee
@@ -105,7 +105,7 @@ plotMultiline(files=flist[1], spl=75, lpp=10)
 ![plotMultiline example](vignettes/Fig11.jpg)  
 __Fig 7.__ Left: `plotMultiline` default output. Right: Modified output.
 
-#### Collect TESS runs
+### Collect TESS runs
 TESS run files are generated in multiple folders. These file can be collect into a single folder using this function.  
 `collectRunsTess(runsdir = choose.dir())`
 
