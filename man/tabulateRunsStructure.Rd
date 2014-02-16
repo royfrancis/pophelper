@@ -1,0 +1,34 @@
+\name{tabulateRunsStructure}
+\alias{tabulateRunsStructure}
+\title{Tabulate STRUCTURE runs}
+\usage{
+  tabulateRunsStructure(files = NULL, writetable = F,
+    quiet = F)
+}
+\arguments{
+  \item{files}{A character vector of STRUCTURE output files
+  to be tabulated. Use \code{choose.files(multi=TRUE)} for
+  interactive selection.}
+
+  \item{writetable}{Set to F by default. Setting to T
+  writes the output table as a tab-delimited text file in
+  the working directory.}
+
+  \item{quiet}{Set to F by default to print number of
+  selected files. If set to T, then number of selected
+  files are not printed.}
+}
+\value{
+  Returns a dataframe with all runs sorted by K. The table
+  has 10 columns namely file name, value of K, Number of
+  individuals, Number of loci, Estimated ln probability of
+  data, Mean value of ln likelihood, Variance of ln
+  likelihood, Mean value of alpha, Number of burn-in and
+  Number of repeats. Missing values are given NA.
+}
+\description{
+  Creates a table from STRUCTURE output files with various
+  STRUCTURE parameters. Refer to return for detailed list
+  of columns.
+}
+
