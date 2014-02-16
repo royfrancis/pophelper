@@ -6,8 +6,8 @@
 }
 \arguments{
   \item{data}{A dataframe with tabulated runs. An output
-  from tabulateRunsStructure(). Must have minimum 4 columns
-  named k, ind, loci and elpd.}
+  from \code{tabulateRunsStructure()}. Must have minimum 4
+  columns named k, ind, loci and elpd.}
 
   \item{writetable}{Set to F by default. Setting to T
   writes the output table as a tab-delimited text file in

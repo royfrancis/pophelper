@@ -5,7 +5,8 @@
   runsToDfTess(files = NA)
 }
 \arguments{
-  \item{files}{One or more TESS cluster run files}
+  \item{files}{One or more TESS cluster run files. Use
+  \code{choose.files(multi=TRUE)} to select interactively.}
 }
 \value{
   If a single file is selected, a single dataframe is

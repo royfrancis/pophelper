@@ -25,4 +25,10 @@
   Creates a table from TESS output files with filenames, K
   and number of individuals.
 }
+\details{
+  The row numbers of the output table denotes the file
+  number selected. This is helpful if a particular file
+  from the table needs to be identified in the selection
+  vector.
+}
 

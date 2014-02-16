@@ -6,7 +6,7 @@
 }
 \arguments{
   \item{files}{A character vector of TESS cluster run files
-  to be tabulated. Use choose.files(multi=TRUE) for
+  to be tabulated. Use \code{choose.files(multi=TRUE)} for
   interactive selection.}
 
   \item{prefix}{A character prefix for folder names.}
@@ -14,7 +14,8 @@
 \value{
   The combined file and paramfile are written into
   respective folders named by population. A tabulated table
-  is returned from function same as tabulateRunsTess().
+  is returned from function same as
+  \code{tabulateRunsTess()}.
 }
 \description{
   Takes multiple TESS runs and combines several repeats for

@@ -31,4 +31,10 @@
   STRUCTURE parameters. Refer to return for detailed list
   of columns.
 }
+\details{
+  The row numbers of the output table denotes the file
+  number selected. This is helpful if a particular file
+  from the table needs to be identified in the selection
+  vector.
+}
 

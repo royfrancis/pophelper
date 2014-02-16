@@ -8,7 +8,7 @@
 }
 \arguments{
   \item{data}{A dataframe with summarised runs. An output
-  from summariseRunsStructure(). Must have minimum 7
+  from \code{summariseRunsStructure()}. Must have minimum 7
   columns named meanelpd, sd, k, runs, loci, maxelpd and
   minelpd.}
 

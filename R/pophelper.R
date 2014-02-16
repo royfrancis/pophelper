@@ -33,6 +33,7 @@ getColours <- function(k)
 #' @param writetable Set to F by default. Setting to T writes the output table as a tab-delimited text file in the working directory.
 #' @param quiet Set to F by default to print number of selected files. If set to T, then number of selected files are not printed.
 #' @return Returns a dataframe with all runs sorted by K. The table has 10 columns namely file name, value of K, Number of individuals, Number of loci, Estimated ln probability of data, Mean value of ln likelihood, Variance of ln likelihood, Mean value of alpha, Number of burn-in and Number of repeats. Missing values are given NA.
+#' @details The row numbers of the output table denotes the file number selected. This is helpful if a particular file from the table needs to be identified in the selection vector.
 #' @export
 
 tabulateRunsStructure <- function(files=NULL, writetable=F, quiet=F)
@@ -107,7 +108,7 @@ tabulateRunsStructure <- function(files=NULL, writetable=F, quiet=F)
   
   #sort table on K
   main1 <- main[with(main, order(k)), ]
-  rownames(main1) <- 1:length(main1[, 1])
+  #rownames(main1) <- 1:length(main1[, 1])
   
   #write table if opted
   if (writetable == T | writetable == "T" | writetable == "TRUE")
@@ -126,6 +127,7 @@ tabulateRunsStructure <- function(files=NULL, writetable=F, quiet=F)
 #' @param writetable Set to F by default. Setting to T writes the output table as a tab-delimited text file in the same folder as the STRUCTURE run files.
 #' @param quiet If set to T, then number of selected files are not printed.
 #' @return Returns a dataframe with filenames, K and number of individuals of all runs sorted by K.
+#' @details The row numbers of the output table denotes the file number selected. This is helpful if a particular file from the table needs to be identified in the selection vector.
 #' @export
 #'
 tabulateRunsTess <- function(files=NULL, writetable=F, quiet=F)
@@ -157,7 +159,7 @@ tabulateRunsTess <- function(files=NULL, writetable=F, quiet=F)
   main$ind <- as.numeric(main$ind)
   #sort table on K
   main1 <- main[with(main, order(k)), ]
-  rownames(main1) <- 1:length(main1[, 1])
+  #rownames(main1) <- 1:length(main1[, 1])
   
   #write table if opted
   if (writetable == T | writetable == "T" | writetable == "TRUE")
@@ -741,7 +743,7 @@ runsToDfStructure <- function(files=NA)
   #cat(paste("Number of files selected: ", number, "\n", sep=""))
   
   i=1
-  dlist <- list()
+  dlist <- list(length=number)
   for (i in 1:length(files))
   {
     name <- basename(files[i])
@@ -766,9 +768,9 @@ runsToDfStructure <- function(files=NA)
     file_a <- file1[cstart1:cend1]
     file_b <- gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
     file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b, " ")))))
-    dframe <- as.data.frame(matrix(file_c, nrow=ind, byrow=T))
+    dframe <- as.data.frame(matrix(file_c, nrow=ind, byrow=T),stringsAsFactors=FALSE)
+    dframe <- as.data.frame(sapply(dframe, as.numeric))
     colnames(dframe) <- paste("Cluster", 1:k, sep="")
-    dframe[, 1:length(dframe)] = apply(dframe[, 1:length(dframe)], 2, function(x) as.numeric(as.character(x)))
     dlist[[i]] <- dframe
     #names(dlist[[i]]) <- as.character(name)
   }
@@ -792,7 +794,7 @@ runsToDfTess <- function(files=NA)
   #cat(paste("Number of files selected: ", number, "\n", sep=""))
   
   i=1
-  dlist <- list()
+  dlist <- list(length=number)
   for (i in 1:length(files))
   {
     name <- gsub(".txt", "", basename(files[i]))
@@ -806,10 +808,10 @@ runsToDfTess <- function(files=NA)
     #extract the cluster table part
     file1 <- file1[3:c(grep("Estimated Allele Frequencies", file1)-4)]
     file2 <- as.vector(unlist(strsplit(file1, "\t")))
-    file3 <- as.data.frame(matrix(file2, nrow=length(file1), byrow=T))
+    file3 <- as.data.frame(matrix(file2, nrow=length(file1), byrow=T),stringsAsFactors=FALSE)
     dframe <- file3[, -c(1, ncol(file3)-1, ncol(file3))]
+    dframe <- as.data.frame(sapply(dframe, as.numeric))
     colnames(dframe) <- paste("Cluster", 1:ncol(dframe), sep="")
-    dframe[, 1:length(dframe)] = apply(dframe[, 1:length(dframe)], 2, function(x) as.numeric(as.character(x)))
     dlist[[i]] <- dframe
     #names(dlist[[i]]) <- as.character(name)
   }
@@ -1556,6 +1558,12 @@ collectClumppOutput <- function(prefix="STRUCTUREpop", filetype="aligned", runsd
 #' @param spl samples per line. Defaults to 60.
 #' @param lpp lines per page. Defaults to 11.
 #' @param popcol A vector of colours for populations.
+#' @param barwidth The width of the bars.
+#' @param barspace The space between the bars.
+#' @param labsize The size of the labels.
+#' @param labangle The angle of labels.
+#' @param labvjust The vertical justification of the labels.
+#' @param labhjust The horizontal justification of the labels.
 #' @param imgtype Figure output format. Options are 'png', 'jpeg' or 'pdf'. If pdf, height and width must be in inches and res argument is ignored.
 #' @param height Height of the full figure. If NA, height is set to 29.7cm (A4 height).
 #' @param width Width of the full figure. If NA, width is set to 21cm (A4 width).
@@ -1564,7 +1572,7 @@ collectClumppOutput <- function(prefix="STRUCTUREpop", filetype="aligned", runsd
 #' @details Figures are always created to A4 size. Any plotted row will span the width of the figure. Note that this function is slow and may take several minutes when plotting mutiple tables.
 #' @export
 #'
-plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, imgtype="png", height=NA, width=NA, res=NA, units=NA)
+plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, barspace=0.1, labsize=5, labangle=90, labvjust=0.5,labhjust=1, imgtype="png", height=NA, width=NA, res=NA, units=NA)
 {
   #check image
   imgtype <- tolower(imgtype)
@@ -1597,21 +1605,49 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, imgtype="png", he
       df1 <- split(df1[, -length(df1)], df1$tab)
     }
     
+    #determine if df1 is list or dataframe
     if (as.character(class(df1)) == "data.frame") flen <- 1
     if (as.character(class(df1)) == "list") flen <- length(df1)
     
     for (j in 1:flen)
     {
-      #rows calculation
+      #move to dff
       if (as.character(class(df1)) == "data.frame") dff <- df1
       if (as.character(class(df1)) == "list") dff <- df1[[j]]
       
+      #primary calculation of spl
       nr1 <- nrow(dff)
-      if (is.na(spl)) if (nr1 <= 60) {spl <- nr1} else {spl <- 60}
-      if (spl > nr1) stop("Samples per line (spl) is greater than total number of samples")
+
+      #numrows <- floor(nr1/spl)
+      #numextra <- nr1-(spl*numrows)
+      #nr2 <- numrows
+      #if (numextra > 0) nr2 <- nr2+1
       
-      numrows <- floor(nr1/spl)
-      numextra <- nr1-(spl*numrows)
+      if (!is.na(spl))
+      {
+        if (spl > nr1) stop("Samples per line (spl) is greater than total number of samples")
+        spl1<-spl
+        numrows <- floor(nr1/spl1)
+        numextra <- nr1-(spl1*numrows)
+      }
+      
+      #optimise spl
+      if (is.na(spl))
+      {
+        if (nr1 <= 60) {spl1 <- nr1} else {spl1 <- 60}
+        
+        #automatically optimise number of rows and spl
+        numextra <- 0
+        while(numextra < 0.70*spl1)
+        {
+          numrows <- floor(nr1/spl1)
+          numextra <- nr1-(spl1*numrows)
+          if (numextra < 0.70*spl1) spl1=spl1+1
+          if (spl1 > nr1) {spl1 <- nr1; break;}
+          print(spl1)
+        }
+      }
+     
       nr2 <- numrows
       if (numextra > 0) nr2 <- nr2+1
       
@@ -1619,36 +1655,36 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, imgtype="png", he
       coll <- popcol
       if (is.na(popcol)) coll <- getColours(ncol(dff))
       
-      dff$rows <- factor(c(rep(1:numrows, each=spl), rep(nr2, each=numextra)))
+      dff$rows <- factor(c(rep(1:numrows, each=spl1), rep(nr2, each=numextra)))
       dff$ind <- as.factor(as.numeric(1:nr1))
-      #dff$line <- as.factor(c(rep(1:spl, numrows), 1:numextra))
+      #dff$line <- as.factor(c(rep(1:spl1, numrows), 1:numextra))
       
       #split and plot rows
       dlist <- split(dff, dff$rows)
       plist <- list(length=nr2)
-      widthsvec <- vector(length=nr2)
+      #widthsvec <- vector(length=nr2)
       for (i in 1: nr2)
       {
         df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))
         plist[[i]] <- ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
-          geom_bar(width=0.9, space=0.1, stat="identity", position="stack")+
+          geom_bar(width=barwidth, space=barspace, stat="identity", position="stack")+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0))+
           scale_fill_manual(values=coll)+
           labs(x=NULL, y=NULL)+
           theme(legend.position="none", panel.grid=element_blank(), panel.background=element_blank(), 
                 axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.line=element_blank(), 
-                axis.title=element_blank(), axis.text.x=element_text(size=5, angle=90, vjust=0.5), 
-                plot.margin=unit(c(0.1, 0.1, 0.1, 0), "cm"))
+                axis.title=element_blank(), axis.text.x=element_text(size=labsize, angle=labangle, 
+                vjust=labvjust,hjust=labhjust), plot.margin=unit(c(0.1, 0.1, 0.1, 0), "cm"))
         
-        widthsvec[i] <- nrow(dlist[[i]])/spl
+        #calculate widths. not implemented.
+        #widthsvec[i] <- nrow(dlist[[i]])/spl1
       }
       
       #lpp calculations
-      nr2
-      if (is.na(lpp)) {lpp <- 11; if (lpp > nr2) lpp <- nr2}
-      #if (lpp > nr2) stop("Lines per line (lpp) is greater than total number of lines")
-      numpages <- ceiling(nr2/lpp)
+      if (!is.na(lpp)) lpp1 <- lpp
+      if (is.na(lpp)) {lpp1 <- 11; if (lpp1 > nr2) lpp1 <- nr2}
+      numpages <- ceiling(nr2/lpp1)
       #numpagesextra <- nr2-(lpp*numpages)
       #numpages1 <- numpages
       #if (numpagesextra > 0) numpages1 <- numpages1+1
@@ -1658,11 +1694,11 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, imgtype="png", he
       while (r <= numpages)
       {
         start1 <- e+1
-        stop1 <- e+lpp
+        stop1 <- e+lpp1
         if (stop1 > length(plist)) stop1 <- length(plist)
         
         #widths <- widthsvec[start1:stop1]
-        alist <- c(plist[start1:stop1], lpp, 1)
+        alist <- c(plist[start1:stop1], lpp1, 1)
         names(alist) <- c(as.character(start1:stop1), "nrow", "ncol")
         
         if (imgtype == "png") png(paste(fname, "-Multiline-", j, "-", r, ".png", sep=""), height=height, width=width, res=res, units=units)
@@ -1682,6 +1718,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, imgtype="png", he
         e=stop1
         r=r+1
       }
+      rm(nr1,nr2,numrows,numextra,numpages,start1,stop1,e,r,dlist,plist,df2,dff)
     }
   }
 }

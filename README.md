@@ -105,8 +105,14 @@ plotMultiline(files=flist[1], spl=75, lpp=10)
 ![plotMultiline example](vignettes/Fig11.jpg)  
 __Fig 7.__ Left: `plotMultiline` default output. Right: Modified output.
 
-### Collect TESS runs
+### 9. Collect TESS runs
 TESS run files are generated in multiple folders. These file can be collect into a single folder using this function.  
 `collectRunsTess(runsdir = choose.dir())`
+
+### Sample plot outputs
+
+![Sample](vignettes/Fig12.jpg)  
+
+Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(x,"Spectral")` from `RColorBrewer` package.
 
 #### End of Document.

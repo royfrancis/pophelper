@@ -6,7 +6,7 @@
 }
 \arguments{
   \item{files}{A character vector of STRUCTURE output files
-  to be tabulated. Use choose.files(multi=TRUE) for
+  to be tabulated. Use \code{choose.files(multi=TRUE)} for
   interactive selection.}
 
   \item{prefix}{A character prefix for folder names.}
@@ -15,7 +15,7 @@
   The combined file and paramfile are written into
   respective folders named by population. A tabulated table
   is returned from function same as
-  tabulateRunsStructure().
+  \code{tabulateRunsStructure()}.
 }
 \description{
   Takes multiple STRUCTURE runs and combines several
