@@ -2,8 +2,8 @@
 \alias{getDim}
 \title{Internal: Get dimensions for figures.}
 \usage{
-  getDim(ind, units = "cm", height = NA, width = NA,
-    res = 300, plotnum = 1)
+getDim(ind, units = "cm", height = NA, width = NA, res = 300,
+  plotnum = 1)
 }
 \arguments{
   \item{ind}{Number of individuals.}
@@ -19,11 +19,11 @@
   \item{plotnum}{Number of plot in the figure.}
 }
 \value{
-  a vector with height and width.
+a vector with height and width.
 }
 \description{
-  Generate height and width of figure based on number of
-  individuals. This is an internal function that calculates
-  figure dimensions for export.
+Generate height and width of figure based on number of
+individuals. This is an internal function that calculates
+figure dimensions for export.
 }
 

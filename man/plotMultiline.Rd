@@ -2,11 +2,10 @@
 \alias{plotMultiline}
 \title{Plot STRUCTURE/TESS/table run files in multiline}
 \usage{
-  plotMultiline(files = NA, spl = NA, lpp = NA,
-    popcol = NA, barwidth = 0.9, barspace = 0.1,
-    labsize = 5, labangle = 90, labvjust = 0.5,
-    labhjust = 1, imgtype = "png", height = NA, width = NA,
-    res = NA, units = NA)
+plotMultiline(files = NA, spl = NA, lpp = NA, popcol = NA,
+  barwidth = 0.9, barspace = 0.1, indlabs = TRUE, labsize = 5,
+  labangle = 90, labvjust = 0.5, labhjust = 1, imgtype = "png",
+  height = NA, width = NA, res = NA, units = NA)
 }
 \arguments{
   \item{files}{One or more STRUCTURE output files. Use
@@ -22,6 +21,10 @@
   \item{barwidth}{The width of the bars.}
 
   \item{barspace}{The space between the bars.}
+
+  \item{indlabs}{By default, \code{indlabs=TRUE}, then
+  individual labels 1, 2, 3.. are indicated below bars. To
+  hide labels, set \code{indlabs=FALSE}}
 
   \item{labsize}{The size of the labels.}
 
@@ -49,13 +52,13 @@
   cm.}
 }
 \description{
-  Plot STRUCTURE/TESS run files as barplots with multiple
-  lines
+Plot STRUCTURE/TESS run files as barplots with multiple
+lines
 }
 \details{
-  Figures are always created to A4 size. Any plotted row
-  will span the width of the figure. Note that this
-  function is slow and may take several minutes when
-  plotting mutiple tables.
+Figures are always created to A4 size. Any plotted row will
+span the width of the figure. Note that this function is
+slow and may take several minutes when plotting mutiple
+tables.
 }
 

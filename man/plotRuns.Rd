@@ -2,13 +2,12 @@
 \alias{plotRuns}
 \title{Plot STRUCTURE, TESS or table files as barplots.}
 \usage{
-  plotRuns(files = NULL, imgoutput = "sep", poplab = NA,
-    popcol = NA, imgtype = "png", height = NA, width = NA,
-    dpi = NA, units = NA, flabsize = NA, flabcol = NA,
-    flabbackcol = NA, labpos = NA, labsize = NA,
-    labangle = NA, labjust = NA, labcol = NA,
-    pointsize = NA, pointcol = NA, pointtype = NA,
-    linepos = NA, linethick = NA, linecol = NA, fmar = NA)
+plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
+  imgtype = "png", height = NA, width = NA, dpi = NA, units = NA,
+  flabsize = NA, flabcol = NA, flabbackcol = NA, labpos = NA,
+  labsize = NA, labangle = NA, labjust = NA, labcol = NA,
+  pointsize = NA, pointcol = NA, pointtype = NA, linepos = NA,
+  linethick = NA, linecol = NA, fmar = NA)
 }
 \arguments{
   \item{files}{One or more STRUCTURE/TESS/table files}
@@ -90,17 +89,17 @@
   c(0.2,0.2,0.2,0).}
 }
 \value{
-  Nothing is returned.
+Nothing is returned.
 }
 \description{
-  Plot one or more STRUCTURE/TESS output files or table
-  files (aligned/combined/merged) files. The STRUCTURE and
-  TESS files can be plotted individually or joined
-  together. The table files will be plotted based on number
-  of runs in each file.
+Plot one or more STRUCTURE/TESS output files or table files
+(aligned/combined/merged) files. The STRUCTURE and TESS
+files can be plotted individually or joined together. The
+table files will be plotted based on number of runs in each
+file.
 }
 \details{
-  It is possible to set either height or width and leave
-  other as default.
+It is possible to set either height or width and leave
+other as default.
 }
 

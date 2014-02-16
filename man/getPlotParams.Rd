@@ -2,10 +2,10 @@
 \alias{getPlotParams}
 \title{Internal: Generate parameters for plots with labels}
 \usage{
-  getPlotParams(poplab = NA, plotnum = 1, labpos = NA,
-    labsize = NA, labangle = NA, labjust = NA, labcol = NA,
-    pointsize = NA, pointcol = NA, pointtype = NA,
-    linepos = NA, linethick = NA, linecol = NA, fmar = NA)
+getPlotParams(poplab = NA, plotnum = 1, labpos = NA, labsize = NA,
+  labangle = NA, labjust = NA, labcol = NA, pointsize = NA,
+  pointcol = NA, pointtype = NA, linepos = NA, linethick = NA,
+  linecol = NA, fmar = NA)
 }
 \arguments{
   \item{poplab}{A character vector of labels same length as
@@ -46,12 +46,12 @@
   c(0.2,0.2,0.2,0).}
 }
 \value{
-  A list with following plot parameters: poplab, plotnum,
-  labpos, labsize, labangle, labjust, labcol, pointsize,
-  pointcol, pointtype, linepos, linethick, linecol, fmar
+A list with following plot parameters: poplab, plotnum,
+labpos, labsize, labangle, labjust, labcol, pointsize,
+pointcol, pointtype, linepos, linethick, linecol, fmar
 }
 \description{
-  Generates various parameters required for plotting with
-  labels. Internal function.
+Generates various parameters required for plotting with
+labels. Internal function.
 }
 
