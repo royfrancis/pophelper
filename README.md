@@ -35,7 +35,8 @@ This function calculates the Evanno derivatives, tables and figures. The output 
 ```coffee
 evannoMethodStructure(df1)
 ```
-[Evanno Method](/Vignettes/evannoMethodStructure.png).
+![Evanno Method](/vignettes/evannoMethodStructure.png)  
+Evanno Method
 
 #### Convert to dataframe  
 STRUCTURE and TESS run files can be converted to R dataframes using this function.
@@ -51,8 +52,10 @@ This function can be used to create files for use with CLUMPP. The function crea
 clumppExportStructure(files=flist)  
 clumppExportTess()
 ```
-![Folders created from clumpp export and the contents of each folder.](/Vignettes/Fig3.jpg).
-![Folder showing CLUMPP results: aligned file, merged file and misc file.](https://github.com/royfrancis/pophelper/blob/master/vignettes/Fig4).
+![CLUMPP results and the contents of each folder](/vignettes/Fig3.jpg) 
+Folders created from CLUMPP export and the contents of each folder.
+![CLUMPP results aligned file, merged file and misc file.](/vignettes/Fig4.jpg)  
+Folder showing CLUMPP results: aligned file, merged file and misc file.
 
 #### Collect CLUMPP output files  
 The CLUMPP output files are created in multiple folders. This function helps to collect aligned files, merged files or both from multiple directories into a single directory.
@@ -73,7 +76,8 @@ plotRuns(files=flist, imgoutput="sep")
 To plot joined files from STRUCTURE/TESS files  
 `plotRuns(files=flist, imgoutput="join")`
 
-[Left: Single run plotted separately. Right: Two runs joined together in one image.](/Vignettes/Fig5.jpg)
+![plotRuns example 1](/vignettes/Fig5.jpg)  
+Left: Single run plotted separately. Right: Two runs joined together in one image
 
 To plot with populations labels  
 
@@ -81,12 +85,13 @@ To plot with populations labels
 plotRuns(files=flist, imgoutput="sep", poplab=pops$V1)  
 plotRuns(files=flist, imgoutput="join", poplab=pops$V1)  
 ```
-[Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.](/Vignettes/Fig6.jpg)
+![plotRuns example 2](/vignettes/Fig6.jpg)  
+Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.
 
 To plot only joined files from table files (combined/aligned/merged)  
 `plotRuns(files=flist, imgoutput="tab")`
 
-[Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP)](/Vignettes/Fig7.jpg)
+![PlotRuns example 3](/vignettes/Fig7.jpg "Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).")  
 
 #### Plot Multiline  
 This function is also used to create barplots from STRUCTURE, TESS or table files. The output is created as A4 format by default. The barplot is broken down to multiple rows to enable easier identification of individuals. The number of samples per line (`spl`) and number of lines per page (`lpp`) can be defined manually.
@@ -95,7 +100,8 @@ This function is also used to create barplots from STRUCTURE, TESS or table file
 plotMultiline(files=flist[1])  
 plotMultiline(files=flist[1], spl=75, lpp=10)
 ```
-[Left: Default output. Right: Modified output](/Vignettes/Fig11.jpg)
+![plotMultiline example](/vignettes/Fig11.jpg)  
+Left: `plotMultiline` default output. Right: Modified output.
 
 #### Collect TESS runs
 TESS run files are generated in multiple folders. These file can be collect into a single folder using this function.  
