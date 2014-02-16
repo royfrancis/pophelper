@@ -34,6 +34,7 @@ tabulateRunsTess(files=flist1)
 The tabulated runs can be further condensed by repeats. This is applicable only to STRUCTURE runs.
 
 ```coffee
+#summarise STRUCTURE runs
 df1<-summariseRunsStructure(df)
 ```
 
@@ -41,6 +42,7 @@ df1<-summariseRunsStructure(df)
 This function calculates the Evanno derivatives, tables and figures. The output from `summariseRunsStructure()` can be provided as input.
 
 ```coffee
+#perform evanno method
 evannoMethodStructure(df1)
 ```
 ![Evanno Method](vignettes/evannoMethodStructure.jpg)  
@@ -50,14 +52,20 @@ __Fig 1.__ Evanno Method
 STRUCTURE and TESS run files can be converted to R dataframes using this function. If multiple files are selected, then a list of dataframes is returned.
 
 ```coffee
+#convert STRUCTURE run files to R dataframe
 runsToDfStructure(files=flist)
+
+#convert TESS run files to R dataframe
 runsToDfTess(files=flist1)
 ```
 ### 5. Generate CLUMPP output  
 This function can be used to create files for use with CLUMPP. The function creates a combined file and paramfile in separate directories by K.
 
 ```coffee
-clumppExportStructure(files=flist)  
+#convert STRUCTURE runs for CLUMPP
+clumppExportStructure(files=flist)
+
+#convert TESS runs for CLUMPP
 clumppExportTess(files=flist1)
 ```
 ![CLUMPP results and the contents of each folder](vignettes/Fig3.jpg) 
@@ -69,9 +77,10 @@ __Fig 3.__ Folder showing CLUMPP results: aligned file, merged file and misc fil
 ### 6. Collect CLUMPP output files  
 The CLUMPP output files are created in multiple folders. This function helps to collect aligned files, merged files or both from multiple directories into a single directory. 
 
-To follow this function in this tutorial, you will need to manually run CLUMPP.exe in each folder.
+To follow this function in this tutorial, you will need to manually run CLUMPP.exe in each directory.
 
 ```coffee
+#collect CLUMPP outputs into single directory
 collectClumppOutput(prefix="STRUCTUREpop", filetype="both")  
 collectClumppOutput(prefix="TESSpop", filetype="both")
 ```
@@ -81,13 +90,16 @@ This function is used to plot barplots from STRUCTURE files, TESS files, combine
 
 * To plot separate files from STRUCTURE/TESS files  
 ```coffee
-plotRuns(files=flist)  
-plotRuns(files=flist, imgoutput="sep")
+#plot separate figures
+plotRuns(files=flist[1:2]) 
+#plot separate figures
+plotRuns(files=flist[1:2], imgoutput="sep")
 ```
 
 * To plot joined files from STRUCTURE/TESS files  
 ```coffee
-plotRuns(files=flist, imgoutput="join")
+#plot joined figures
+plotRuns(files=flist[1:2], imgoutput="join")
 ```
 
 ![plotRuns example 1](vignettes/Fig5.jpg)  
@@ -95,8 +107,20 @@ __Fig 4.__ Left: Single run plotted separately. Right: Two runs joined together 
 
 * To plot with populations labels  
 ```coffee
-plotRuns(files=flist, imgoutput="sep", poplab=pops$V1)  
-plotRuns(files=flist, imgoutput="join", poplab=pops$V1)  
+#read labels for STRUCTURE
+pops<-read.delim(system.file("files/structurepoplabels.txt",package="pophelper"),header=F)
+
+#plot separately with labels
+plotRuns(files=flist[1:2], imgoutput="sep", poplab=pops$V1) 
+#plot joined with labels
+plotRuns(files=flist[1:2], imgoutput="join", poplab=pops$V1) 
+
+#create TESS labels
+labs1 <- factor(c(rep("PopA",30),rep("PopB",45)))
+
+#plot TESS runs with labels
+plotRuns(files=flist1[1:2], imgoutput="sep", poplab=labs1) 
+plotRuns(files=flist1[1:2], imgoutput="join", poplab=labs1) 
 ```
 
 ![plotRuns example 2](vignettes/Fig6.jpg)  
@@ -104,7 +128,13 @@ __Fig 5.__ Left: Single run plotted separately with pop labels. Right: Two runs 
 
 * To plot only joined files from table files (combined/aligned/merged)  
 ```coffee
-plotRuns(files=flist, imgoutput="tab")
+#read table files
+tabs1<-c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
+          system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
+          system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
+
+#plot table files
+plotRuns(files=tabs1, imgoutput="tab")
 ```
 
 ![PlotRuns example 3](vignettes/Fig7.jpg)  
@@ -114,8 +144,13 @@ __Fig 6.__ Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned 
 This function is also used to create barplots from STRUCTURE, TESS or table files. The output is created as A4 format by default. The barplot is broken down to multiple rows to enable easier identification of individuals. The number of samples per line (`spl`) and number of lines per page (`lpp`) can be defined manually if required.
 
 ```coffee
-plotMultiline(files=flist[1])  
+#plot multiline
+plotMultiline(files=flist[1]) 
+plotMultiline(files=flist1[1]) 
+
+#plotmultiline with custom setting
 plotMultiline(files=flist[1], spl=75, lpp=10)
+plotMultiline(files=flist1[1], spl=75, lpp=11)
 ```
 ![plotMultiline example](vignettes/Fig11.jpg)  
 __Fig 7.__ Left: `plotMultiline` default output. Right: Modified output.
@@ -128,7 +163,11 @@ __Fig 8.__ Multiline plots with (left) standard colours, (middle) `rich.colors()
 
 
 ### 9. Collect TESS runs
-TESS run files are generated from TESS into multiple folders. These file can be collect into a single folder using this function.  
-`collectRunsTess(runsdir = choose.dir())`
+TESS run files are generated from TESS into multiple folders. These file can be collect into a single folder using this function. 
+
+```coffee
+#collect TESS runs from multiple directories into one
+collectRunsTess(runsdir = choose.dir())
+```
 
 #### End of Document.

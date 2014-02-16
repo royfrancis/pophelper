@@ -1644,7 +1644,6 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
           numextra <- nr1-(spl1*numrows)
           if (numextra < 0.70*spl1) spl1=spl1+1
           if (spl1 > nr1) {spl1 <- nr1; break;}
-          print(spl1)
         }
       }
      
@@ -1722,5 +1721,9 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
     }
   }
 }
+
+# New concepts
+# Option to have no labels in plotMultiline
+# Option to have custom labels in plotMultiline
 
 cat("pophelper v1.0.0 loaded\n")
