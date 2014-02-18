@@ -10,8 +10,13 @@ require(devtools)
 install_github('pophelper', 'royfrancis')
 require(pophelper)
 ```
+For help on any function, use  
+`?tabulateRunsStructure`  
+`?evannoMethodStructure`
 
-## List of Functions  
+For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use `choose.files(multi=T)`. Mac users can use `file.choose()` for single selection and `tk_choose.files()` from `tcltk` package for multiple selection.
+
+## Functions and workflow 
 A list of important functions are shown below. Once the package is installed, and you have set a working directory, you can follow the mini tutorial below.
 
 ### 1. Tabulate runs  
@@ -168,6 +173,30 @@ TESS run files are generated from TESS into multiple folders. These file can be 
 ```coffee
 #collect TESS runs from multiple directories into one
 collectRunsTess(runsdir = choose.dir())
+```
+
+## List of Functions  
+### STRUCTURE
+```coffee
+tabulateRunsStructure()  
+summariseRunsStructure()  
+evannoMethodStructure()  
+runsToDfStructure()  
+clumppExportStructure()  
+collectClumppOutput()  
+plotRuns()
+PlotMultiline()
+```
+
+### TESS
+```coffee
+collectRunsTess()  
+tabulateRunsTess()  
+runsToDfTess()  
+clumppExportTess()  
+collectClumppOutput()  
+plotRuns()  
+plotMultiline()  
 ```
 
 #### End of Document.
