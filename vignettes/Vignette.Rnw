@@ -2,18 +2,33 @@
 % \VignettePackage{Vignette}
 % \VignetteIndexEntry{pophelper 1.0.0 Demonstration and workflow}
 
+\usepackage{zi4}
 \usepackage{fancyhdr}
 \usepackage[pdftex]{graphicx}
 \usepackage{a4wide}
 \usepackage{parskip}
 \usepackage{float}
+\usepackage[hidelinks]{hyperref}
 
-\title{\bf \texttt{pophelper 1.0.0} \\ \bf Demonstration and Workflow}
+% Dark blue colour for all links
+\RequirePackage{color}
+\definecolor{link}{rgb}{0.45,0.51,0.67}
+\hypersetup{
+  colorlinks,%
+  citecolor=link,%
+  filecolor=link,%
+  linkcolor=link,%
+  urlcolor=link
+}
+
+\title{\bf \texttt{pophelper 1.0.0} \\ \bf Demonstration and workflow}
 \author{ \textbf{Roy M Francis} \\ roy.m.francis@outlook.com}
+%begin document
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 \setkeys{Gin}{width=1\textwidth}
 \pagestyle{fancy}
+
 
 %\oddsidemargin = 18pt
 %\topmargin = 0pt
@@ -46,7 +61,7 @@ pkgname<-"pophelper"
 options(SweaveHooks = list(fig = function() par(mfrow=c(1,1))))
 @
 
-This vignette aims to demonstrate the use of R package \texttt{\Sexpr{print(pkgname)}}. This package contains functions that are useful for processing output results from two programs used in the analysis of population structure: 'STRUCTURE' and 'TESS'.
+This vignette aims to demonstrate the use of R package \texttt{\Sexpr{print(pkgname)}}. This package contains functions that are useful for processing output results from two programs used in the analysis of population structure: 'STRUCTURE' \textsuperscript{4} and 'TESS' \textsuperscript{2}.
 
 The programs 'STRUCTURE' and 'TESS' are two popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (K). The assignment is usually run for a range of K such as from K=2 to K=10. Multiple repeats are also usually carried out for each K. Each output file for each repeat of K showing the assignment probabilities of all individuals is referred to as the run file or cluster file. \texttt{\Sexpr{print(pkgname)}} has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as 'BAPS', 'INSTRUCT', 'GENELAND' etc which will not be covered for now.
 
@@ -73,6 +88,8 @@ The installation and version can be verified using the following command.
 <<results=verbatim>>=
 packageDescription("pophelper", fields = "Version")
 @
+
+For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use \texttt{choose.files(multi=T)}. Mac users can use \texttt{file.choose()} for single selection and \texttt{tk\_choose.files()} from \texttt{tcltk} package for multiple selection.
 
 The next step to set the working directory. The working directory is a folder that usually contains the run files of interest so as to allow R to access it. Functions may produce outputs such as text files or images which will be exported to the working directory. The working directory can be set by running the command below and then selecting the folder interactively in the popup window.
 
@@ -102,7 +119,7 @@ A typical STRUCTURE run produces a large number of output run files as seen in F
 \caption{Typical view of Structure output run files.}
 \end{figure}
 
-The function \texttt{tabulateRunsStructure()} can be used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. This function can be run as shown below and the files to be tabulated can be selected interactively using the function \texttt{choose.files(multi=TRUE)}. The results can be pointed to a variable \texttt{df} for further use.
+The function \texttt{tabulateRunsStructure()} can be used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. This function can be run as shown below and the files to be tabulated can be selected interactively using \texttt{choose.files(multi=TRUE)}. The results can be pointed to a variable \texttt{df} for further use.
 
 For this demonstration, we will use the sample structure files accompanied with this library.
 
@@ -130,7 +147,7 @@ df
 @
 
 
-The \texttt{tabulateRunsStructure()} function produces a table listing all selected files showing 10 columns namely file names, value of K, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, mean value of alpha, number of burn-in and number of repeats. Missing values are given NA.
+The \texttt{tabulateRunsStructure()} function produces a table listing all selected files showing 10 columns namely file names, value of K, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, mean value of alpha, number of burn-in and number of repeats. The table is sorted by loci, ind and K. Missing values are given NA.
 
 By default, the \texttt{tabulateRunsStructure()} function prints the number of selected files as \texttt{Number of files selected: 10}. This can be turned off using the \texttt{quiet} argument as such \texttt{tabulateRunsStructure(files=files,quiet=T)}. The tabulated output can be written to the working directory as a text file by setting the argument \texttt{writetable} like so \texttt{tabulateRunsStructure(files = choose.files(multi=TRUE),writetable=T)}.
 
@@ -150,20 +167,21 @@ The summarised runs can be written to the working directory as a text file by se
 
 \subsection{evannoMethodStructure}
 
-The Evanno method is used to estimate the number of K. The method is based on Evanno et al., (2005) listed in references. The summarised runs table output from \texttt{summariseRunsStructure()} function can be input to \texttt{evannoMethodStructure()}. The \texttt{evannoMethodStructure()} function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument \texttt{exportplot=T}. The table can be written to file using \texttt{writetable=T}.
+The Evanno method \textsuperscript{1} is used to estimate the number of K. The method is based on Evanno et al., (2005) listed in references. The summarised runs table output from \texttt{summariseRunsStructure()} function can be input to \texttt{evannoMethodStructure()}. The \texttt{evannoMethodStructure()} function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument \texttt{exportplot=T}. The table can be written to file using \texttt{writetable=T}.
 
 <<results=verbatim,echo=TRUE>>=
 #usage
 #df2<-evannoMethodStructure(data=df1)
 #to export a plot
 #evannoMethodStructure(data=df1,exportplot=T)
+#evannoMethodStructure(data=df1,doplot=F)
 #to export plot and table
-evannoMethodStructure(data=df1,exportplot=T,writetable=T)
+evannoMethodStructure(data=df1,exportplot=T,writetable=T,na.rm=T)
 @
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=12cm]{evannoMethodStructure}
+\includegraphics[width=12cm]{Fig2}
 \caption{Plots produced from the Evanno method.}
 \end{figure}
 
@@ -195,7 +213,7 @@ The dataframe contains the assignment probabilities of all individuals into K po
 
 \subsection{clumppExportStructure}
 
-When multiple repeats are run for each K in STRUCTURE, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP, see Jakobsson and Rosenberg (2007) in references.
+When multiple repeats are run for each K in STRUCTURE, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP \textsuperscript{2}.
 
 <<results=verbatim, echo=TRUE, eval=FALSE>>=
 #usage
@@ -361,7 +379,7 @@ flist1<-list.files(path="./files/tess",full.names=T)
 df<-tabulateRunsTess(files=flist1)
 @
 
-This function produces a tabulated result and shown below.
+This function produces a tabulated result and shown below. The table is sorted by ind and K.
 
 <<results=verbatim,echo=TRUE>>=
 head(df)
@@ -369,6 +387,16 @@ head(df)
 
 
 By default, the \texttt{tabulateRunsTess()} function prints the number of selected files as \texttt{Number of files selected: 10}. This can be turned off using the \texttt{quiet} argument as such \texttt{tabulateRunsTess(files=files),quiet=T}. The tabulated output can be written to the working directory as a text file by setting the option \texttt{writetable} like so \texttt{tabulateRunsTess(files = choose.files(multi=TRUE),writetable=T)}.
+
+\subsection{summariseRunsTess}
+
+This function further condenses the tabulated table by number of runs.
+
+<<results=verbatim,echo=TRUE>>=
+df2<-summariseRunsTess(df)
+head(df2)
+@
+
 
 \subsection{runsToDfTess}
 
@@ -392,7 +420,7 @@ The dataframe contains the assignment probabilities of all individuals into K po
 
 \subsection{clumppExportTess}
 
-When multiple repeats are run for each K in TESS, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP, see Jakobsson and Rosenberg (2007) in references.
+When multiple repeats are run for each K in TESS, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly.
 
 <<results=verbatim, echo=TRUE, eval=FALSE>>=
 #usage
@@ -553,21 +581,45 @@ plotMultiline(flist[1],spl=70,lpp=10)
 runsToDfTess(flist)
 @
 
-<<results=hide, echo=FALSE, eval=FALSE>>=
-#options(SweaveHooks = list(fig = function() par(mfrow=c(1,1))))
-@
-
+Some of the same functionalities in this package have been implented in the online tool \texttt{StructureHarvester} by other authors. For those who prefer a GUI, this may be useful. See useful links.
 
 \section{References}
 
-Evanno, G., Regnaut, S., and Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620
+1. Evanno, G., Regnaut, S., and Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620\\
+\href{http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract}{(Link)}
+\url{}
 
-Jakobsson, M., and Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806.
+2. François, O., and Durand, E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.\\
+\href{http://onlinelibrary.wiley.com/doi/10.1111/j.1755-0998.2010.02868.x/abstract}{(Link)}
+\url{}
 
+3. Jakobsson, M., and Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806.\\
+\href{http://bioinformatics.oxfordjournals.org/content/23/14/1801.short}{(Link)}
+\url{}
 
+4. Pritchard, J. K., Stephens, M., and Donnelly, P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.\\
+\href{http://www.genetics.org/content/155/2/945.short}{(Link)}
+\url{}
 
-\textbf{Roy M Francis} \\
-roy.m.francis@outlook.com
+\section{Useful links}
 
+STRUCTURE program\\
+\url{http://pritchardlab.stanford.edu/structure.html}
+
+TESS program\\
+\url{http://membres-timc.imag.fr/Olivier.Francois/tess.html}
+
+CLUMPP program\\
+\url{http://www.stanford.edu/group/rosenberglab/clumpp.html}
+
+Structure Harvester\\
+\url{http://taylor0.biology.ucla.edu/structureHarvester}
+
+\textbf{Disclaimer}
+
+The \texttt{pophelper} R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or 
+inability to use this program. \texttt{pophelper} R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
+
+\copyright \  \textbf{2014 Roy M Francis} \ roy.m.francis@outlook.com
 
 \end{document}
