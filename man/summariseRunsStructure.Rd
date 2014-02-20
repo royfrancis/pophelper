@@ -14,12 +14,12 @@ summariseRunsStructure(data = NULL, writetable = FALSE)
   in the working directory.}
 }
 \value{
-Returns a dataframe with all values of K sorted by K. The
-table has 6 columns namely Mean estimated ln probability of
-data, Standard deviation, Value of K, Number of runs for
-each K, Estimated ln probability of data plus standard
-deviation, Estimated ln probability of data minus standard
-deviation.
+Returns a dataframe with all values of K sorted by loci,
+ind and K. The table has 6 columns namely mean estimated ln
+probability of data, standard deviation, value of K, Number
+of runs for each K, number of individuals, number of loci,
+estimated ln probability of data plus standard deviation,
+estimated ln probability of data minus standard deviation.
 }
 \description{
 Creates a summary table of several STRUCTURE runs with

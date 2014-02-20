@@ -3,9 +3,9 @@
 \title{Plot STRUCTURE/TESS/table run files in multiline}
 \usage{
 plotMultiline(files = NA, spl = NA, lpp = NA, popcol = NA,
-  barwidth = 0.9, barspace = 0.1, indlabs = TRUE, labsize = 5,
-  labangle = 90, labvjust = 0.5, labhjust = 1, imgtype = "png",
-  height = NA, width = NA, res = NA, units = NA)
+  na.rm = FALSE, barwidth = 0.9, barspace = 0.1, indlabs = TRUE,
+  labsize = 5, labangle = 90, labvjust = 0.5, labhjust = 1,
+  imgtype = "png", height = NA, width = NA, res = NA, units = NA)
 }
 \arguments{
   \item{files}{One or more STRUCTURE output files. Use
@@ -17,6 +17,11 @@ plotMultiline(files = NA, spl = NA, lpp = NA, popcol = NA,
   \item{lpp}{lines per page. Defaults to 11.}
 
   \item{popcol}{A vector of colours for populations.}
+
+  \item{na.rm}{Default set to FALSE. NAs are not removed
+  from data, therefore ggplot prints warning messages for
+  NAs. If set to TRUE, NAs are removed before plotting and
+  ggplot NA warning is suppressed.}
 
   \item{barwidth}{The width of the bars.}
 

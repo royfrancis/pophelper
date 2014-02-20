@@ -10,13 +10,11 @@ Description: A set of useful functions for processing output files from the
 Depends:
     R(>= 3.0.1),
     Cairo,
-    Hmisc,
-    gplots,
     ggplot2,
-    reshape,
+    gplots,
     grid,
-    gridExtra
+    gridExtra,
+    Hmisc,
+    reshape
 License: GPL-3
 Encoding: UTF-8
-Collate:
-    'pophelper.R'

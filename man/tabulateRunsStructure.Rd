@@ -18,12 +18,12 @@ tabulateRunsStructure(files = NULL, writetable = FALSE, quiet = FALSE)
   files are not printed.}
 }
 \value{
-Returns a dataframe with all runs sorted by K. The table
-has 10 columns namely file name, value of K, Number of
-individuals, Number of loci, Estimated ln probability of
-data, Mean value of ln likelihood, Variance of ln
-likelihood, Mean value of alpha, Number of burn-in and
-Number of repeats. Missing values are given NA.
+Returns a dataframe with all runs sorted by loci, ind and
+K. The table has 10 columns namely file name, value of K,
+number of individuals, number of loci, estimated ln
+probability of data, mean value of ln likelihood, variance
+of ln likelihood, mean value of alpha, number of burn-in
+and number of repeats. Missing values are given NA.
 }
 \description{
 Creates a table from STRUCTURE output files with various

@@ -2,7 +2,8 @@
 \alias{clumppExportStructure}
 \title{Combine STRUCTURE runs and export files for use with software CLUMPP}
 \usage{
-clumppExportStructure(files = NULL, prefix = NA)
+clumppExportStructure(files = NULL, prefix = NA, parammode = NA,
+  paramrep = NA)
 }
 \arguments{
   \item{files}{A character vector of STRUCTURE output files
@@ -10,11 +11,17 @@ clumppExportStructure(files = NULL, prefix = NA)
   interactive selection.}
 
   \item{prefix}{A character prefix for folder names.}
+
+  \item{parammode}{The greedy option for CLUMPP paramfile.
+  Calculated automatically by default. Options are 1, 2 or
+  3. See details.}
+
+  \item{paramrep}{The repeats options for CLUMPP paramfile.
+  Calculated automatically by default. See details.}
 }
 \value{
 The combined file and paramfile are written into respective
-folders named by population. A tabulated table is returned
-from function same as \code{tabulateRunsStructure()}.
+folders named by population.
 }
 \description{
 Takes multiple STRUCTURE runs and combines several repeats
@@ -37,5 +44,14 @@ M., & Rosenberg, N. A. (2007). CLUMPP: a cluster matching
 and permutation program for dealing with label switching
 and multimodality in analysis of population structure.
 Bioinformatics, 23(14), 1801-1806.
+
+The parammode and paramrep for CLUMPP paramfile is set
+based on this calculation. T <-
+factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number
+of populations, runs is number of runs for k and ind is
+number of individuals. If T <= 100000000, then parammode is
+2 and paramrep is 20, otherwise parammode is 3 and paramrep
+is set to 500. To find out what parammode (greedy option)
+and paramrep (repeats) are, refer to CLUMPP documentation.
 }
 

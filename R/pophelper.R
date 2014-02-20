@@ -2,13 +2,19 @@
 
 #load or install required libraries
 require(utils)
-i=1
-pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra")
-for (i in 1:length(pakvec))
+pkgCheck <- function()
 {
-  if (!pakvec[i] %in% installed.packages()) install.packages(pakvec[i], repos="http://cran.us.r-project.org", dependencies=TRUE)
-  require(pakvec[i], character.only=TRUE, quiet=TRUE)
+  i <- 1
+  pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra")
+  for (i in 1:length(pakvec))
+  {
+    if (!pakvec[i] %in% installed.packages()) install.packages(pakvec[i], repos="http://cran.rstudio.com/", dependencies=TRUE)
+    require(pakvec[i], character.only=TRUE, quiet=TRUE)
+  }
 }
+pkgCheck()
+rm(pkgCheck)
+
 
 #FUNCTION getColours
 #' Internal: Get Colours
@@ -19,7 +25,7 @@ for (i in 1:length(pakvec))
 #' 
 getColours <- function(k)
 {
-  if (!is.numeric(k)) stop("Non-numeric input passed to getColours()")
+  if (!is.numeric(k)) stop("Non-numeric input passed to getColours(). \n")
   col1 <- c("#2121D9", "#9999FF", "#DF0101", "#04B404", "#FFFB23", "#FF9326", "#A945FF", "#0089B2", "#B26314", "#610B5E", "#FE2E9A", "#BFF217")
   if (k <= 12) return(col1[1:k])
   if (k > 12) return(rich.colors(k))
@@ -28,35 +34,48 @@ getColours <- function(k)
 
 #FUNCTION tabulateRunsStructure
 #' Tabulate STRUCTURE runs
-#' @description Creates a table from STRUCTURE output files with various STRUCTURE parameters. Refer to return for detailed list of columns.
-#' @param files A character vector of STRUCTURE output files to be tabulated. Use \code{choose.files(multi=TRUE)} for interactive selection.
-#' @param writetable Set to FALSE by default. Setting to TRUE writes the output table as a tab-delimited text file in the working directory.
-#' @param quiet Set to FALSE by default to print number of selected files. If set to TRUE, then number of selected files are not printed.
-#' @return Returns a dataframe with all runs sorted by K. The table has 10 columns namely file name, value of K, Number of individuals, Number of loci, Estimated ln probability of data, Mean value of ln likelihood, Variance of ln likelihood, Mean value of alpha, Number of burn-in and Number of repeats. Missing values are given NA.
-#' @details The row numbers of the output table denotes the file number selected. This is helpful if a particular file from the table needs to be identified in the selection vector.
+#' @description Creates a table from STRUCTURE output files with various 
+#' STRUCTURE parameters. Refer to return for detailed list of columns.
+#' @param files A character vector of STRUCTURE output files to be tabulated. 
+#' Use \code{choose.files(multi=TRUE)} for interactive selection.
+#' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
+#' table as a tab-delimited text file in the working directory.
+#' @param quiet Set to FALSE by default to print number of selected files. If 
+#' set to TRUE, then number of selected files are not printed.
+#' @return Returns a dataframe with all runs sorted by loci, ind and K. The table has 10 
+#' columns namely file name, value of K, number of individuals, number of loci, 
+#' estimated ln probability of data, mean value of ln likelihood, variance of 
+#' ln likelihood, mean value of alpha, number of burn-in and number of repeats. 
+#' Missing values are given NA.
+#' @details The row numbers of the output table denotes the file number selected. 
+#' This is helpful if a particular file from the table needs to be identified in 
+#' the selection vector.
 #' @export
-
+#' 
 tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
 {
   quiet <- toupper(quiet)
   #if no files chosen, stop excecution, give error message
-  if (length(files) == 0) stop("No input files")
+  if (length(files) == 0) stop("No input files.\n")
   #get filenames from selection
   filenames <- basename(files)
   #number of files selected
   number <- length(filenames)
   if (quiet == FALSE | quiet == "F" | quiet == "FALSE") cat(paste("Number of files selected: ", number, "\n", sep=""))
   
-  #make dataframe container
-  main <- data.frame(file=filenames, k=1:number, ind=1:number,loci=1:number,
-                     elpd=1:number, mvll=1:number, vll=1:number,
-                     mva=1:number, burnin=1:number, reps=1:number)
-  
-  vll <- NA
-  mva <- NA
-  
   #loop to make dataframe with filenames and other variables
-  i=1
+  
+  ind <- vector(length=number, mode="numeric")
+  k <- vector(length=number, mode="numeric")
+  loci <- vector(length=number, mode="numeric")
+  burnin <- vector(length=number, mode="numeric")
+  reps <- vector(length=number, mode="numeric")
+  elpd <- vector(length=number, mode="numeric")
+  mvll <- vector(length=number, mode="numeric")
+  vll <- vector(length=number, mode="numeric")
+  mva <- vector(length=number, mode="numeric")
+  
+  i <- 1
   for (i in i:number)
   {
     #read STRUCTURE file & error check
@@ -64,71 +83,73 @@ tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
     
     #read files
     chk1 <- grep("STRUCTURE", toupper(file1[4]))
-    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.")
+    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.\n")
     
     #find individuals and get number of individuals
-    ind <- as.numeric(gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
-    if (is.na(ind)) cat(paste("Number of individuals is NA in file: ", filenames[i], sep=""))
+    ind[i] <- as.numeric(gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    if (is.na(ind[i])) cat(paste("Number of individuals is NA in file: ", filenames[i], sep=""))
     #get value of k & error check
-    k <- as.numeric(gsub("\\D", "", grep("\\d populations assumed", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
-    if (is.na(k)) cat(paste("Value of K is NA in file: ", filenames[i], sep=""))
+    k[i] <- as.numeric(gsub("\\D", "", grep("\\d populations assumed", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    if (is.na(k[i])) cat(paste("Value of K is NA in file: ", filenames[i], sep=""))
     #get number of loci & error check
-    loci <- as.numeric(gsub("\\D", "", grep("\\d loci", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
-    if (is.na(loci)) cat(paste("Number of Loci is NA in file: ", filenames[i], "\n", sep=""))
+    loci[i] <- as.numeric(gsub("\\D", "", grep("\\d loci", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    if (is.na(loci[i])) cat(paste("Number of Loci is NA in file: ", filenames[i], "\n", sep=""))
     #get burn-in value & error check
-    burnin <- as.numeric(gsub("\\D", "", grep("\\d Burn-in period", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
-    if (is.na(burnin)) cat(paste("Burn-in value is NA in file: ", filenames[i], "\n", sep=""))
+    burnin[i] <- as.numeric(gsub("\\D", "", grep("\\d Burn-in period", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    if (is.na(burnin[i])) cat(paste("Burn-in value is NA in file: ", filenames[i], "\n", sep=""))
     #get burn-in value & error check
-    reps <- as.numeric(gsub("\\D", "", grep("\\d Reps", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
-    if (is.na(reps)) cat(paste("Reps value is NA in file: ", filenames[i], "\n", sep=""))
+    reps[i] <- as.numeric(gsub("\\D", "", grep("\\d Reps", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    if (is.na(reps[i])) cat(paste("Reps value is NA in file: ", filenames[i], "\n", sep=""))
     #get est ln prob of data & error check
-    elpd <- as.numeric(gsub("=", "", gsub("Estimated Ln Prob of Data", "", grep("Estimated Ln Prob of Data", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
-    if (is.na(elpd)) cat(paste("Estimated Ln Prob of Data is NA in file: ", filenames[i], sep=""))
+    elpd[i] <- as.numeric(gsub("=", "", gsub("Estimated Ln Prob of Data", "", grep("Estimated Ln Prob of Data", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    if (is.na(elpd[i])) cat(paste("Estimated Ln Prob of Data is NA in file: ", filenames[i], sep=""))
     #get mn value of ln likelihood & error check
-    mvll <- as.numeric(gsub("=", "", gsub("Mean value of ln likelihood", "", grep("Mean value of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
-    if (is.na(mvll)) cat(paste("Mean value of ln likelihood is NA in file: ", filenames[i], sep=""))
+    mvll[i] <- as.numeric(gsub("=", "", gsub("Mean value of ln likelihood", "", grep("Mean value of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    if (is.na(mvll[i])) cat(paste("Mean value of ln likelihood is NA in file: ", filenames[i], sep=""))
     #get Variance of ln likelihood else NA
-    vll <- as.numeric(gsub("=", "", gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    vll[i] <- as.numeric(gsub("=", "", gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     #get Mean value of alpha
-    mva <- as.numeric(gsub("=", "", gsub("Mean value of alpha", "", grep("Mean value of alpha", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    mva[i] <- as.numeric(gsub("=", "", gsub("Mean value of alpha", "", grep("Mean value of alpha", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     #add values to rows in main table
-    main[i, ] <- c(filenames[i], k, ind, loci, elpd, mvll, vll, mva, burnin, reps)
-    i = i+1
   }
   
-  #convert to numeric
-  main$k <- as.numeric(main$k)
-  main$ind <- as.numeric(main$ind)
-  main$elpd <- as.numeric(main$elpd)
-  main$mvll <- as.numeric(main$mvll)
-  main$vll <- as.numeric(main$vll)
-  main$mva <- as.numeric(main$mva)
-  main$loci <- as.numeric(main$loci)
-  main$burnin <- as.numeric(main$burnin)
-  main$reps <- as.numeric(main$reps)
+  #make dataframe container
+  main <- data.frame(file=filenames, k=as.numeric(k), ind=as.numeric(ind),
+                     loci=as.numeric(loci), elpd=as.numeric(elpd), 
+                     mvll=as.numeric(mvll), vll=as.numeric(vll),
+                     mva=as.numeric(mva), burnin=as.numeric(burnin), 
+                     reps=as.numeric(reps))
   
-  #sort table on K
-  main1 <- main[with(main, order(k)), ]
-  #rownames(main1) <- 1:length(main1[, 1])
+  #sort table on loci, ind, K
+  main <- main[with(main, order(loci, ind, k)), ]
+
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
-    write.table(prettyNum(main1, preserve.width="common"), "tabulateRunsStructure.txt", quote=FALSE, row.names=FALSE)
+    write.table(prettyNum(main, preserve.width="common"), "tabulateRunsStructure.txt", quote=FALSE, row.names=FALSE)
     cat("tabulateRunsStructure.txt exported\n") 
   }
   
-  return(main1)
+  return(main)
 }
+
 
 #FUNCTION tabulateRunsTess
 #' Tabulate TESS runs
-#' @description Creates a table from TESS output files with filenames, K and number of individuals.
-#' @param files A character vector of TESS cluster files to be tabulated. Use \code{choose.files(multi=TRUE)} for interactive selection. Use \code{collectRunsTess()} to collect TESS runs from multiple folders into one.
-#' @param writetable Set to FALSE by default. Setting to TRUE writes the output table as a tab-delimited text file in the same folder as the STRUCTURE run files.
+#' @description Creates a table from TESS output files with filenames, K and 
+#' number of individuals.
+#' @param files A character vector of TESS cluster files to be tabulated. 
+#' Use \code{choose.files(multi=TRUE)} for interactive selection. Use 
+#' \code{collectRunsTess()} to collect TESS runs from multiple folders into one.
+#' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
+#' table as a tab-delimited text file in the same folder as the STRUCTURE run files.
 #' @param quiet If set to TRUE, then number of selected files are not printed.
-#' @return Returns a dataframe with filenames, K and number of individuals of all runs sorted by K.
-#' @details The row numbers of the output table denotes the file number selected. This is helpful if a particular file from the table needs to be identified in the selection vector.
+#' @return Returns a dataframe with filenames, K and number of individuals of 
+#' all runs sorted by ind and K.
+#' @details The row numbers of the output table denotes the file number selected. 
+#' This is helpful if a particular file from the table needs to be identified in 
+#' the selection vector.
 #' @export
 #'
 tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
@@ -137,7 +158,7 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
   #choose output files
   filename <- files
   #if no files chosen, stop excecution, give error message
-  if (length(filename) == 0) stop("No input files")
+  if (length(filename) == 0) stop("No input files.\n")
   #get filenames from selection
   filenames <- basename(filename)
   #number of files selected
@@ -147,80 +168,93 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
   main <- data.frame(file=filenames, k=1:number, ind=1:number)
   
   #loop to make dataframe with filenames and other variables
-  i = 1
+  k <- vector(length=number, mode="numeric")
+  ind <- vector(length=number, mode="numeric")
+  i <- 1
   for (i in i:number)
   {
     #read file & error check
     df1 <- runsToDfTess(files[i])
-    #add values to rows in main table
-    main[i, ] <- c(filenames[i], k=ncol(df1), ind=nrow(df1))
+    #get k
+    k[i] <- ncol(df1)
+    #get ind
+    ind[i] <- nrow(df1)
   }
   
   #convert to numeric
-  main$k <- as.numeric(main$k)
-  main$ind <- as.numeric(main$ind)
+  main <- data.frame(file=filenames, k=k, ind=ind)
+
   #sort table on K
-  main1 <- main[with(main, order(k)), ]
-  #rownames(main1) <- 1:length(main1[, 1])
+  main <- main[with(main, order(ind, k)), ]
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
-    write.table(prettyNum(main1, preserve.width="common"), "tabulateRunsTess.txt", quote=FALSE, row.names=FALSE)
+    write.table(prettyNum(main, preserve.width="common"), "tabulateRunsTess.txt", 
+                quote=FALSE, row.names=FALSE)
     cat("tabulateRunsTess.txt exported\n") 
   }
   
-  return(main1)
+  return(main)
 }
+
 
 #FUNCTION summariseRunsStructure
 #' Summarise STRUCTURE runs
-#' @description Creates a summary table of several STRUCTURE runs with means and std deviation. Refer to return for detailed list of columns.
-#' @param data A dataframe with tabulated runs. An output from \code{tabulateRunsStructure()}. Must have minimum 4 columns named k, ind, loci and elpd.
-#' @param writetable Set to FALSE by default. Setting to TRUE writes the output table as a tab-delimited text file in the working directory.
-#' @return Returns a dataframe with all values of K sorted by K. The table has 6 columns namely Mean estimated ln probability of data, Standard deviation, Value of K, Number of runs for each K, Estimated ln probability of data plus standard deviation, Estimated ln probability of data minus standard deviation.
+#' @description Creates a summary table of several STRUCTURE runs with means and 
+#' std deviation. Refer to return for detailed list of columns.
+#' @param data A dataframe with tabulated runs. An output from 
+#' \code{tabulateRunsStructure()}. Must have minimum 4 columns named k, ind, 
+#' loci and elpd.
+#' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
+#' table as a tab-delimited text file in the working directory.
+#' @return Returns a dataframe with all values of K sorted by loci, ind and K. The table has 
+#' 6 columns namely mean estimated ln probability of data, standard deviation, 
+#' value of K, Number of runs for each K, number of individuals, number of loci, 
+#' estimated ln probability of data plus standard deviation, estimated ln 
+#' probability of data minus standard deviation.
 #' @export
-
+#' 
 summariseRunsStructure <- function(data=NULL, writetable=FALSE)
 {
   #does df data contain any data?
-  if (length(data) == 0) stop("No input files")
+  if (length(data) == 0) stop("No input files.\n")
   #make sure dataframe
   data <- as.data.frame(data)
   #convert column names to lowercase
   colnames(data) <- tolower(colnames(data))
   #is column k available?
-  if (length(grep("k", colnames(data))) == 0) stop("Column k not available.")
+  if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
   #is column ind available?
-  if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.")
+  if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
   #is column loci available?
-  if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available.")
+  if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available.\n")
   #is column elpd available?
-  if (length(grep("elpd", colnames(data))) == 0) stop("Column elpd not available.")
-  #is column elpd available?
-  if (nrow(data) < 2) stop("At least 2 runs are required for this function.")
+  if (length(grep("elpd", colnames(data))) == 0) stop("Column elpd not available.\n")
+  #check
+  if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  #Generate Graph
-  elpd2 <- vector()
-  elpd3 <- vector()
-  sd1 <- vector()
-  sd2 <- vector()
-  kval <- vector()
-  lenk <- vector()
-  indvec <- vector()
-  locivec <- vector()
-  e = 1
-  while(e<=length(data[, 1]))
+  #Loop
+  elpd2 <- vector(mode="numeric")
+  elpd3 <- vector(mode="numeric")
+  sd1 <- vector(mode="numeric")
+  sd2 <- vector(mode="numeric")
+  kval <- vector(mode="numeric")
+  lenk <- vector(mode="numeric")
+  indvec <- vector(mode="numeric")
+  locivec <- vector(mode="numeric")
+  e <- 1
+  while(e <= length(data[, 1]))
   {
     elpd1 <- vector()
-    o <- data$k[e]
-    p <- data$ind[e]
     q <- data$loci[e]
-    while(o == data$k[e])
+    p <- data$ind[e]
+    o <- data$k[e]
+    while(q == data$loci[e])
     {
       if (p == data$ind[e])
       {
-        if (q == data$loci[e])
+        if (o == data$k[e])
         {
           ind <- data$ind[e]
           loci <- data$loci[e]
@@ -254,7 +288,8 @@ summariseRunsStructure <- function(data=NULL, writetable=FALSE)
   }
   
   #results into a dataframe
-  data1 <- data.frame(meanelpd=elpd3, sd=sd2, k=kval, runs=lenk, ind=indvec, loci=locivec, maxelpd=elpd3+sd2,  minelpd=elpd3-sd2)
+  data1 <- data.frame(meanelpd=elpd3, sd=sd2, k=kval, runs=lenk, ind=indvec, 
+                      loci=locivec, maxelpd=elpd3+sd2,  minelpd=elpd3-sd2)
   data1$meanelpd <- as.numeric(as.character(data1$meanelpd))
   data1$sd <- as.numeric(as.character(data1$sd))
   data1$k <- as.integer(as.character(data1$k))
@@ -267,20 +302,96 @@ summariseRunsStructure <- function(data=NULL, writetable=FALSE)
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
-    write.table(prettyNum(data1, preserve.width="common"), "summariseRunsStructure.txt", quote=FALSE, row.names=FALSE)
+    write.table(prettyNum(data1, preserve.width="common"), 
+                "summariseRunsStructure.txt", quote=FALSE, row.names=FALSE)
     cat("summariseRunsStructure.txt exported\n") 
   }
   
   return(data1)
 }
 
+
+#FUNCTION summariseRunsTess
+#' Summarise TESS runs
+#' @description Creates a summary table of several TESS runs with k, number 
+#' of runs and individuals.
+#' @param data A dataframe with tabulated runs. An output from 
+#' \code{tabulateRunsTess()}. Must have minimum 2 columns named k and ind.
+#' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
+#' table as a tab-delimited text file in the working directory.
+#' @return Returns a dataframe with all values of K sorted by K. The table has 
+#' 3 columns namely value of K, number of runs for each K and number of 
+#' individuals.
+#' @export
+#' 
+summariseRunsTess <- function(data=NULL, writetable=FALSE)
+{
+  #does df data contain any data?
+  if (length(data) == 0) stop("No input files.\n")
+  #make sure dataframe
+  data <- as.data.frame(data)
+  #convert column names to lowercase
+  colnames(data) <- tolower(colnames(data))
+  #is column k available?
+  if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
+  #is column ind available?
+  if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
+  #is column loci available?
+  #check
+  if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
+  
+  #Loop
+  kval <- vector(mode="numeric")
+  indvec <- vector(mode="numeric")
+  lenk <- vector(mode="numeric")
+  e <- 1
+  while(e <= length(data[, 1]))
+  {
+    o <- data$k[e]
+    p <- data$ind[e]
+    r <- 0
+    while(o == data$k[e])
+    {
+      if (p == data$ind[e])
+      {
+          ind <- data$ind[e]
+          k <- data$k[e]
+          len <- r
+          
+      }else
+      {break}
+      e = e + 1
+      r = r + 1
+      if (e > nrow(data)) break;
+    }
+    
+    kval <- c(kval, k)
+    indvec <- c(indvec, ind)
+    lenk <- c(lenk, r)
+  }
+  
+  #results into a dataframe
+  data1 <- data.frame(k=kval, runs=lenk, ind=indvec)
+
+  #write table if opted
+  if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
+  {
+    write.table(prettyNum(data1, preserve.width="common"), "summariseRunsTess.txt", quote=FALSE, row.names=FALSE)
+    cat("summariseRunsTess.txt exported\n") 
+  }
+  
+  return(data1)
+}
+
+
 #FUNCTION evannoMethodStructure
 #' Perform the Evanno method
 #' @description The Evanno method for detecting the appropriate number of population clusters from STRUCTURE results. Creates table and figure with Evanno method derivatives. Refer to return for detailed list of columns. See details for Evanno method reference.
 #' @param data A dataframe with summarised runs. An output from \code{summariseRunsStructure()}. Must have minimum 7 columns named meanelpd, sd, k, runs, loci, maxelpd and minelpd.
 #' @param writetable Set to FALSE by default. Setting to TRUE writes the output table as a tab-delimited text file in the working directory.
-#' @param showplot If set to TRUE, shows the Evanno plots in the graphical device. If Evanno method cannot be computed, a kPlot (elpd over k) is shown instead.
+#' @param doplot Default set to TRUE, calculates the Evanno plots and plots in the graphical device. If Evanno method cannot be computed, a kPlot (elpd over k) is shown instead. Set this to FALSE to avoid computation of plots and only return table (much faster).
 #' @param exportplot If set to TRUE, exports the Evanno plots as image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.
+#' @param na.rm Default set to FALSE. Does not remove NAs for plot and this generates warnings from ggplot. If set to TRUE, NAs are removed before plotting and warning messages from ggplot are avoided.
 #' @param imgtype Type of exported image. Default set to png. Other possible options are jpeg or pdf.
 #' @param height Height of exported image. Default units in px. If imgtype is pdf, height must be in inches.
 #' @param width Width of exported image. Default units in px. If imgtype is pdf, height must be in inches.
@@ -289,101 +400,128 @@ summariseRunsStructure <- function(data=NULL, writetable=FALSE)
 #' @return Returns a dataframe with all values sorted by K. The table has 16 columns namely Mean estimated ln probability of data, Standard deviation, Value of K, Number of runs for each K, Number of runs for each K, Number of individuals for each K, Number of loci for each K, Estimated ln probability of data plus standard deviation, Estimated ln probability of data minus standard deviation, First derivative, Max error of first derivative, Min error of first derivative, Second derivative, Max error of second derivative, Min error of second derivative, Third derivative and Best value of K.
 #' @details The Evanno method is based on the paper: Evanno, G., Regnaut, S., & Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620. The Evanno plot generated from this function can be recreated from the returned dataframe if furthur customisation is required.
 #' @export
-
-evannoMethodStructure <- function(data=NULL, writetable=FALSE, showplot=TRUE, exportplot=FALSE, imgtype="png", height=NA, width=NA, res=NA, units=NA)
+#' 
+evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, exportplot=FALSE, na.rm=FALSE, imgtype="png", height=NA, width=NA, res=NA, units=NA)
 {
-  #checks
-  exportplot <- toupper(exportplot)
-  imgtype <- tolower(imgtype)
-  if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg' or 'pdf'.")
-  
-  if (is.na(height) && imgtype == "pdf") height <- 8;
-  if (is.na(width) && imgtype =="pdf") width <- 8;
-  if (is.na(height)) height <- 1500;
-  if (is.na(width)) width <- 1500;
-  if (is.na(units)) units <- "px";
+  height1 <- height
+  width1 <- width
+  if (is.na(units)) units <- "cm";
   if (is.na(res)) res <- 200;
   
+  #checks
+  doplot <- toupper(doplot)
+  exportplot <- toupper(exportplot)
+  imgtype <- tolower(imgtype)
+  if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg' or 'pdf'.\n")
+   
   #does df data contain any data?
-  if (length(data) == 0) stop("No input files")
+  if (length(data) == 0) stop("No input files.\n")
   #make sure dataframe
   data <- as.data.frame(data)
   #convert column names to lowercase
   colnames(data) <- tolower(colnames(data))
   #is column meanelpd available?
-  if (length(grep("meanelpd", colnames(data))) == 0) stop("Column meanelpd not available")
+  if (length(grep("meanelpd", colnames(data))) == 0) stop("Column meanelpd not available.\n")
   #is column sd available?
-  if (length(grep("sd", colnames(data))) == 0) stop("Column sd not available")
+  if (length(grep("sd", colnames(data))) == 0) stop("Column sd not available.\n")
   #is column k available?
-  if (length(grep("k", colnames(data))) == 0) stop("Column k not available")
+  if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
   #is column runs available?
-  if (length(grep("runs", colnames(data))) == 0) stop("Column runs not available")
+  if (length(grep("runs", colnames(data))) == 0) stop("Column runs not available.\n")
   #is column ind available?
-  if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available")
+  if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
   #is column loci available?
-  if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available")
+  if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available.\n")
   #is column maxelpd available?
-  if (length(grep("maxelpd", colnames(data))) == 0) stop("Column maxelpd not available")
+  if (length(grep("maxelpd", colnames(data))) == 0) stop("Column maxelpd not available.\n")
   #is column minelpd available?
-  if (length(grep("minelpd", colnames(data))) == 0) stop("Column minelpd not available")
+  if (length(grep("minelpd", colnames(data))) == 0) stop("Column minelpd not available.\n")
   
   err <- 0
   #atleast 3 values of K?
-  if (length(data$k) < 3) {cat("Error: The Evanno method not possible. Requires at least 3 values of K"); err <- 1;}
+  if (length(data$k) < 3) {cat("Error: The Evanno method not computed. Requires at least 3 values of K.\n"); err <- 1;}
+  #do loci vary?
+  if (all(data$loci[1] == data$loci) != TRUE) {cat("Error: The Evanno method not computed. Number of loci vary between runs. \n"); err <- 1;}
+  #do ind vary?
+  if (all(data$ind[1] == data$ind) != TRUE) {cat("Error: The Evanno method not computed. Number of individuals vary between runs. \n"); err <- 1;}
   #are k values sequential?
   is.sequential <- function(x) all(abs(diff(x)) == 1)
-  if (is.sequential(data$k) == FALSE) {cat("Error: The Evanno method not possible. Requires sequential values of K"); err <- 1;}
-  #do ind vary?
-  if (all(data$ind[1] == data$ind) != TRUE) {cat("Error: The Evanno method not possible. Number of individuals vary between runs"); err <- 1;}
-  #do loci vary?
-  if (all(data$loci[1] == data$loci) != TRUE) {cat("Error: The Evanno method not possible. Number of loci vary between runs"); err <- 1;}
+  if (is.sequential(data$k) == FALSE) {cat("Error: The Evanno method not computed. Requires increasing sequential values of K. \n"); err <- 1;}
   #repeats of k<2
-  if (all(data$runs < 2)) warning("Results may not be meaningful if repeats (runs) for any value of K is less than 2")
+  if (all(data$runs < 2)) warning("Results may not be meaningful if repeats (runs) for any value of K is less than 2. \n")
+  
+  if (doplot == TRUE | doplot == "T" | doplot == "TRUE")
+  {
+    
+    #create plots list
+    plist <- list()
+    
+    #seetings for kPlot
+    if (is.na(height) && imgtype == "pdf") height1 <- 4;
+    if (is.na(width) && imgtype =="pdf") width1 <- 4;
+    if (is.na(height && imgtype != "pdf")) height1 <- 10;
+    if (is.na(width && imgtype != "pdf")) width1 <- 10;
+    
+    plist[[1]] <- ggplot(data, aes(x=k, y=meanelpd))+
+      geom_path(colour="grey30", na.rm=na.rm)+
+      geom_point(colour="white", size=4, shape=16, na.rm=na.rm)+
+      geom_point(colour="grey30", size=2.5, shape=16, na.rm=na.rm)+
+      geom_errorbar(aes(x=k, ymax=maxelpd, ymin=minelpd, width=0.2), 
+                    colour="grey30", na.rm=na.rm)+
+      #scale_x_continuous(breaks=1:max(data$k))+
+      theme_bw(base_size = 11)+
+      labs(x=expression(paste(italic(K))), 
+           y=expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep="")),
+           title="A")+
+      theme(legend.position="none", axis.title=element_text(vjust=0.4),
+            axis.text.y=element_text(angle=90, hjust=0.5), 
+            plot.title = element_text(hjust = 0),
+            plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+  }
   
   if (err == 1)
   {
-    errbar(x=data$k, y=data$meanelpd, yplus=data$maxelpd, yminus=data$minelpd, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep="")), main="kPlot", cex.main=0.8)
-    if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-    {
-      #check image imgtype
-      if (imgtype == "pdf") pdf("kPlot.pdf", height=height, width=width)
-      if (imgtype == "png") png("kPlot.png", height=height, width=width, res=res, units=units, type="cairo")
-      if (imgtype == "jpeg") jpeg("kPlot.jpg", height=height, width=width, res=res, quality=100, units=units, type="cairo")
-      errbar(x=data$k, y=data$meanelpd, yplus=data$maxelpd, yminus=data$minelpd, type="b", pch=19 , cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep="")), main="kPlot", cex.main=0.8)
-      dev.off()
+      #show plot
+      print(plist[[1]])
       
-      if (imgtype == "pdf") cat("kPlot.pdf exported\n")
-      if (imgtype == "png") cat("kPlot.png exported\n")
-      if (imgtype == "jpeg") cat("kPlot.jpg exported\n")
-    }
-    stop("Evanno method not possible")
+      if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
+      {
+        #check image imgtype
+        if (imgtype == "pdf") ggsave("kPlot.pdf", plist[[1]], height=height1, width=width1)
+        if (imgtype == "png") ggsave("kPlot.png", plist[[1]], height=height1, width=width1, dpi=res, units=units)
+        if (imgtype == "jpeg") ggsave("kPlot.jpg", plist[[1]], height=height1, width=width1, dpi=res, units=units, quality=100)
+        
+        if (imgtype == "pdf") cat("kPlot.pdf exported.\n")
+        if (imgtype == "png") cat("kPlot.png exported.\n")
+        if (imgtype == "jpeg") cat("kPlot.jpg exported.\n")
+      }
+      
+    stop("Evanno method not computed.\n")
   }
   
+  
   #Loop to get first derivative of l(K) and its sd
-  drv1 <- vector()
-  drv1sd <- vector()
+  drv1 <- vector(length=nrow(data)-1, mode="numeric")
+  drv1sd <- vector(length=nrow(data)-1, mode="numeric")
   i <- 1
   while (i < length(data$meanelpd))
   {
-    drvt1 <- data$meanelpd[i+1]-data$meanelpd[i]
-    drv1 <- c(drv1, drvt1)
-    drv1sdt <- data$sd[i+1]-data$sd[i]
-    drv1sd <- c(abs(drv1sd), abs(drv1sdt))
+    drv1[i] <- data$meanelpd[i+1]-data$meanelpd[i]
+    drv1sd[i] <- abs(data$sd[i+1]-data$sd[i])
     i=i+1
   }
   
   #Loop to get second derivative of l(K) and its sd
-  drv2 <- vector()
-  drv2sd <- vector()
+  drv2 <- vector(length=nrow(data)-2, mode="numeric")
+  drv2sd <- vector(length=nrow(data)-2, mode="numeric")
   i <- 1
   while (i < length(drv1))
   {
-    drvt2 <- abs(drv1[i+1]-drv1[i])
-    drv2 <- c(drv2, drvt2) 
-    drv2sdt <- abs(drv1sd[i+1]-drv1sd[i])
-    drv2sd <- c(drv2sd, abs(drv2sdt))
+    drv2[i] <- abs(drv1[i+1]-drv1[i])
+    drv2sd[i] <- abs(drv1sd[i+1]-drv1sd[i])
     i=i+1
   }
+  
   #add NA to SD vector 1 and 2
   drv1sdf <- c(NA, drv1sd)
   drv2sdf <- c(NA, drv2sd, NA)
@@ -400,6 +538,9 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, showplot=TRUE, ex
   bestpos <- bestpos[!is.na(bestpos)]
   data$BestK[bestpos] <- "*"
   
+  colnames(data)[9:15] <- c("lnk1" ,"lnk1max" ,"lnk1min" , "lnk2", "lnk2max", 
+                            "lnk2min", "deltaK")
+  
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
@@ -407,125 +548,170 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, showplot=TRUE, ex
     cat("evannoMethodStructure.txt exported\n") 
   }
   
-  if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE") showplot=FALSE
   #show plot
-  if (showplot == TRUE | showplot == "T" | showplot == "TRUE")
+  if (doplot == TRUE | doplot == "T" | doplot == "TRUE")
   { 
-    #change par settings
-    par(mfrow=c(2, 2))
-    par(mar=c(3.5, 3.5, 1, 1))
-    par(oma=c(1, 1, 1, 0.5))
-    par(mgp=c(2.2, 1, 0))
-    #plot images
-    errbar(x=data$k, y=data$meanelpd, yplus=data$maxelpd, yminus=data$minelpd, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="A", line=0.2, cex=0.8, adj=0)
-    errbar(x=data$k, y=data$drv1, yplus=data$drv1max, yminus=data$drv1min, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("L'(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="B", line=0.2, cex=0.8, adj=0)
-    errbar(x=data$k, y=data$drv2, yplus=data$drv2max, yminus=data$drv2min, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("L''(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="C", line=0.2, cex=0.8, adj=0)
-    if (is.finite(sum(data$drv3, na.rm=TRUE))) plot(x=data$k, y=data$drv3, type="b", pch=19, xlab=expression(paste(italic(K))), ylab=expression(paste(Delta, italic(K), sep="")))
-    if (is.finite(sum(data$drv3, na.rm=TRUE))) mtext(side=3, text="D", line=0.2, cex=0.8, adj=0)
-    #mtext(side = 1, outer=TRUE, text = expression(paste("Detecting Cluster Number. (Evanno ", italic(et~al.), ", 2005)")), line = 0, cex=0.4, adj=1, padj=1)
-    #mtext(side = 1, outer=TRUE, text = paste("Analysed: ", date(), sep=""), line = 0, cex=0.4, adj=0, padj=1)
-  }
+    #plot 2
+    plist[[2]] <- ggplot(data, aes(x=k, y=lnk1))+
+      geom_path(colour="grey30", na.rm=na.rm)+
+      geom_point(colour="white", size=4, shape=16, na.rm=na.rm)+
+      geom_point(colour="grey30", size=2.5, shape=16, na.rm=na.rm)+
+      geom_errorbar(aes(x=k, ymax=lnk1max, ymin=lnk1min, width=0.2), 
+                    colour="grey30", na.rm=na.rm)+
+      theme_bw(base_size = 11)+
+      labs(x=expression(paste(italic(K))), 
+           y=expression(paste("L'(", italic(K), ") " %+-% " SD", sep="")),
+           title="B")+
+      theme(legend.position="none", axis.title=element_text(vjust=0.4),
+            axis.text.y=element_text(angle=90, hjust=0.5), 
+            plot.title = element_text(hjust = 0),
+            plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+    
+    #plot 3
+    plist[[3]] <- ggplot(data, aes(x=k, y=lnk2))+
+      geom_path(colour="grey30", na.rm=na.rm)+
+      geom_point(colour="white", size=4, shape=16, na.rm=na.rm)+
+      geom_point(colour="grey30", size=2.5, shape=16, na.rm=na.rm)+
+      geom_errorbar(aes(x=k, ymax=lnk2max, ymin=lnk2min, width=0.2), 
+                    colour="grey30", na.rm=na.rm)+
+      theme_bw(base_size = 11)+
+      labs(x=expression(paste(italic(K))), 
+           y=expression(paste("|L\"(", italic(K), ")| " %+-% " SD", sep="")),
+           title="C")+
+      theme(legend.position="none", axis.title=element_text(vjust=0.4),
+            axis.text.y=element_text(angle=90, hjust=0.5), 
+            plot.title = element_text(hjust = 0),
+            plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+    
+    #plot 4
+    if (is.finite(sum(data$drv3, na.rm=TRUE)))
+    {
+      plist[[4]] <- ggplot(data, aes(x=k, y=deltaK))+
+        geom_path(colour="grey30", na.rm=na.rm)+
+        geom_point(colour="white", size=4, shape=16, na.rm=na.rm)+
+        geom_point(colour="grey30", size=2.5, shape=16, na.rm=na.rm)+
+        theme_bw(base_size = 11)+
+        labs(x=expression(paste(italic(K))), 
+             y=expression(paste(Delta, italic(K), sep="")),
+             title="D")+
+        theme(legend.position="none", axis.title=element_text(vjust=0.4),
+              axis.text.y=element_text(angle=90, hjust=0.5), 
+              plot.title = element_text(hjust = 0),
+              plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
+    }
+   
+    
+    #combine images
+    plen <- length(plist)
+    if (plen == 3) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], ncol=2, nrow=2)
+    if (plen == 4) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], plist[[4]], ncol=2, nrow=2)
   
+    #show plots
+    print(pall)
+    
   #export image
   if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-  {
-    #check image imgtype
-    if (imgtype == "pdf") pdf("evannoMethodStructure.pdf", height=height, width=width)
-    if (imgtype == "png") png("evannoMethodStructure.png", height=height, width=width, res=res, units=units, type="cairo")
-    if (imgtype == "jpeg") jpeg("evannoMethodStructure.jpg", height=height, width=width, res=res, quality=100, units=units, type="cairo")
-    #change par settings
-    par(mfrow=c(2, 2))
-    par(mar=c(3.5, 3.5, 1, 1))
-    par(oma=c(1, 1, 1, 0.5))
-    par(mgp=c(2.2, 1, 0))
-    errbar(x=data$k, y=data$meanelpd, yplus=data$maxelpd, yminus=data$minelpd, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="A", line=0.2, cex=1.2, adj=0)
-    errbar(x=data$k, y=data$drv1, yplus=data$drv1max, yminus=data$drv1min, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("L'(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="B", line=0.2, cex=1.2, adj=0)
-    errbar(x=data$k, y=data$drv2, yplus=data$drv2max, yminus=data$drv2min, type="b", pch=19, cap=0.01, xlab=expression(paste(italic(K))), ylab=expression(paste("L''(", italic(K), ") " %+-% " SD", sep="")))
-    mtext(side=3, text="C", line=0.2, cex=1.2, adj=0)
-    if (is.finite(sum(data$drv3, na.rm=TRUE))) plot(x=data$k, y=data$drv3, type="b", pch=19, xlab=expression(paste(italic(K))), ylab=expression(paste(Delta, italic(K), sep="")))
-    if (is.finite(sum(data$drv3, na.rm=TRUE))) mtext(side=3, text="D", line=0.2, cex=1.2, adj=0)
-    #mtext(side = 1, outer=TRUE, text = expression(paste("Detecting Cluster Number. (Evanno ",italic(et~al.),", 2005)")), line = 0, cex=0.4, adj=1, padj=1)
-    #mtext(side = 1, outer=TRUE, text = paste("Analysed: ",date(),sep=""), line = 0, cex=0.4, adj=0, padj=1)
-    dev.off()
+  {   
+    if (is.na(height) && imgtype == "pdf") height1 <- 7;
+    if (is.na(width) && imgtype =="pdf") width1 <- 7;
+    if (is.na(height && imgtype != "pdf")) height1 <- 18;
+    if (is.na(width && imgtype != "pdf")) width1 <- 18;
     
+    #check image imgtype  
+    if (imgtype == "pdf") ggsave("evannoMethodStructure.pdf", pall, height=height1, width=width1)
+    if (imgtype == "png") ggsave("evannoMethodStructure.png", pall, height=height1, width=width1, dpi=res, units=units)
+    if (imgtype == "jpeg") ggsave("evannoMethodStructure.jpg", pall, height=height1, width=width1, dpi=res, units=units, quality=100)
+  
     if (imgtype == "pdf") cat("evannoMethodStructure.pdf exported\n")
     if (imgtype == "png") cat("evannoMethodStructure.png exported\n")
     if (imgtype == "jpeg") cat("evannoMethodStructure.jpg exported\n")
   }
+}
   
   #return table
   return(data)
 }
 
+
 #FUNCTION clumppExportStructure
 #' Combine STRUCTURE runs and export files for use with software CLUMPP
-#' @description Takes multiple STRUCTURE runs and combines several repeats for each K into a single file along with a parameter file. The two output files are organised into folders by K. The CLUMPP.exe file can simply be copied to this folder and run to reorder the clusters for each K.
-#' @param files A character vector of STRUCTURE output files to be tabulated. Use \code{choose.files(multi=TRUE)} for interactive selection.
+#' @description Takes multiple STRUCTURE runs and combines several repeats for 
+#' each K into a single file along with a parameter file. The two output files 
+#' are organised into folders by K. The CLUMPP.exe file can simply be copied to 
+#' this folder and run to reorder the clusters for each K.
+#' @param files A character vector of STRUCTURE output files to be tabulated. 
+#' Use \code{choose.files(multi=TRUE)} for interactive selection.
 #' @param prefix A character prefix for folder names.
-#' @return The combined file and paramfile are written into respective folders named by population. A tabulated table is returned from function same as \code{tabulateRunsStructure()}.
-#' @details When multiple repeats are run for each K in STRUCTURE, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. This function clumppExportStructure() takes multiple runs for each K and combines them into a single file and generates a parameter file for easy use with CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806.
+#' @param parammode The greedy option for CLUMPP paramfile. Calculated 
+#' automatically by default. Options are 1, 2 or 3. See details.
+#' @param paramrep The repeats options for CLUMPP paramfile. Calculated 
+#' automatically by default. See details.
+#' @return The combined file and paramfile are written into respective folders 
+#' named by population.
+#' @details When multiple repeats are run for each K in STRUCTURE, the order of 
+#' clusters may be jumbled for each run. Therefore, when plotting multiple runs 
+#' within each K, the colours cannot be assigned correctly. The software CLUMPP 
+#' helps to overcome this issue by reordering the clusters correctly. This 
+#' function clumppExportStructure() takes multiple runs for each K and combines 
+#' them into a single file and generates a parameter file for easy use with 
+#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & 
+#' Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program 
+#' for dealing with label switching and multimodality in analysis of population 
+#' structure. Bioinformatics, 23(14), 1801-1806.
+#' 
+#' The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
+#' T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
+#' populations, runs is number of runs for k and ind is number of individuals.
+#' If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
+#' parammode is 3 and paramrep is set to 500. To find out what parammode 
+#' (greedy option) and paramrep (repeats) are, refer to CLUMPP documentation.
+#' 
 #' @export
-#'
-clumppExportStructure <- function(files=NULL, prefix=NA)
+#' 
+clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 {
-  if (length(files) == 0) stop("No input files")
+  if (length(files) == 0) stop("No input files.\n")
   if (is.na(prefix)) prefix <- "STRUCTUREpop"
   prefix <- paste(prefix, "_K", sep="")
   
   #get tabulated runs
-  df <- tabulateRunsStructure(files=files)
+  df1 <- tabulateRunsStructure(files=files)
+  df2 <- summariseRunsStructure(df1)
   
-  #Loop to move through k
-  e=1
-  while(e <= nrow(df))
+  #k val duplicated?
+  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. Repeating values of K found. \n")
+  #do ind vary?
+  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals vary between runs. \n")
+  #do loci vary?
+  if (all(df2$loci[1] == df2$loci) != TRUE) cat("Warning: Number of loci vary between runs. \n")
+  
+  e <- 1
+  p <- 1
+  while (e <= length(df2$k))
   {
-    #loop to extract and combine tables
-    o <- df$k[e]
-    p <- df$ind[e]
-    q <- df$loci[e]
-    n <- 0
-    ldata <- list()
-    while(o == df$k[e])
+    k <- df2$k[e]
+    ind <- df2$ind[e]
+    runs <- df2$runs[e]
+    
+    ldata <- list(length=runs)
+    f <- 1
+    for (f in 1:runs)
     {
-      if (p == df$ind[e])
-      {
-        if (q == df$loci[e])
-        {
-          k <- df$k[e]
-          ind <- df$ind[e]
-          loci <- df$loci[e]
-          n <- n+1
-          
-          sel <- grep(as.character(df[e, 1]), files)
-          dframe1 <- runsToDfStructure(files[sel])
-          
-          #generate first and last line
-          v <- character();v1 <- vector();
-          for (z in 1:p)
-          {
-            v <- (paste(z, ":", sep=""))
-            v1 <- c(v1, v)
-          }
-          dframe2 <- data.frame(V1=v1, dframe1, last=as.character(rep(1, p)))
-          dframe3 <- as.matrix(dframe2)
-          
-          #add dataframes to list
-          ldata[[n]] <- dframe3
-          if (e>nrow(df))break;
-          
-        }else
-        {break;}
-      }else
-      {break;}
-      e=e+1
-      if (e>nrow(df))break;
+      sel <- grep(as.character(df1$file[p]), files)
+      dframe1 <- runsToDfStructure(files[sel])
+      
+      #generate df
+      dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
+                                      dframe1, 
+                                      last=as.character(rep(1, ind))))
+      
+      #add dataframes to list
+      ldata[[f]] <- dframe3
+      rm(dframe3)
+      p=p+1
     }
-    if (n>1)
+    
+    if (runs > 1 & k > 1)
     {
       currwd <- getwd()
       dir.create(paste(currwd, "/", prefix, k, sep=""))
@@ -549,15 +735,15 @@ clumppExportStructure <- function(files=NULL, prefix=NA)
       }
       cat(paste(out), "exported\n")
       
-      
+      #PARAMFILE section
       T1 <- factorial(k)*((length(ldata)*(length(ldata)-1))/2)*k*ind
       if (T1 <= 100000000)
       {
-        mode <- 2
-        repeats <- 20
+        if(is.na(parammode)) parammode <- 2
+        if(is.na(paramrep)) paramrep <- 20
       }else{
-        mode <- 3
-        repeats <- 500
+        if(is.na(parammode)) parammode <- 3
+        if(is.na(paramrep)) paramrep <- 500
       }
       out1 <- gsub(".txt","",out)
       params <- c("DATATYPE 1 ",
@@ -568,11 +754,11 @@ clumppExportStructure <- function(files=NULL, prefix=NA)
                   paste("K ",k," ",sep=""),
                   paste("C ",ind," ",sep=""),
                   paste("R ",length(ldata)," ",sep=""),
-                  paste("M ",mode," ",sep=""),
+                  paste("M ",parammode," ",sep=""),
                   "W 0 ",
                   "S 2 ",
                   "GREEDY_OPTION 2 ",
-                  paste("REPEATS ", repeats," ",sep=""),
+                  paste("REPEATS ", paramrep," ",sep=""),
                   "PERMUTATIONFILE NOTNEEDED.permutationfile ",
                   "PRINT_PERMUTED_DATA 1 ",
                   paste("PERMUTED_DATAFILE ",out1,"-aligned.txt ",sep=""),
@@ -587,77 +773,97 @@ clumppExportStructure <- function(files=NULL, prefix=NA)
       cat(paste("paramfile exported\n", sep=""))
       
       setwd(paste(currwd))
-      cat("***********************\n")
+      cat("-----------------------\n")
     }else
     {
-      cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
-      cat("***********************\n")
+      if (k == 1) cat(paste(prefix, k, " not exported. K less than 2\n", sep=""))
+      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
+      cat("-----------------------\n")
     }
+    e <- e + 1
   }
+  
   cat("Run completed.\n")
-  return(df)
 }
 
 
 #FUNCTION clumppExportTess
 #' Combine TESS runs and export files for use with software CLUMPP
-#' @description Takes multiple TESS runs and combines several repeats for each K into a single file along with a parameter file. The two output files are organised into folders by K. The CLUMPP.exe file can simply be copied to this folder and run to reorder the clusters for each K.
-#' @param files A character vector of TESS cluster run files to be tabulated. Use \code{choose.files(multi=TRUE)} for interactive selection.
+#' @description Takes multiple TESS runs and combines several repeats for each 
+#' K into a single file along with a parameter file. The two output files are 
+#' organised into folders by K. The CLUMPP.exe file can simply be copied to this 
+#' folder and run to reorder the clusters for each K.
+#' @param files A character vector of TESS cluster run files to be tabulated. 
+#' Use \code{choose.files(multi=TRUE)} for interactive selection.
 #' @param prefix A character prefix for folder names.
-#' @return The combined file and paramfile are written into respective folders named by population. A tabulated table is returned from function same as \code{tabulateRunsTess()}.
-#' @details When multiple repeats are run for each K in TESS, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each K, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. This function clumppExportTess() takes multiple runs for each K and combines them into a single file and generates a parameter file for easy use with CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806.
+#' @param parammode The mode option for CLUMPP paramfile. Calculated 
+#' automatically by default. Options are 1, 2 or 3. See details.
+#' @param paramrep The repeats options for CLUMPP paramfile. Calculated 
+#' automatically by default. See details.
+#' @return The combined file and paramfile are written into respective folders 
+#' named by population.
+#' @details When multiple repeats are run for each K in TESS, the order of 
+#' clusters may be jumbled for each run. Therefore, when plotting multiple runs 
+#' within each K, the colours cannot be assigned correctly. The software CLUMPP 
+#' helps to overcome this issue by reordering the clusters correctly. This 
+#' function clumppExportTess() takes multiple runs for each K and combines 
+#' them into a single file and generates a parameter file for easy use with 
+#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & 
+#' Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program 
+#' for dealing with label switching and multimodality in analysis of population 
+#' structure. Bioinformatics, 23(14), 1801-1806.
+#' 
+#' The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
+#' T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
+#' populations, runs is number of runs for k and ind is number of individuals.
+#' If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
+#' parammode is 3 and paramrep is set to 500. To find out what parammode 
+#' (greedy option) and paramrep (repeats) are, refer to CLUMPP documentation.
+#' 
 #' @export
-#'
-clumppExportTess <- function(files=NULL, prefix=NA)
+#' 
+clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 {
-  if (length(files) == 0) stop("No input files")
+  if (length(files) == 0) stop("No input files.\n")
   if (is.na(prefix)) prefix <- "TESSpop"
   prefix <- paste(prefix, "_K", sep="")
   
   #get tabulated runs
-  df <- tabulateRunsTess(files=files)
+  df1 <- tabulateRunsTess(files=files)
+  df2 <- summariseRunsTess(df1)
   
-  #Loop to move through k
-  e=1
-  while(e <= nrow(df))
+  #k val duplicated?
+  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. Repeating values of K found. \n")
+  #do ind vary?
+  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals vary between runs. \n")
+ 
+  e <- 1
+  p <- 1
+  while (e <= length(df2$k))
   {
-    #loop to extract and combine tables
-    o <- df$k[e]
-    p <- df$ind[e]
-    n <- 0
-    ldata <- list()
-    while(o == df$k[e])
+    k <- df2$k[e]
+    ind <- df2$ind[e]
+    runs <- df2$runs[e]
+    
+    ldata <- list(length=runs)
+    f <- 1
+    for (f in 1:runs)
     {
-      if (p == df$ind[e])
-      {
-        k <- df$k[e]
-        ind <- df$ind[e]
-        n <- n+1
-        
-        sel <- grep(as.character(df[e, 1]), files)
-        dframe1 <- runsToDfTess(files[sel])
-        
-        #generate first and last line
-        v <- character();v1 <- vector();
-        for (z in 1:p)
-        {
-          v <- (paste(z, ":", sep=""))
-          v1 <- c(v1, v)
-        }
-        
-        dframe2 <- data.frame(V1=v1, dframe1, last=as.character(rep(1, p)))
-        dframe3 <- as.matrix(dframe2)
-        
-        #add dataframes to list
-        ldata[[n]] <- dframe3
-        if (e>nrow(df))break;
-        
-      }else
-      {break;}
-      e=e+1
-      if (e>nrow(df))break;
+      sel <- grep(as.character(df1$file[p]), files)
+      dframe1 <- runsToDfTess(files[sel])
+      
+      #generate df
+      dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
+                                      dframe1, 
+                                      last=as.character(rep(1, ind))))
+      
+      #add dataframes to list
+      ldata[[f]] <- dframe3
+      rm(dframe3)
+      p=p+1
     }
-    if (n>1)
+    
+    if (runs > 1 & k > 1)
     {
       currwd <- getwd()
       dir.create(paste(currwd, "/", prefix, k, sep=""))
@@ -681,15 +887,15 @@ clumppExportTess <- function(files=NULL, prefix=NA)
       }
       cat(paste(out), "exported\n")
       
-      
+      #PARAMFILE section
       T1 <- factorial(k)*((length(ldata)*(length(ldata)-1))/2)*k*ind
       if (T1 <= 100000000)
       {
-        mode <- 2
-        repeats <- 20
+        if(is.na(parammode)) parammode <- 2
+        if(is.na(paramrep)) paramrep <- 20
       }else{
-        mode <- 3
-        repeats <- 500
+        if(is.na(parammode)) parammode <- 3
+        if(is.na(paramrep)) paramrep <- 500
       }
       out1 <- gsub(".txt","",out)
       params <- c("DATATYPE 1 ",
@@ -700,11 +906,11 @@ clumppExportTess <- function(files=NULL, prefix=NA)
                   paste("K ",k," ",sep=""),
                   paste("C ",ind," ",sep=""),
                   paste("R ",length(ldata)," ",sep=""),
-                  paste("M ",mode," ",sep=""),
+                  paste("M ",parammode," ",sep=""),
                   "W 0 ",
                   "S 2 ",
                   "GREEDY_OPTION 2 ",
-                  paste("REPEATS ", repeats," ",sep=""),
+                  paste("REPEATS ", paramrep," ",sep=""),
                   "PERMUTATIONFILE NOTNEEDED.permutationfile ",
                   "PRINT_PERMUTED_DATA 1 ",
                   paste("PERMUTED_DATAFILE ",out1,"-aligned.txt ",sep=""),
@@ -719,16 +925,19 @@ clumppExportTess <- function(files=NULL, prefix=NA)
       cat(paste("paramfile exported\n", sep=""))
       
       setwd(paste(currwd))
-      cat("***********************\n")
+      cat("-----------------------\n")
     }else
     {
-      cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
-      cat("***********************\n")
+      if (k == 1) cat(paste(prefix, k, " not exported. K less than 2\n", sep=""))
+      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
+      cat("-----------------------\n")
     }
+    e <- e + 1
   }
+  
   cat("Run completed.\n")
-  return(df)
 }
+
 
 # FUNCTION runsToDfStructure
 #' Convert STRUCTURE run files to R dataframes.
@@ -736,10 +945,10 @@ clumppExportTess <- function(files=NULL, prefix=NA)
 #' @param files One or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)} to select interactively.
 #' @return If a single file is selected, a single dataframe is returned. If multiple files are selected, a list with multiple dataframes is returned.
 #' @export
-#'
+#' 
 runsToDfStructure <- function(files=NA)
 {
-  if (all(is.na(files))) stop("No input files")
+  if (all(is.na(files))) stop("No input files.\n")
   #number of files selected
   number <- length(files)
   #cat(paste("Number of files selected: ", number, "\n", sep=""))
@@ -752,8 +961,8 @@ runsToDfStructure <- function(files=NA)
     
     file1 <- readLines(as.character(files[i]), warn=FALSE)
     chk1 <- grep("STRUCTURE", toupper(file1[4]))
-    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.")
-    if (length(file1)<1) stop("Cannot read file")
+    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.\n")
+    if (length(file1)<1) stop("Cannot read file.\n")
     
     #find individuals and get number of individuals
     ind <- as.numeric(as.character(gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
@@ -765,9 +974,8 @@ runsToDfStructure <- function(files=NA)
     
     cstart <- charmatch("Inferred ancestry of individuals", file1)
     cend <- charmatch("Estimated Allele Frequencies in each cluster", file1)
-    cstart1 <- cstart+2
-    cend1 <- cend-3
-    file_a <- file1[cstart1:cend1]
+    file1 <- file1[(cstart+2):(cend-1)]
+    file_a <- file1[file1 != ""]
     file_b <- gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
     file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b, " ")))))
     dframe <- as.data.frame(matrix(file_c, nrow=ind, byrow=TRUE),stringsAsFactors=FALSE)
@@ -790,7 +998,7 @@ runsToDfStructure <- function(files=NA)
 #'
 runsToDfTess <- function(files=NA)
 {
-  if (all(is.na(files))) stop("No input files")
+  if (all(is.na(files))) stop("No input files.\n")
   #number of files selected
   number <- length(files)
   #cat(paste("Number of files selected: ", number, "\n", sep=""))
@@ -804,14 +1012,17 @@ runsToDfTess <- function(files=NA)
     file1 <- readLines(files[i], warn=FALSE)
     #read TESS files
     chk <- grep("CLUSTERING PROBABILITIES", toupper(file1[1]))
-    if (length(chk) == 0) stop("Input not appropriate TESS file/Incorrect input format.")
-    if (length(file1) < 1) stop("Cannot read file")
+    if (length(chk) == 0) stop("Input not appropriate TESS file/Incorrect input format.\n")
+    if (length(file1) < 1) stop("Cannot read file.\n")
     
     #extract the cluster table part
-    file1 <- file1[3:c(grep("Estimated Allele Frequencies", file1)-4)]
+    file1 <- file1[3:c(grep("Estimated Allele Frequencies", file1)-1)]
+    file1 <- file1[file1 != ""]
     file2 <- as.vector(unlist(strsplit(file1, "\t")))
     file3 <- as.data.frame(matrix(file2, nrow=length(file1), byrow=TRUE),stringsAsFactors=FALSE)
+    rm(file1, file2)
     dframe <- file3[, -c(1, ncol(file3)-1, ncol(file3))]
+    rm(file3)
     dframe <- as.data.frame(sapply(dframe, as.numeric))
     colnames(dframe) <- paste("Cluster", 1:ncol(dframe), sep="")
     dlist[[i]] <- dframe
@@ -860,6 +1071,7 @@ getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
   return(c(height, width))
 }
 
+
 # FUNCTION getPlotParams
 #' Internal: Generate parameters for plots with labels
 #' @description Generates various parameters required for plotting with labels. Internal function.
@@ -883,7 +1095,7 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
                           pointsize=NA, pointcol=NA, pointtype=NA,
                           linepos=NA, linethick=NA, linecol=NA, fmar=NA)
 {
-  if (all(is.na(poplab))) stop("Labels are empty")
+  if (all(is.na(poplab))) stop("Labels are empty.\n")
   #labangle <- NA
   #labjust <- NA
   #labpos <- NA
@@ -954,6 +1166,7 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
   return(dlist)
 }
 
+
 # FUNCTION plotRuns
 #' Plot STRUCTURE, TESS or table files as barplots.
 #' @description Plot one or more STRUCTURE/TESS output files or table files (aligned/combined/merged) files. The STRUCTURE and TESS files can be plotted individually or joined together. The table files will be plotted based on number of runs in each file.
@@ -961,6 +1174,7 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
 #' @param imgoutput Options are 'sep','join' or'tab'.If output="sep", STRUCTURE/TESS run files are plotted as separate image files. If output="join", STRUCTURE/TESS run files are joined into a single image. If output="tab", combined/aligned/merged files are plotted into separate or joined plots based on number of tables within each file.
 #' @param poplab A character vector of population labels equal to length of individuals. Each pop name must repeat to the number of individuals present in each pop.
 #' @param popcol A vector of colours (representing populations) for colouring clusters. If NA, colours are automatically generated. K 1 to 12 are custom unique colours while K>12 are coloured by function rich.color().
+#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore ggplot prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and ggplot NA warning is suppressed.
 #' @param imgtype Image file type. Possible options are "png","jpeg" or "pdf". For pdf, height and width are in inches and res does not apply.
 #' @param height Height of individual run plot. By default, automatically generated based on number of Individuals. Ranges between 2.5cm and 4.6cm.
 #' @param width Width of individual run plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
@@ -985,7 +1199,7 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
 #' @details It is possible to set either height or width and leave other as default.
 #' @export
 #' 
-plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype="png", height=NA, width=NA, dpi=NA, units=NA, 
+plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FALSE, imgtype="png", height=NA, width=NA, dpi=NA, units=NA, 
                      flabsize=NA, flabcol=NA, flabbackcol=NA, labpos=NA, labsize=NA, labangle=NA, labjust=NA, labcol=NA, 
                      pointsize=NA, pointcol=NA, pointtype=NA, linepos=NA, linethick=NA, linecol=NA, fmar=NA)
 { 
@@ -1010,7 +1224,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     pos <- c(1, cumsum(lenvec))
     #labels
     posl <- round((diff(pos)/2)+pos[1:length(pos)-1], 1)
-    if (length(labs)!=length(posl)) stop("Label position and label length mismatch")
+    if (length(labs)!=length(posl)) stop("Label position and label length mismatch.\n")
     
     lframe <- data.frame(pos=posl, lab=labs)
     lframe$temp <- factor(rep(1, nrow(lframe)))
@@ -1019,13 +1233,13 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
   
   
   #if no files chosen, stop excecution, give error message
-  if (length(files) == 0) stop("No files selected")
+  if (length(files) == 0) stop("No input files.\n")
   #check imgoutput
   imgoutput <- tolower(imgoutput)
-  if (imgoutput != "sep" && imgoutput != "join" && imgoutput != "tab") stop("Argument 'imgoutput' set incorrectly. Set as 'sep' if input are structure files and output are separate plots. Set as 'join' if input are structure files and output is one joined plot. Set as 'tab' if input is aligned/combined/merged files")
+  if (imgoutput != "sep" && imgoutput != "join" && imgoutput != "tab") stop("Argument 'imgoutput' set incorrectly. Set as 'sep' if input are structure files and output are separate plots. Set as 'join' if input are structure files and output is one joined plot. Set as 'tab' if input is aligned/combined/merged files.\n")
   #check image
   imgtype <- tolower(imgtype)
-  if (imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'")
+  if (imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
   #length of files
   flen <- length(files)
   #make labeller function for facets
@@ -1045,7 +1259,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       #read TESS files
       chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn=FALSE))[4])
       if (length(chk1) != 0) df1 <- runsToDfStructure(files=files[i])
-      if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type")
+      if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
       
       k <- ncol(df1)
       Ind <- nrow(df1)
@@ -1059,7 +1273,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       #get Colours
       coll <- popcol
       if (all(is.na(popcol))) coll <- getColours(k)
-      if (length(coll)!=k) stop("Number of colours not equal to number of populations")
+      if (length(coll)!=k) stop("Number of colours not equal to number of populations.\n")
       
       #getDim
       #pnum <- 1
@@ -1071,7 +1285,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       {
         #plot
         p <- ggplot(data=df2, aes(x=Ind, y=value, fill=variable))+
-          geom_bar(width=1, space=0, stat="identity", position="stack")+
+          geom_bar(width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0))+
           scale_fill_manual(values=coll)+
@@ -1093,7 +1307,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       }
       if (!all(is.na(poplab)))
       {
-        if (nrow(df1)!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.")
+        if (nrow(df1)!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
         
         ppar <- getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
                               labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, 
@@ -1115,7 +1329,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
         fmar <- ppar$fmar
         
         p <- ggplot()+
-          geom_bar(data=df2, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack")+
+          geom_bar(data=df2, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0))+
           scale_fill_manual(values=coll)+
@@ -1152,16 +1366,16 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
   if (imgoutput == "join")
   {
     #checks
-    if (flen < 2) stop("Joined plot not processed. Number of selected files less than 2")
+    if (flen < 2) stop("Joined plot not processed. Number of selected files less than 2.\n")
     
     chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[1], warn=FALSE))[1])
     if (length(chk) !=0 ) tempdf <- tabulateRunsTess(files=files, quiet=TRUE)
     #read TESS files
     chk1 <- grep("STRUCTURE", toupper(readLines(files[1], warn=FALSE))[4])
     if (length(chk1) !=0 ) tempdf <- tabulateRunsStructure(files=files, quiet=TRUE)
-    if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type")
+    if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
     
-    if (all(tempdf$ind[1] != tempdf$ind)) stop("Joined plot not processed. Number of individuals differ between selected runs")
+    if (all(tempdf$ind[1] != tempdf$ind)) stop("Joined plot not processed. Number of individuals differ between selected runs.\n")
     Ind <- tempdf$ind[1]
     
     #loop to process selected files
@@ -1176,7 +1390,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       #read TESS files
       chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn=FALSE))[4])
       if (length(chk1) != 0) df1 <- runsToDfStructure(files=files[i])
-      if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type")
+      if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
       
       k <- ncol(df1)
       df1$Ind <- factor(1:nrow(df1))
@@ -1199,7 +1413,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     #Get Col
     coll <- popcol
     if (all(is.na(popcol))) coll <- getColours(max(kvec))
-    if (length(coll)!=max(kvec)) stop("Number of colours not equal to number of populations")
+    if (length(coll)!=max(kvec)) stop("Number of colours not equal to number of populations.\n")
     
     
     #save plot
@@ -1209,7 +1423,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     {
       #ggplot
       p <- ggplot(data=df3, aes(x=Ind, y=value, fill=variable))+
-        geom_bar(width=1, space=0, stat="identity", position="stack")+
+        geom_bar(width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
         scale_x_discrete(expand=c(0, 0))+
         scale_y_continuous(expand=c(0, 0))+
         scale_fill_manual(values=coll)+
@@ -1233,7 +1447,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     if (!all(is.na(poplab)))
     {
       #plot with labels
-      if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.")
+      if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
       
       df3 <- subset(df2, df2$Num == 1)
       df3$Num <- df3$Num[drop=TRUE]
@@ -1262,7 +1476,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       fmar <- ppar$fmar
       
       p <- ggplot()+
-        geom_bar(data=df3.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack")+
+        geom_bar(data=df3.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
         scale_x_discrete(expand=c(0, 0))+
         scale_y_continuous(expand=c(0, 0))+
         scale_fill_manual(values=coll)+
@@ -1284,7 +1498,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       facetnames <- as.list(unlist(facetnames)[-1])
       
       p2 <- ggplot()+
-        geom_bar(data=df4.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack")+
+        geom_bar(data=df4.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
         scale_x_discrete(expand=c(0, 0))+
         scale_y_continuous(expand=c(0, 0))+
         scale_fill_manual(values=coll)+
@@ -1322,7 +1536,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     {
       fname <- gsub(".txt", "", basename(files[i]))
       df1 <- read.table(files[i])
-      if (class(df1)!="data.frame") stop("Incorrect input file type")
+      if (class(df1)!="data.frame") stop("Incorrect input file type.\n")
       
       Ind <- as.numeric(as.character(length(levels(df1[, 1]))))
       tempb <- as.numeric(nrow(df1))
@@ -1342,7 +1556,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       #Get col
       coll <- popcol
       if (all(is.na(popcol))) coll <- getColours(tempd)
-      if (length(coll)!=tempd) stop("Number of colours not equal to number of populations")
+      if (length(coll)!=tempd) stop("Number of colours not equal to number of populations.\n")
       
       
       #save plot
@@ -1352,7 +1566,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       {
         #ggplot
         p <- ggplot(data=df3, aes(x=Ind, y=value, fill=variable))+
-          geom_bar(width=1, space=0, stat="identity", position="stack")+
+          geom_bar(width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0))+
           scale_fill_manual(values=coll)+
@@ -1375,7 +1589,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
       if (!all(is.na(poplab)))
       {
         #plot with labels
-        if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.")
+        if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
         df3 <- subset(df2, df2$Num == 1)
         df3$Num <- df3$Num[drop=TRUE]
         df3.1 <- melt(df3, id.var=c("Ind", "Num"))
@@ -1400,7 +1614,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
         fmar <- ppar$fmar
         
         p <- ggplot()+
-          geom_bar(data=df3.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack")+
+          geom_bar(data=df3.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0))+
           scale_fill_manual(values=coll)+
@@ -1425,7 +1639,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
           df4.1 <- melt(df4, id.var=c("Ind", "Num"))
           
           p2 <- ggplot()+
-            geom_bar(data=df4.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack")+
+            geom_bar(data=df4.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
             scale_x_discrete(expand=c(0, 0))+
             scale_y_continuous(expand=c(0, 0))+
             scale_fill_manual(values=coll)+
@@ -1460,6 +1674,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, imgtype=
     } 
   }
 }
+
 
 # FUNCTION collectRunsTess
 #' Collect TESS cluster run files from multiple folders
@@ -1518,7 +1733,7 @@ collectRunsTess <- function(runsdir=NA, newdir=NA, quiet=FALSE)
 collectClumppOutput <- function(prefix="STRUCTUREpop", filetype="aligned", runsdir=NA, newdir=NA, quiet=FALSE)
 {
   #check imgoutput
-  if (tolower(filetype)!="aligned" && tolower(filetype)!="merged" && tolower(filetype)!="both") stop("Argument 'filetype' set incorrectly. Set as 'aligned', 'merged' or 'both'.")
+  if (tolower(filetype)!="aligned" && tolower(filetype)!="merged" && tolower(filetype)!="both") stop("Argument 'filetype' set incorrectly. Set as 'aligned', 'merged' or 'both'.\n")
   quiet <- toupper(quiet)
   
   currwd <- getwd()
@@ -1562,6 +1777,7 @@ collectClumppOutput <- function(prefix="STRUCTUREpop", filetype="aligned", runsd
 #' @param spl samples per line. Defaults to 60.
 #' @param lpp lines per page. Defaults to 11.
 #' @param popcol A vector of colours for populations.
+#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore ggplot prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and ggplot NA warning is suppressed.
 #' @param barwidth The width of the bars.
 #' @param barspace The space between the bars.
 #' @param indlabs By default, \code{indlabs=TRUE}, then individual labels 1, 2, 3.. are indicated below bars. To hide labels, set \code{indlabs=FALSE}
@@ -1577,12 +1793,12 @@ collectClumppOutput <- function(prefix="STRUCTUREpop", filetype="aligned", runsd
 #' @details Figures are always created to A4 size. Any plotted row will span the width of the figure. Note that this function is slow and may take several minutes when plotting mutiple tables.
 #' @export
 #'
-plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, barspace=0.1, indlabs=TRUE, labsize=5, labangle=90, labvjust=0.5,labhjust=1, imgtype="png", height=NA, width=NA, res=NA, units=NA)
+plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barwidth=0.9, barspace=0.1, indlabs=TRUE, labsize=5, labangle=90, labvjust=0.5,labhjust=1, imgtype="png", height=NA, width=NA, res=NA, units=NA)
 {
   #check image
   imgtype <- tolower(imgtype)
   indlabs <- toupper(indlabs)
-  if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg" ) stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.")
+  if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg" ) stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
   
   #set NA values
   if (is.na (height)) {height <- 29.7; if (imgtype == "pdf") height <- round(height*0.3937,2)}
@@ -1603,7 +1819,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
     if (length(chk) == 0 & length(chk1) == 0) 
     {
       df1 <- read.table(files[i])
-      if (class(df1) != "data.frame") stop("Incorrect input file type")
+      if (class(df1) != "data.frame") stop("Incorrect input file type.\n")
       nrow1 <- length(df1$V1)/length(levels(factor(as.character(df1$V1))))
       df1$tab <- rep(1:nrow1, each=length(levels(factor(as.character(df1$V1)))))
       df1 <- df1[, -c(1, length(df1)-1)]
@@ -1631,7 +1847,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
       
       if (!is.na(spl))
       {
-        if (spl > nr1) stop("Samples per line (spl) is greater than total number of samples")
+        if (spl > nr1) stop("Samples per line (spl) is greater than total number of samples.\n")
         spl1<-spl
         numrows <- floor(nr1/spl1)
         numextra <- nr1-(spl1*numrows)
@@ -1674,7 +1890,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
         {
           df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))
           plist[[i]] <- ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
-            geom_bar(width=barwidth, space=barspace, stat="identity", position="stack")+
+            geom_bar(width=barwidth, space=barspace, stat="identity", position="stack", na.rm=na.rm)+
             scale_x_discrete(expand=c(0, 0))+
             scale_y_continuous(expand=c(0, 0))+
             scale_fill_manual(values=coll)+
@@ -1689,7 +1905,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, barwidth=0.9, bar
         {
           df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))
           plist[[i]] <- ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
-            geom_bar(width=barwidth, space=barspace, stat="identity", position="stack")+
+            geom_bar(width=barwidth, space=barspace, stat="identity", position="stack", na.rm=na.rm)+
             scale_x_discrete(expand=c(0, 0))+
             scale_y_continuous(expand=c(0, 0))+
             scale_fill_manual(values=coll)+

@@ -2,9 +2,9 @@
 \alias{evannoMethodStructure}
 \title{Perform the Evanno method}
 \usage{
-evannoMethodStructure(data = NULL, writetable = FALSE, showplot = TRUE,
-  exportplot = FALSE, imgtype = "png", height = NA, width = NA,
-  res = NA, units = NA)
+evannoMethodStructure(data = NULL, writetable = FALSE, doplot = TRUE,
+  exportplot = FALSE, na.rm = FALSE, imgtype = "png", height = NA,
+  width = NA, res = NA, units = NA)
 }
 \arguments{
   \item{data}{A dataframe with summarised runs. An output
@@ -16,14 +16,21 @@ evannoMethodStructure(data = NULL, writetable = FALSE, showplot = TRUE,
   TRUE writes the output table as a tab-delimited text file
   in the working directory.}
 
-  \item{showplot}{If set to TRUE, shows the Evanno plots in
-  the graphical device. If Evanno method cannot be
-  computed, a kPlot (elpd over k) is shown instead.}
+  \item{doplot}{Default set to TRUE, calculates the Evanno
+  plots and plots in the graphical device. If Evanno method
+  cannot be computed, a kPlot (elpd over k) is shown
+  instead. Set this to FALSE to avoid computation of plots
+  and only return table (much faster).}
 
   \item{exportplot}{If set to TRUE, exports the Evanno
   plots as image in the working directory. If Evanno method
   cannot be computed, a kPlot (elpd over k) is exported
   instead.}
+
+  \item{na.rm}{Default set to FALSE. Does not remove NAs
+  for plot and this generates warnings from ggplot. If set
+  to TRUE, NAs are removed before plotting and warning
+  messages from ggplot are avoided.}
 
   \item{imgtype}{Type of exported image. Default set to
   png. Other possible options are jpeg or pdf.}

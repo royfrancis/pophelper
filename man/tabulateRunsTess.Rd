@@ -19,7 +19,7 @@ tabulateRunsTess(files = NULL, writetable = FALSE, quiet = FALSE)
 }
 \value{
 Returns a dataframe with filenames, K and number of
-individuals of all runs sorted by K.
+individuals of all runs sorted by ind and K.
 }
 \description{
 Creates a table from TESS output files with filenames, K

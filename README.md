@@ -36,11 +36,12 @@ df<-tabulateRunsStructure(files=flist)
 tabulateRunsTess(files=flist1)
 ```
 ### 2. Summarise runs  
-The tabulated runs can be further condensed by repeats. This is applicable only to STRUCTURE runs.
+The tabulated runs can be further condensed by repeats.
 
 ```coffee
 #summarise STRUCTURE runs
 df1<-summariseRunsStructure(df)
+summariseRunsTess()
 ```
 
 ### 3. Evanno method  
@@ -50,7 +51,7 @@ This function calculates the Evanno derivatives, tables and figures. The output 
 #perform evanno method
 evannoMethodStructure(df1)
 ```
-![Evanno Method](vignettes/evannoMethodStructure.jpg)  
+![Evanno Method](vignettes/Fig2.jpg)  
 __Fig 1.__ Evanno Method
 
 ### 4. Convert to dataframe  
@@ -191,12 +192,26 @@ PlotMultiline()
 ### TESS
 ```coffee
 collectRunsTess()  
-tabulateRunsTess()  
+tabulateRunsTess()
+summariseRunsTess()
 runsToDfTess()  
 clumppExportTess()  
 collectClumppOutput()  
 plotRuns()  
 plotMultiline()  
 ```
+## References
+[Evanno, G., Regnaut, S., and Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620](http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract)
 
-#### End of Document.
+[François, O., and Durand, E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.](http://onlinelibrary.wiley.com/doi/10.1111/j.1755-0998.2010.02868.x/abstract)
+
+[Jakobsson, M., and Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806](http://bioinformatics.oxfordjournals.org/content/23/14/1801.short)
+
+[Pritchard, J. K., Stephens, M., & Donnelly, P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.](http://www.genetics.org/content/155/2/945.short)
+
+### Disclaimer
+The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or 
+inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely 
+for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
+
+#### (c) 2014 Roy M Francis | roy.m.francis@outlook.com

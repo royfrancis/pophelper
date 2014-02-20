@@ -3,9 +3,9 @@
 \title{Plot STRUCTURE, TESS or table files as barplots.}
 \usage{
 plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
-  imgtype = "png", height = NA, width = NA, dpi = NA, units = NA,
-  flabsize = NA, flabcol = NA, flabbackcol = NA, labpos = NA,
-  labsize = NA, labangle = NA, labjust = NA, labcol = NA,
+  na.rm = FALSE, imgtype = "png", height = NA, width = NA, dpi = NA,
+  units = NA, flabsize = NA, flabcol = NA, flabbackcol = NA,
+  labpos = NA, labsize = NA, labangle = NA, labjust = NA, labcol = NA,
   pointsize = NA, pointcol = NA, pointtype = NA, linepos = NA,
   linethick = NA, linecol = NA, fmar = NA)
 }
@@ -29,6 +29,11 @@ plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
   automatically generated. K 1 to 12 are custom unique
   colours while K>12 are coloured by function
   rich.color().}
+
+  \item{na.rm}{Default set to FALSE. NAs are not removed
+  from data, therefore ggplot prints warning messages for
+  NAs. If set to TRUE, NAs are removed before plotting and
+  ggplot NA warning is suppressed.}
 
   \item{imgtype}{Image file type. Possible options are
   "png","jpeg" or "pdf". For pdf, height and width are in
