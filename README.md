@@ -214,4 +214,4 @@ The `pophelper` R package is offered free and without warranty of any kind, eith
 inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely 
 for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
 
-#### (c) 2014 Roy M Francis | roy.m.francis@outlook.com
+(c) 2014 Roy M Francis | roy.m.francis@outlook.com
