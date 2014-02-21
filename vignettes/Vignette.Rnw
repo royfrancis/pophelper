@@ -589,7 +589,7 @@ Some of the same functionalities in this package have been implented in the onli
 \href{http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract}{(Link)}
 \url{}
 
-2. François, O., and Durand, E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.\\
+2. Fran\c{c}ois, O., and Durand, E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.\\
 \href{http://onlinelibrary.wiley.com/doi/10.1111/j.1755-0998.2010.02868.x/abstract}{(Link)}
 \url{}
 
