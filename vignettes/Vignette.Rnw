@@ -2,7 +2,7 @@
 % \VignettePackage{Vignette}
 % \VignetteIndexEntry{pophelper 1.0.0 Demonstration and workflow}
 
-\usepackage{zi4}
+%\usepackage{zi4}
 \usepackage{fancyhdr}
 \usepackage[pdftex]{graphicx}
 \usepackage{a4wide}
