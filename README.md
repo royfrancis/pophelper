@@ -209,9 +209,11 @@ plotMultiline()
 
 [Pritchard, J. K., Stephens, M., & Donnelly, P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.](http://www.genetics.org/content/155/2/945.short)  
 
-Please make sure you verify all your results by eye atleast once per batch. And feel free to email me if there are any issues which I am sure there will be since all possibilities have not been exhaustively tested.  
-
+  
 ### Disclaimer
+
+Please make sure you verify all your results by eye atleast once per batch. And feel free to email me if there are any issues which I am sure there will be since all possibilities have not been exhaustively tested.
+
 The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or 
 inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely 
 for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
