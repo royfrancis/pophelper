@@ -51,7 +51,7 @@ This function calculates the Evanno derivatives, tables and figures. The output 
 #perform evanno method
 evannoMethodStructure(df1)
 ```
-![Evanno Method](vignettes/Fig2.jpg)  
+![Evanno Method](screenshots/Fig2.jpg)  
 __Fig 1.__ Evanno Method
 
 ### 4. Convert to dataframe  
@@ -74,10 +74,10 @@ clumppExportStructure(files=flist)
 #convert TESS runs for CLUMPP
 clumppExportTess(files=flist1)
 ```
-![CLUMPP results and the contents of each folder](vignettes/Fig3.jpg) 
+![CLUMPP results and the contents of each folder](screenshots/Fig3.jpg) 
 __Fig 2.__ Folders created from CLUMPP export and the contents of each folder.
 
-![CLUMPP results aligned file merged file and misc file](vignettes/Fig4.jpg)  
+![CLUMPP results aligned file merged file and misc file](screenshots/Fig4.jpg)  
 __Fig 3.__ Folder showing CLUMPP results: aligned file, merged file and misc file.
 
 ### 6. Collect CLUMPP output files  
@@ -108,7 +108,7 @@ plotRuns(files=flist[1:2], imgoutput="sep")
 plotRuns(files=flist[1:2], imgoutput="join")
 ```
 
-![plotRuns example 1](vignettes/Fig5.jpg)  
+![plotRuns example 1](screenshots/Fig5.jpg)  
 __Fig 4.__ Left: Single run plotted separately. Right: Two runs joined together in one image  
 
 * To plot with populations labels  
@@ -129,7 +129,7 @@ plotRuns(files=flist1[1:2], imgoutput="sep", poplab=labs1)
 plotRuns(files=flist1[1:2], imgoutput="join", poplab=labs1) 
 ```
 
-![plotRuns example 2](vignettes/Fig6.jpg)  
+![plotRuns example 2](screenshots/Fig6.jpg)  
 __Fig 5.__ Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.
 
 * To plot only joined files from table files (combined/aligned/merged)  
@@ -143,7 +143,7 @@ tabs1<-c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
 plotRuns(files=tabs1, imgoutput="tab")
 ```
 
-![PlotRuns example 3](vignettes/Fig7.jpg)  
+![PlotRuns example 3](screenshots/Fig7.jpg)  
 __Fig 6.__ Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).
 
 ### 8. Plot Multiline  
@@ -158,12 +158,12 @@ plotMultiline(files=flist1[1])
 plotMultiline(files=flist[1], spl=75, lpp=10)
 plotMultiline(files=flist1[1], spl=75, lpp=11)
 ```
-![plotMultiline example](vignettes/Fig11.jpg)  
+![plotMultiline example](screenshots/Fig11.jpg)  
 __Fig 7.__ Left: `plotMultiline` default output. Right: Modified output.
 
 #### 8.1 Sample plot outputs
 
-![Sample](vignettes/Fig12.jpg)  
+![Sample](screenshots/Fig12.jpg)  
 
 __Fig 8.__ Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(x,"Spectral")` from `RColorBrewer` package.
 
