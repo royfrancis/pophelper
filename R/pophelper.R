@@ -122,7 +122,7 @@ tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
   
   #sort table on loci, ind, K
   main <- main[with(main, order(loci, ind, k)), ]
-
+  
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
@@ -183,7 +183,7 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
   
   #convert to numeric
   main <- data.frame(file=filenames, k=k, ind=ind)
-
+  
   #sort table on K
   main <- main[with(main, order(ind, k)), ]
   
@@ -217,19 +217,19 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
 #' 
 summariseRunsStructure <- function(data=NULL, writetable=FALSE)
 {
-  #does df data contain any data?
+  #does df data contain any data
   if (length(data) == 0) stop("No input files.\n")
   #make sure dataframe
   data <- as.data.frame(data)
   #convert column names to lowercase
   colnames(data) <- tolower(colnames(data))
-  #is column k available?
+  #is column k available
   if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
-  #is column ind available?
+  #is column ind available
   if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
-  #is column loci available?
+  #is column loci available
   if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available.\n")
-  #is column elpd available?
+  #is column elpd available
   if (length(grep("elpd", colnames(data))) == 0) stop("Column elpd not available.\n")
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
@@ -326,17 +326,17 @@ summariseRunsStructure <- function(data=NULL, writetable=FALSE)
 #' 
 summariseRunsTess <- function(data=NULL, writetable=FALSE)
 {
-  #does df data contain any data?
+  #does df data contain any data
   if (length(data) == 0) stop("No input files.\n")
   #make sure dataframe
   data <- as.data.frame(data)
   #convert column names to lowercase
   colnames(data) <- tolower(colnames(data))
-  #is column k available?
+  #is column k available
   if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
-  #is column ind available?
+  #is column ind available
   if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
-  #is column loci available?
+  #is column loci available
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
@@ -354,10 +354,10 @@ summariseRunsTess <- function(data=NULL, writetable=FALSE)
     {
       if (p == data$ind[e])
       {
-          ind <- data$ind[e]
-          k <- data$k[e]
-          len <- r
-          
+        ind <- data$ind[e]
+        k <- data$k[e]
+        len <- r
+        
       }else
       {break}
       e = e + 1
@@ -372,7 +372,7 @@ summariseRunsTess <- function(data=NULL, writetable=FALSE)
   
   #results into a dataframe
   data1 <- data.frame(k=kval, runs=lenk, ind=indvec)
-
+  
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
@@ -386,19 +386,49 @@ summariseRunsTess <- function(data=NULL, writetable=FALSE)
 
 #FUNCTION evannoMethodStructure
 #' Perform the Evanno method
-#' @description The Evanno method for detecting the appropriate number of population clusters from STRUCTURE results. Creates table and figure with Evanno method derivatives. Refer to return for detailed list of columns. See details for Evanno method reference.
-#' @param data A dataframe with summarised runs. An output from \code{summariseRunsStructure()}. Must have minimum 7 columns named meanelpd, sd, k, runs, loci, maxelpd and minelpd.
-#' @param writetable Set to FALSE by default. Setting to TRUE writes the output table as a tab-delimited text file in the working directory.
-#' @param doplot Default set to TRUE, calculates the Evanno plots and plots in the graphical device. If Evanno method cannot be computed, a kPlot (elpd over k) is shown instead. Set this to FALSE to avoid computation of plots and only return table (much faster).
-#' @param exportplot If set to TRUE, exports the Evanno plots as image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.
-#' @param na.rm Default set to FALSE. Does not remove NAs for plot and this generates warnings from ggplot. If set to TRUE, NAs are removed before plotting and warning messages from ggplot are avoided.
-#' @param imgtype Type of exported image. Default set to png. Other possible options are jpeg or pdf.
-#' @param height Height of exported image. Default units in px. If imgtype is pdf, height must be in inches.
-#' @param width Width of exported image. Default units in px. If imgtype is pdf, height must be in inches.
-#' @param res Resolution of exported image. Default set to 200. If imgtype is pdf, this option does not apply.
-#' @param units Units of measure of the export image. Some options include 'px','in','cm','mm' etc. By default, units is set to 'px' for png and jpeg and to 'in' if imgtype is 'pdf'.
-#' @return Returns a dataframe with all values sorted by K. The table has 16 columns namely Mean estimated ln probability of data, Standard deviation, Value of K, Number of runs for each K, Number of runs for each K, Number of individuals for each K, Number of loci for each K, Estimated ln probability of data plus standard deviation, Estimated ln probability of data minus standard deviation, First derivative, Max error of first derivative, Min error of first derivative, Second derivative, Max error of second derivative, Min error of second derivative, Third derivative and Best value of K.
-#' @details The Evanno method is based on the paper: Evanno, G., Regnaut, S., & Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620. The Evanno plot generated from this function can be recreated from the returned dataframe if furthur customisation is required.
+#' @description The Evanno method for detecting the appropriate number of 
+#' population clusters from STRUCTURE results. Creates table and figure with 
+#' Evanno method derivatives. Refer to return for detailed list of columns. 
+#' See details for Evanno method reference.
+#' @param data A dataframe with summarised runs. An output from 
+#' \code{summariseRunsStructure()}. Must have minimum 7 columns named meanelpd, 
+#' sd, k, runs, loci, maxelpd and minelpd.
+#' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
+#' table as a tab-delimited text file in the working directory.
+#' @param doplot Default set to TRUE, calculates the Evanno plots and plots in 
+#' the graphical device. If Evanno method cannot be computed, a kPlot 
+#' (elpd over k) is shown instead. Set this to FALSE to avoid computation of 
+#' plots and only return table (much faster).
+#' @param exportplot If set to TRUE, exports the Evanno plots as image in the 
+#' working directory. If Evanno method cannot be computed, a kPlot (elpd over k) 
+#' is exported instead.
+#' @param na.rm Default set to FALSE. Does not remove NAs for plot and this 
+#' generates warnings from ggplot. If set to TRUE, NAs are removed before 
+#' plotting and warning messages from ggplot are avoided.
+#' @param imgtype Type of exported image. Default set to png. Other possible 
+#' options are jpeg or pdf.
+#' @param height Height of exported image. Default units in px. If imgtype is 
+#' pdf, height must be in inches.
+#' @param width Width of exported image. Default units in px. If imgtype is 
+#' pdf, height must be in inches.
+#' @param res Resolution of exported image. Default set to 200. If imgtype is 
+#' pdf, this option does not apply.
+#' @param units Units of measure of the export image. Some options include 'px',
+#' 'in','cm','mm' etc. By default, units is set to 'px' for png and jpeg and to 
+#' 'in' if imgtype is 'pdf'.
+#' @return Returns a dataframe with all values sorted by K. The table has 16 
+#' columns namely Mean estimated ln probability of data, Standard deviation, 
+#' Value of K, Number of runs for each K, Number of runs for each K, Number of 
+#' individuals for each K, Number of loci for each K, Estimated ln probability 
+#' of data plus standard deviation, Estimated ln probability of data minus 
+#' standard deviation, First derivative, Max error of first derivative, Min 
+#' error of first derivative, Second derivative, Max error of second derivative, 
+#' Min error of second derivative, Third derivative and Best value of K.
+#' @details The Evanno method is based on the paper: Evanno, G., Regnaut, S., 
+#' and Goudet, J. (2005). Detecting the number of clusters of individuals using 
+#' the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 
+#' 2611-2620. The Evanno plot generated from this function can be recreated 
+#' from the returned dataframe if furthur customisation is required.
 #' @export
 #' 
 evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, exportplot=FALSE, na.rm=FALSE, imgtype="png", height=NA, width=NA, res=NA, units=NA)
@@ -413,38 +443,38 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
   exportplot <- toupper(exportplot)
   imgtype <- tolower(imgtype)
   if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg' or 'pdf'.\n")
-   
-  #does df data contain any data?
+  
+  #does df data contain any data
   if (length(data) == 0) stop("No input files.\n")
   #make sure dataframe
   data <- as.data.frame(data)
   #convert column names to lowercase
   colnames(data) <- tolower(colnames(data))
-  #is column meanelpd available?
+  #is column meanelpd available
   if (length(grep("meanelpd", colnames(data))) == 0) stop("Column meanelpd not available.\n")
-  #is column sd available?
+  #is column sd available
   if (length(grep("sd", colnames(data))) == 0) stop("Column sd not available.\n")
-  #is column k available?
+  #is column k available
   if (length(grep("k", colnames(data))) == 0) stop("Column k not available.\n")
-  #is column runs available?
+  #is column runs available
   if (length(grep("runs", colnames(data))) == 0) stop("Column runs not available.\n")
-  #is column ind available?
+  #is column ind available
   if (length(grep("ind", colnames(data))) == 0) stop("Column ind not available.\n")
-  #is column loci available?
+  #is column loci available
   if (length(grep("loci", colnames(data))) == 0) stop("Column loci not available.\n")
-  #is column maxelpd available?
+  #is column maxelpd available
   if (length(grep("maxelpd", colnames(data))) == 0) stop("Column maxelpd not available.\n")
-  #is column minelpd available?
+  #is column minelpd available
   if (length(grep("minelpd", colnames(data))) == 0) stop("Column minelpd not available.\n")
   
   err <- 0
-  #atleast 3 values of K?
+  #atleast 3 values of K
   if (length(data$k) < 3) {cat("Error: The Evanno method not computed. Requires at least 3 values of K.\n"); err <- 1;}
-  #do loci vary?
+  #do loci vary
   if (all(data$loci[1] == data$loci) != TRUE) {cat("Error: The Evanno method not computed. Number of loci vary between runs. \n"); err <- 1;}
-  #do ind vary?
+  #do ind vary
   if (all(data$ind[1] == data$ind) != TRUE) {cat("Error: The Evanno method not computed. Number of individuals vary between runs. \n"); err <- 1;}
-  #are k values sequential?
+  #are k values sequential
   is.sequential <- function(x) all(abs(diff(x)) == 1)
   if (is.sequential(data$k) == FALSE) {cat("Error: The Evanno method not computed. Requires increasing sequential values of K. \n"); err <- 1;}
   #repeats of k<2
@@ -481,21 +511,21 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
   
   if (err == 1)
   {
-      #show plot
-      print(plist[[1]])
+    #show plot
+    print(plist[[1]])
+    
+    if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
+    {
+      #check image imgtype
+      if (imgtype == "pdf") ggsave("kPlot.pdf", plist[[1]], height=height1, width=width1)
+      if (imgtype == "png") ggsave("kPlot.png", plist[[1]], height=height1, width=width1, dpi=res, units=units)
+      if (imgtype == "jpeg") ggsave("kPlot.jpg", plist[[1]], height=height1, width=width1, dpi=res, units=units, quality=100)
       
-      if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-      {
-        #check image imgtype
-        if (imgtype == "pdf") ggsave("kPlot.pdf", plist[[1]], height=height1, width=width1)
-        if (imgtype == "png") ggsave("kPlot.png", plist[[1]], height=height1, width=width1, dpi=res, units=units)
-        if (imgtype == "jpeg") ggsave("kPlot.jpg", plist[[1]], height=height1, width=width1, dpi=res, units=units, quality=100)
-        
-        if (imgtype == "pdf") cat("kPlot.pdf exported.\n")
-        if (imgtype == "png") cat("kPlot.png exported.\n")
-        if (imgtype == "jpeg") cat("kPlot.jpg exported.\n")
-      }
-      
+      if (imgtype == "pdf") cat("kPlot.pdf exported.\n")
+      if (imgtype == "png") cat("kPlot.png exported.\n")
+      if (imgtype == "jpeg") cat("kPlot.jpg exported.\n")
+    }
+    
     stop("Evanno method not computed.\n")
   }
   
@@ -544,7 +574,8 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
-    write.table(prettyNum(data, preserve.width="common"), "evannoMethodStructure.txt", quote=FALSE, row.names=FALSE)
+    write.table(prettyNum(data, preserve.width="common"), "evannoMethodStructure.txt", 
+                quote=FALSE, row.names=FALSE)
     cat("evannoMethodStructure.txt exported\n") 
   }
   
@@ -599,34 +630,41 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
               plot.title = element_text(hjust = 0),
               plot.margin=unit(c(0.2,0.2,0.2,0.2),"cm"))
     }
-   
+    
     
     #combine images
     plen <- length(plist)
-    if (plen == 3) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], ncol=2, nrow=2)
-    if (plen == 4) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], plist[[4]], ncol=2, nrow=2)
-  
+    if (plen == 3) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], ncol=2, 
+                                       nrow=2)
+    if (plen == 4) pall <- arrangeGrob(plist[[1]],plist[[2]],plist[[3]], 
+                                       plist[[4]], ncol=2, nrow=2)
+    
     #show plots
     print(pall)
     
-  #export image
-  if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-  {   
-    if (is.na(height) && imgtype == "pdf") height1 <- 7;
-    if (is.na(width) && imgtype =="pdf") width1 <- 7;
-    if (is.na(height && imgtype != "pdf")) height1 <- 18;
-    if (is.na(width && imgtype != "pdf")) width1 <- 18;
-    
-    #check image imgtype  
-    if (imgtype == "pdf") ggsave("evannoMethodStructure.pdf", pall, height=height1, width=width1)
-    if (imgtype == "png") ggsave("evannoMethodStructure.png", pall, height=height1, width=width1, dpi=res, units=units)
-    if (imgtype == "jpeg") ggsave("evannoMethodStructure.jpg", pall, height=height1, width=width1, dpi=res, units=units, quality=100)
-  
-    if (imgtype == "pdf") cat("evannoMethodStructure.pdf exported\n")
-    if (imgtype == "png") cat("evannoMethodStructure.png exported\n")
-    if (imgtype == "jpeg") cat("evannoMethodStructure.jpg exported\n")
+    #export image
+    if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
+    {   
+      if (is.na(height) && imgtype == "pdf") height1 <- 7;
+      if (is.na(width) && imgtype =="pdf") width1 <- 7;
+      if (is.na(height && imgtype != "pdf")) height1 <- 18;
+      if (is.na(width && imgtype != "pdf")) width1 <- 18;
+      
+      #check image imgtype  
+      if (imgtype == "pdf") ggsave("evannoMethodStructure.pdf", pall, 
+                                   height=height1, width=width1)
+      if (imgtype == "png") ggsave("evannoMethodStructure.png", pall, 
+                                   height=height1, width=width1, dpi=res, 
+                                   units=units)
+      if (imgtype == "jpeg") ggsave("evannoMethodStructure.jpg", pall, 
+                                    height=height1, width=width1, dpi=res, 
+                                    units=units, quality=100)
+      
+      if (imgtype == "pdf") cat("evannoMethodStructure.pdf exported\n")
+      if (imgtype == "png") cat("evannoMethodStructure.png exported\n")
+      if (imgtype == "jpeg") cat("evannoMethodStructure.jpg exported\n")
+    }
   }
-}
   
   #return table
   return(data)
@@ -654,7 +692,7 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
 #' helps to overcome this issue by reordering the clusters correctly. This 
 #' function clumppExportStructure() takes multiple runs for each K and combines 
 #' them into a single file and generates a parameter file for easy use with 
-#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & 
+#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., and 
 #' Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program 
 #' for dealing with label switching and multimodality in analysis of population 
 #' structure. Bioinformatics, 23(14), 1801-1806.
@@ -678,12 +716,15 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
   df1 <- tabulateRunsStructure(files=files)
   df2 <- summariseRunsStructure(df1)
   
-  #k val duplicated?
-  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. Repeating values of K found. \n")
-  #do ind vary?
-  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals vary between runs. \n")
-  #do loci vary?
-  if (all(df2$loci[1] == df2$loci) != TRUE) cat("Warning: Number of loci vary between runs. \n")
+  #k val duplicated
+  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. 
+                                           Repeating values of K found. \n")
+  #do ind vary
+  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals 
+                                              vary between runs. \n")
+  #do loci vary
+  if (all(df2$loci[1] == df2$loci) != TRUE) cat("Warning: Number of loci vary 
+                                                between runs. \n")
   
   e <- 1
   p <- 1
@@ -765,7 +806,8 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
                   "PRINT_EVERY_PERM 0 ",
                   paste("EVERY_PERMFILE ",out1,".every_permfile ",sep=""),
                   "PRINT_RANDOM_INPUTORDER 0 ",
-                  paste("RANDOM_INPUTORDERFILE ",out1,".random_inputorderfile ",sep=""),
+                  paste("RANDOM_INPUTORDERFILE ",out1,".random_inputorderfile ",
+                        sep=""),
                   "OVERRIDE_WARNINGS 0 ",
                   "ORDER_BY_RUN 0 ")
       
@@ -777,7 +819,8 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
     }else
     {
       if (k == 1) cat(paste(prefix, k, " not exported. K less than 2\n", sep=""))
-      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
+      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", 
+                              sep=""))
       cat("-----------------------\n")
     }
     e <- e + 1
@@ -808,7 +851,7 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
 #' helps to overcome this issue by reordering the clusters correctly. This 
 #' function clumppExportTess() takes multiple runs for each K and combines 
 #' them into a single file and generates a parameter file for easy use with 
-#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., & 
+#' CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., and 
 #' Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program 
 #' for dealing with label switching and multimodality in analysis of population 
 #' structure. Bioinformatics, 23(14), 1801-1806.
@@ -832,11 +875,13 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
   df1 <- tabulateRunsTess(files=files)
   df2 <- summariseRunsTess(df1)
   
-  #k val duplicated?
-  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. Repeating values of K found. \n")
-  #do ind vary?
-  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals vary between runs. \n")
- 
+  #k val duplicated
+  if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. 
+                                           Repeating values of K found. \n")
+  #do ind vary
+  if (all(df2$ind[1] == df2$ind) != TRUE) cat("Warning: Number of individuals 
+                                              vary between runs. \n")
+  
   e <- 1
   p <- 1
   while (e <= length(df2$k))
@@ -917,7 +962,8 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
                   "PRINT_EVERY_PERM 0 ",
                   paste("EVERY_PERMFILE ",out1,".every_permfile ",sep=""),
                   "PRINT_RANDOM_INPUTORDER 0 ",
-                  paste("RANDOM_INPUTORDERFILE ",out1,".random_inputorderfile ",sep=""),
+                  paste("RANDOM_INPUTORDERFILE ",out1,".random_inputorderfile ",
+                        sep=""),
                   "OVERRIDE_WARNINGS 0 ",
                   "ORDER_BY_RUN 0 ")
       
@@ -929,7 +975,8 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
     }else
     {
       if (k == 1) cat(paste(prefix, k, " not exported. K less than 2\n", sep=""))
-      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", sep=""))
+      if (runs < 2) cat(paste(prefix, k, " not exported. Repeats less than 2\n", 
+                              sep=""))
       cat("-----------------------\n")
     }
     e <- e + 1
@@ -941,9 +988,12 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 
 # FUNCTION runsToDfStructure
 #' Convert STRUCTURE run files to R dataframes.
-#' @description Takes one or more STRUCTURE output files and converts each of them to separate dataframes.
-#' @param files One or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)} to select interactively.
-#' @return If a single file is selected, a single dataframe is returned. If multiple files are selected, a list with multiple dataframes is returned.
+#' @description Takes one or more STRUCTURE output files and converts each of 
+#' them to separate dataframes.
+#' @param files One or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)} 
+#' to select interactively.
+#' @return If a single file is selected, a single dataframe is returned. If 
+#' multiple files are selected, a list with multiple dataframes is returned.
 #' @export
 #' 
 runsToDfStructure <- function(files=NA)
@@ -961,22 +1011,26 @@ runsToDfStructure <- function(files=NA)
     
     file1 <- readLines(as.character(files[i]), warn=FALSE)
     chk1 <- grep("STRUCTURE", toupper(file1[4]))
-    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.\n")
+    if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect 
+                                input format.\n")
     if (length(file1)<1) stop("Cannot read file.\n")
     
     #find individuals and get number of individuals
-    ind <- as.numeric(as.character(gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    ind <- as.numeric(as.character(gsub("\\D", "", grep("\\d individuals", 
+                                                        file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(ind)) cat(paste("Number of individuals is NA in file: ", name, sep=""))
     
     #get value of k & error check
-    k <- as.numeric(as.character(gsub("\\D", "", grep("\\d populations assumed", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    k <- as.numeric(as.character(gsub("\\D", "", grep("\\d populations assumed", 
+                                                      file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(k)) cat(paste("Value of K is NA in file: ", name, sep=""))
     
     cstart <- charmatch("Inferred ancestry of individuals", file1)
     cend <- charmatch("Estimated Allele Frequencies in each cluster", file1)
     file1 <- file1[(cstart+2):(cend-1)]
     file_a <- file1[file1 != ""]
-    file_b <- gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
+    file_b <- gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), 
+                                     nchar(file_a)-1))
     file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b, " ")))))
     dframe <- as.data.frame(matrix(file_c, nrow=ind, byrow=TRUE),stringsAsFactors=FALSE)
     dframe <- as.data.frame(sapply(dframe, as.numeric))
@@ -990,9 +1044,12 @@ runsToDfStructure <- function(files=NA)
 
 # FUNCTION runsToDfTess
 #' Convert TESS cluster files to R dataframe.
-#' @description Takes one or more TESS cluster run files and converts each of them to separate dataframes.
-#' @param files One or more TESS cluster run files. Use \code{choose.files(multi=TRUE)} to select interactively.
-#' @return If a single file is selected, a single dataframe is returned. If multiple files are selected, a list with multiple dataframes is returned.
+#' @description Takes one or more TESS cluster run files and converts each of 
+#' them to separate dataframes.
+#' @param files One or more TESS cluster run files. Use \code{choose.files(multi=TRUE)} 
+#' to select interactively.
+#' @return If a single file is selected, a single dataframe is returned. 
+#' If multiple files are selected, a list with multiple dataframes is returned.
 #' @details Use collectRunsTess() to collect TESS runs into one directory.
 #' @export
 #'
@@ -1034,7 +1091,8 @@ runsToDfTess <- function(files=NA)
 
 #FUNCTION getDim
 #' Internal: Get dimensions for figures.
-#' @description Generate height and width of figure based on number of individuals. This is an internal function that calculates figure dimensions for export.
+#' @description Generate height and width of figure based on number of individuals. 
+#' This is an internal function that calculates figure dimensions for export.
 #' @param ind Number of individuals.
 #' @param units unit of dimension: "cm","mm","in".
 #' @param height Height of each plot.
@@ -1080,7 +1138,8 @@ getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
 #' @param labpos The y position of the labels.
 #' @param labsize Size of the labels.
 #' @param labangle Angle/Rotation of labels. 0 is horizontal while 90 is vertical.
-#' @param labjust Justification of labels. Defaults to 0.5 if labangle=0  or 1 if labangle between 20 and 135.
+#' @param labjust Justification of labels. Defaults to 0.5 if labangle=0  or 1 if 
+#' labangle between 20 and 135.
 #' @param labcol Colour of labels. Defaults to "grey30".
 #' @param pointsize Size of points on label marker line.
 #' @param pointcol Colour of the points on the label marker line. Defaults to "grey30".
@@ -1088,10 +1147,13 @@ getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
 #' @param linepos The y position of the label marker line and the points.
 #' @param linethick Thickness of the label marker line.
 #' @param linecol Colour of the label marker line. Defaults to "grey30".
-#' @param fmar Figure margins in 'lines' unit. A vector of 4 numbers for top, right, bottom and left margins. ex. c(0.2,0.2,0.2,0).
-#' @return A list with following plot parameters: poplab, plotnum, labpos, labsize, labangle, labjust, labcol, pointsize, pointcol, pointtype, linepos, linethick, linecol, fmar
+#' @param fmar Figure margins in 'lines' unit. A vector of 4 numbers for top, right, 
+#' bottom and left margins. ex. c(0.2,0.2,0.2,0).
+#' @return A list with following plot parameters: poplab, plotnum, labpos, labsize, 
+#' labangle, labjust, labcol, pointsize, pointcol, pointtype, linepos, linethick, linecol, fmar
 #' 
-getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=NA, labjust=NA, labcol=NA,
+getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=NA, 
+                          labjust=NA, labcol=NA,
                           pointsize=NA, pointcol=NA, pointtype=NA,
                           linepos=NA, linethick=NA, linecol=NA, fmar=NA)
 {
@@ -1160,8 +1222,10 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
   if (is.na(pointsize)) {if (pointsize1 > 3.2) pointsize1 <- 3.2}
   if (is.na(linethick)) {if (linethick1 > 0.6) linethick1 <- 0.6}
   
-  dlist <- list(poplab=poplab, plotnum=plotnum, labpos=labpos1, labsize=labsize1, labangle=labangle, labjust=labjust, labcol=labcol, 
-                pointsize=pointsize1, pointcol=pointcol, pointtype=pointtype, linepos=linepos1, linethick=linethick1, 
+  dlist <- list(poplab=poplab, plotnum=plotnum, labpos=labpos1, labsize=labsize1, 
+                labangle=labangle, labjust=labjust, labcol=labcol, 
+                pointsize=pointsize1, pointcol=pointcol, pointtype=pointtype, 
+                linepos=linepos1, linethick=linethick1, 
                 linecol=linecol, fmar=fmar)
   return(dlist)
 }
@@ -1839,7 +1903,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
       
       #primary calculation of spl
       nr1 <- nrow(dff)
-
+      
       #numrows <- floor(nr1/spl)
       #numextra <- nr1-(spl*numrows)
       #nr2 <- numrows
@@ -1868,7 +1932,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
           if (spl1 > nr1) {spl1 <- nr1; break;}
         }
       }
-     
+      
       nr2 <- numrows
       if (numextra > 0) nr2 <- nr2+1
       
@@ -1898,9 +1962,9 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
             theme(legend.position="none", panel.grid=element_blank(), panel.background=element_blank(), 
                   axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.line=element_blank(), 
                   axis.title=element_blank(), axis.text.x=element_text(size=labsize, angle=labangle, 
-                  vjust=labvjust,hjust=labhjust), plot.margin=unit(c(0.1, 0.1, 0.1, 0), "cm"))
+                                                                       vjust=labvjust,hjust=labhjust), plot.margin=unit(c(0.1, 0.1, 0.1, 0), "cm"))
         }
-
+        
         if (indlabs == FALSE)
         {
           df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))

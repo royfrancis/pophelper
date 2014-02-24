@@ -18,4 +18,4 @@ Depends:
     Hmisc,
     reshape
 License: GPL-3
-Encoding: ASCII
+Encoding: UTF-8
