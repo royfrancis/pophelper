@@ -45,7 +45,7 @@ evannoMethodStructure(data = NULL, writetable = FALSE, doplot = TRUE,
   200. If imgtype is pdf, this option does not apply.}
 
   \item{units}{Units of measure of the export image. Some
-  options include 'px','in','cm','mm' etc. By default,
+  options include 'px', 'in','cm','mm' etc. By default,
   units is set to 'px' for png and jpeg and to 'in' if
   imgtype is 'pdf'.}
 }
@@ -71,7 +71,7 @@ reference.
 }
 \details{
 The Evanno method is based on the paper: Evanno, G.,
-Regnaut, S., & Goudet, J. (2005). Detecting the number of
+Regnaut, S., and Goudet, J. (2005). Detecting the number of
 clusters of individuals using the software STRUCTURE: a
 simulation study. Molecular ecology, 14(8), 2611-2620. The
 Evanno plot generated from this function can be recreated

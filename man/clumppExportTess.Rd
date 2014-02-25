@@ -39,7 +39,7 @@ this issue by reordering the clusters correctly. This
 function clumppExportTess() takes multiple runs for each K
 and combines them into a single file and generates a
 parameter file for easy use with CLUMPP. Further details
-for CLUMPP can be found here: Jakobsson, M., & Rosenberg,
+for CLUMPP can be found here: Jakobsson, M., and Rosenberg,
 N. A. (2007). CLUMPP: a cluster matching and permutation
 program for dealing with label switching and multimodality
 in analysis of population structure. Bioinformatics,
