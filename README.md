@@ -5,9 +5,10 @@
 Also, try the video demo [here](https://www.youtube.com/watch?v=iOqxXcQReJI).
 
 ## Installation  
-You can install `pophelper` from `github` using the `devtools` package
+You need to have R (> 3.0.0) installed on your system. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
 
 ```coffee
+install.packages('devtools',dep=T)
 require(devtools)
 install_github('pophelper', 'royfrancis')
 require(pophelper)
