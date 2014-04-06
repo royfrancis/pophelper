@@ -212,13 +212,21 @@ plotMultiline()
 
 [Pritchard, J. K., Stephens, M., & Donnelly, P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.](http://www.genetics.org/content/155/2/945.short)  
 
-  
+
+### Further work
+
+If you have an issues, suggestions, new useful ideas or ways to improve this, feel free to contact me, or add a comment to the issues section here on github.  
+Current ideas:  
+
+> Option to have custom labels in plotMultiline  
+> Use labels for plotMultiline from input structure file  
+> Plot structure results spatially  
+
+
 ### Disclaimer
 
 Please make sure you verify all your results by eye atleast once per batch. And feel free to email me if there are any issues which I am sure there will be since all possibilities have not been exhaustively tested.
 
-The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or 
-inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely 
-for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
+The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
 
 (c) 2014 Roy M Francis | roy.m.francis@outlook.com
