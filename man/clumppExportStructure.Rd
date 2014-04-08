@@ -10,14 +10,17 @@ clumppExportStructure(files = NULL, prefix = NA, parammode = NA,
   to be tabulated. Use \code{choose.files(multi=TRUE)} for
   interactive selection.}
 
-  \item{prefix}{A character prefix for folder names.}
+  \item{prefix}{A character prefix for folder names. Set to
+  'STRUCTUREpop' by default.}
 
-  \item{parammode}{The greedy option for CLUMPP paramfile.
-  Calculated automatically by default. Options are 1, 2 or
-  3. See details.}
+  \item{parammode}{The algorithm option for CLUMPP
+  paramfile. Calculated automatically by default. Options
+  are 1, 2 or 3. Set to 3 if CLUMPP runs too long. See
+  details.}
 
-  \item{paramrep}{The repeats options for CLUMPP paramfile.
-  Calculated automatically by default. See details.}
+  \item{paramrep}{The number of repeats for CLUMPP
+  paramfile. Calculated automatically by default. See
+  details.}
 }
 \value{
 The combined file and paramfile are written into respective
@@ -45,13 +48,19 @@ and permutation program for dealing with label switching
 and multimodality in analysis of population structure.
 Bioinformatics, 23(14), 1801-1806.
 
+The parammode (M) is the type of algorithm used. Option 1
+is 'FullSearch' (takes the longest time), option 2 is
+'Greedy' and option 3 is 'LargeKGreedy' (fastest).
+
 The parammode and paramrep for CLUMPP paramfile is set
 based on this calculation. T <-
 factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number
 of populations, runs is number of runs for k and ind is
 number of individuals. If T <= 100000000, then parammode is
 2 and paramrep is 20, otherwise parammode is 3 and paramrep
-is set to 500. To find out what parammode (greedy option)
-and paramrep (repeats) are, refer to CLUMPP documentation.
+is set to 500.
+
+To find out more about parammode (algorithm type) and
+paramrep (repeats), refer to CLUMPP documentation.
 }
 

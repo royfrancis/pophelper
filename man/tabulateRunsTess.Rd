@@ -2,7 +2,8 @@
 \alias{tabulateRunsTess}
 \title{Tabulate TESS runs}
 \usage{
-tabulateRunsTess(files = NULL, writetable = FALSE, quiet = FALSE)
+tabulateRunsTess(files = NULL, writetable = FALSE, sorttable = TRUE,
+  quiet = FALSE)
 }
 \arguments{
   \item{files}{A character vector of TESS cluster files to
@@ -14,12 +15,16 @@ tabulateRunsTess(files = NULL, writetable = FALSE, quiet = FALSE)
   TRUE writes the output table as a tab-delimited text file
   in the same folder as the STRUCTURE run files.}
 
+  \item{sorttable}{Default set to T. Sorts table by ind and
+  K.}
+
   \item{quiet}{If set to TRUE, then number of selected
   files are not printed.}
 }
 \value{
 Returns a dataframe with filenames, K and number of
-individuals of all runs sorted by ind and K.
+individuals of all runs sorted by ind and K (if
+sorttable=T).
 }
 \description{
 Creates a table from TESS output files with filenames, K
