@@ -1,3 +1,7 @@
+pophelper 1.0.1
+===========
+* parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
+
 pophelper 1.0.0
 ===========
 

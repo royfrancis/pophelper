@@ -40,10 +40,10 @@ getColours <- function(k)
 #' Use \code{choose.files(multi=TRUE)} for interactive selection.
 #' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
 #' table as a tab-delimited text file in the working directory.
+#' @param sorttable Default set to T. Sorts table by loci, ind and K.
 #' @param quiet Set to FALSE by default to print number of selected files. If 
 #' set to TRUE, then number of selected files are not printed.
-#' @return Returns a dataframe with all runs sorted by loci, ind and K. The table has 10 
-#' columns namely file name, value of K, number of individuals, number of loci, 
+#' @return Returns a dataframe with all runs sorted by loci, ind and K (if sorttable=T). The table has 10 columns namely file name, value of K, number of individuals, number of loci, 
 #' estimated ln probability of data, mean value of ln likelihood, variance of 
 #' ln likelihood, mean value of alpha, number of burn-in and number of repeats. 
 #' Missing values are given NA.
@@ -52,7 +52,7 @@ getColours <- function(k)
 #' the selection vector.
 #' @export
 #' 
-tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
+tabulateRunsStructure <- function(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
 {
   quiet <- toupper(quiet)
   #if no files chosen, stop excecution, give error message
@@ -121,8 +121,7 @@ tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
                      reps=as.numeric(reps))
   
   #sort table on loci, ind, K
-  main <- main[with(main, order(loci, ind, k)), ]
-  
+  if(sorttable == TRUE | sorttable == "TRUE" | sorttable == "T") main <- main[with(main, order(loci, ind, k)), ]
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
@@ -144,15 +143,16 @@ tabulateRunsStructure <- function(files=NULL, writetable=FALSE, quiet=FALSE)
 #' \code{collectRunsTess()} to collect TESS runs from multiple folders into one.
 #' @param writetable Set to FALSE by default. Setting to TRUE writes the output 
 #' table as a tab-delimited text file in the same folder as the STRUCTURE run files.
+#' @param sorttable Default set to T. Sorts table by ind and K.
 #' @param quiet If set to TRUE, then number of selected files are not printed.
 #' @return Returns a dataframe with filenames, K and number of individuals of 
-#' all runs sorted by ind and K.
+#' all runs sorted by ind and K (if sorttable=T).
 #' @details The row numbers of the output table denotes the file number selected. 
 #' This is helpful if a particular file from the table needs to be identified in 
 #' the selection vector.
 #' @export
 #'
-tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
+tabulateRunsTess <- function(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
 {
   quiet <- toupper(quiet)
   #choose output files
@@ -185,7 +185,7 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, quiet=FALSE)
   main <- data.frame(file=filenames, k=k, ind=ind)
   
   #sort table on K
-  main <- main[with(main, order(ind, k)), ]
+  if(sorttable == TRUE | sorttable == "TRUE" | sorttable == "T") main <- main[with(main, order(ind, k)), ]
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
@@ -679,10 +679,11 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
 #' this folder and run to reorder the clusters for each K.
 #' @param files A character vector of STRUCTURE output files to be tabulated. 
 #' Use \code{choose.files(multi=TRUE)} for interactive selection.
-#' @param prefix A character prefix for folder names.
-#' @param parammode The greedy option for CLUMPP paramfile. Calculated 
-#' automatically by default. Options are 1, 2 or 3. See details.
-#' @param paramrep The repeats options for CLUMPP paramfile. Calculated 
+#' @param prefix A character prefix for folder names. Set to 'STRUCTUREpop' by default.
+#' @param parammode The algorithm option for CLUMPP paramfile. Calculated 
+#' automatically by default. Options are 1, 2 or 3. Set to 3 if CLUMPP 
+#' runs too long. See details.
+#' @param paramrep The number of repeats for CLUMPP paramfile. Calculated 
 #' automatically by default. See details.
 #' @return The combined file and paramfile are written into respective folders 
 #' named by population.
@@ -697,12 +698,18 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, doplot=TRUE, expo
 #' for dealing with label switching and multimodality in analysis of population 
 #' structure. Bioinformatics, 23(14), 1801-1806.
 #' 
+#' The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch' 
+#' (takes the longest time), option 2 is 'Greedy' and option 3 is 'LargeKGreedy'
+#' (fastest).
+#' 
 #' The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
 #' T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
 #' populations, runs is number of runs for k and ind is number of individuals.
 #' If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
-#' parammode is 3 and paramrep is set to 500. To find out what parammode 
-#' (greedy option) and paramrep (repeats) are, refer to CLUMPP documentation.
+#' parammode is 3 and paramrep is set to 500. 
+#' 
+#' To find out more about parammode (algorithm type) and paramrep (repeats), 
+#' refer to CLUMPP documentation.
 #' 
 #' @export
 #' 
@@ -838,10 +845,11 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
 #' folder and run to reorder the clusters for each K.
 #' @param files A character vector of TESS cluster run files to be tabulated. 
 #' Use \code{choose.files(multi=TRUE)} for interactive selection.
-#' @param prefix A character prefix for folder names.
-#' @param parammode The mode option for CLUMPP paramfile. Calculated 
-#' automatically by default. Options are 1, 2 or 3. See details.
-#' @param paramrep The repeats options for CLUMPP paramfile. Calculated 
+#' @param prefix A character prefix for folder names. By default, set to 'TESSpop'.
+#' @param parammode The algorithm option for CLUMPP paramfile. Calculated 
+#' automatically by default. Options are 1, 2 or 3. Set to 3 if CLUMPP 
+#' runs too long. See details.
+#' @param paramrep The number of repeats for CLUMPP paramfile. Calculated 
 #' automatically by default. See details.
 #' @return The combined file and paramfile are written into respective folders 
 #' named by population.
@@ -856,12 +864,18 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
 #' for dealing with label switching and multimodality in analysis of population 
 #' structure. Bioinformatics, 23(14), 1801-1806.
 #' 
+#' The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch' 
+#' (takes the longest time), option 2 is 'Greedy' and option 3 is 'LargeKGreedy'
+#' (fastest).
+#' 
 #' The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
 #' T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
 #' populations, runs is number of runs for k and ind is number of individuals.
 #' If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
-#' parammode is 3 and paramrep is set to 500. To find out what parammode 
-#' (greedy option) and paramrep (repeats) are, refer to CLUMPP documentation.
+#' parammode is 3 and paramrep is set to 500. 
+#' 
+#' To find out more about parammode (algorithm type) and paramrep (repeats), 
+#' refer to CLUMPP documentation.
 #' 
 #' @export
 #' 
@@ -1873,10 +1887,10 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
   for (i in 1:length(files))
   {
     fname <- gsub(".txt", "", basename(files[i]))
-    #read STRUCTURE file
+    #read TESS file
     chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[i], warn=FALSE))[1])
     if (length(chk) != 0) df1 <- runsToDfTess(files=files[i])
-    #read TESS file
+    #read STRUCTURE file
     chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn=FALSE))[4])
     if (length(chk1) != 0) df1 <- runsToDfStructure(files=files[i])
     #read TAB files
@@ -2026,7 +2040,9 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
   }
 }
 
+
 # New concepts
 # Option to have custom labels in plotMultiline
-
+# Use labels for plotMultiline from input file
+# Plot structure results to spatial
 cat("pophelper v1.0.0 loaded\n")
