@@ -2,6 +2,8 @@ pophelper 1.0.1
 ===========
 * parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
 
+* grep error [Error in runsToDfTess(files[sel]) : No input files.] in clumppExportStructure() and clumppExportTess() fixed. Thanks to Michael Panasci.
+
 pophelper 1.0.0
 ===========
 

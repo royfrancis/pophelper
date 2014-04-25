@@ -22,6 +22,7 @@ rm(pkgCheck)
 #' @param k Number of colours required
 #' @return Returns a vector of k colours in hexadecimal format
 #' @details Colours 1 to 12 are custom unique colours. Colours beyond 15 are generated from colour ramp \code{rich.colors()}.
+#' @export
 #' 
 getColours <- function(k)
 {
@@ -745,7 +746,7 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
     f <- 1
     for (f in 1:runs)
     {
-      sel <- grep(as.character(df1$file[p]), files)
+      sel <- grep(as.character(df1$file[p]), files,fixed=T)
       dframe1 <- runsToDfStructure(files[sel])
       
       #generate df
@@ -908,7 +909,7 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
     f <- 1
     for (f in 1:runs)
     {
-      sel <- grep(as.character(df1$file[p]), files)
+      sel <- grep(as.character(df1$file[p]), files,fixed=T)
       dframe1 <- runsToDfTess(files[sel])
       
       #generate df
@@ -1114,6 +1115,7 @@ runsToDfTess <- function(files=NA)
 #' @param res Resolution of the figure.
 #' @param plotnum Number of plot in the figure.
 #' @return a vector with height and width.
+#' @export
 #'
 getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
 {
@@ -2045,4 +2047,4 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
 # Option to have custom labels in plotMultiline
 # Use labels for plotMultiline from input file
 # Plot structure results to spatial
-cat("pophelper v1.0.0 loaded\n")
+cat("pophelper v1.0.1 loaded\n")
