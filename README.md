@@ -1,8 +1,8 @@
-# pophelper 1.0.0
+# pophelper 1.0.1
 
-`pophelper` is an R package to analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, perform the Evanno method, export files for CLUMPP and generate barplot figures. A brief introduction and tutorial is provided here. For more detailed demonstration, refer the [vignette](https://github.com/royfrancis/pophelper/blob/master/inst/doc/Vignette.pdf).
+`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, perform the Evanno method, export files for CLUMPP and generate barplot figures. A brief introduction and tutorial is provided here. For more detailed demonstration, refer the [vignette](https://github.com/royfrancis/pophelper/blob/master/inst/doc/Vignette.pdf).
 
-Also, try the video demo [here](https://www.youtube.com/watch?v=iOqxXcQReJI).
+Also, try the short video demo [here](https://www.youtube.com/watch?v=iOqxXcQReJI).
 
 ## Installation  
 You need to have R (> 3.0.0) installed on your system. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
@@ -162,7 +162,7 @@ plotMultiline(files=flist[1], spl=75, lpp=10)
 plotMultiline(files=flist1[1], spl=75, lpp=11)
 ```
 ![plotMultiline example](screenshots/Fig11.jpg)  
-__Fig 7.__ Left: `plotMultiline` default output. Right: Modified output.
+__Fig 7.__ Left: `plotMultiline` default output. Right: Modified output where `spl` and `lpp` were defined manually.
 
 #### 8.1 Sample plot outputs
 
@@ -218,15 +218,15 @@ plotMultiline()
 If you have an issues, suggestions, new useful ideas or ways to improve this, feel free to contact me, or add a comment to the issues section here on github.  
 Current ideas:
 
-> NEW! Web app coming soon!  
-> Option to have custom labels in plotMultiline  
-> Use labels for plotMultiline from input structure file  
-> Plot structure results spatially  
+> NEW! Web app under construction.  
+> Option to have custom labels in plotMultiline.  
+> Use labels for plotMultiline from input structure file.  
+> Plot structure/tess run files spatially on map/interpolate.
 
 
 ### Disclaimer
 
-Please make sure you verify all your results by eye atleast once per batch. Verify, verify and when you are done with that, reverify. And feel free to email me if there are any issues which I am sure there will be since all possibilities have not been exhaustively tested. Preferred email is roy.m.francis@outlook.com. It has happened that once in a while messages go to spam. If you don't receive a reply from me in 48 hours, consider sending an email to roy.francis@ebc.uu.se as well.
+Please make sure you verify all your results by eye atleast once per batch. Verify, verify and when you are done with that, reverify. And feel free to email me if there are any issues which I am sure there will be since all possibilities have not been exhaustively tested. Preferred email is roy.m.francis@outlook.com. My spam filter sometimes goes hyper and swallows emails. If you don't receive a reply from me in 48 hours, consider sending an email to roy.francis@ebc.uu.se as well.
 
 The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
 
