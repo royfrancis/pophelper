@@ -218,7 +218,7 @@ plotMultiline()
 If you have an issues, suggestions, new useful ideas or ways to improve this, feel free to contact me, or add a comment to the issues section here on github.  
 Current ideas:
 
-> NEW! Web app coming soon!
+> NEW! Web app coming soon!  
 > Option to have custom labels in plotMultiline  
 > Use labels for plotMultiline from input structure file  
 > Plot structure results spatially  
