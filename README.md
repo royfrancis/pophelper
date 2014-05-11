@@ -55,7 +55,7 @@ This function calculates the Evanno derivatives, tables and figures. The output 
 evannoMethodStructure(df1)
 ```
 ![Evanno Method](screenshots/Fig2.jpg)  
-__Fig 1.__ Evanno Method
+__Fig 1.__ *Evanno Method*
 
 ### 4. Convert to dataframe  
 STRUCTURE and TESS run files can be converted to R dataframes using this function. If multiple files are selected, then a list of dataframes is returned.
@@ -78,10 +78,10 @@ clumppExportStructure(files=flist)
 clumppExportTess(files=flist1)
 ```
 ![CLUMPP results and the contents of each folder](screenshots/Fig3.jpg) 
-__Fig 2.__ Folders created from CLUMPP export and the contents of each folder.
+__Fig 2.__ *Folders created from CLUMPP export and the contents of each folder.*
 
 ![CLUMPP results aligned file merged file and misc file](screenshots/Fig4.jpg)  
-__Fig 3.__ Folder showing CLUMPP results: aligned file, merged file and misc file.
+__Fig 3.__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
 
 ### 6. Collect CLUMPP output files  
 The CLUMPP output files are created in multiple folders. This function helps to collect aligned files, merged files or both from multiple directories into a single directory. 
@@ -114,7 +114,7 @@ plotRuns(files=flist[1:2], imgoutput="join")
 ```
 
 ![plotRuns example 1](screenshots/Fig5.jpg)  
-__Fig 4.__ Left: Single run plotted separately. Right: Two runs joined together in one image.  
+__Fig 4.__ *Left: Single run plotted separately. Right: Two runs joined together in one image.*  
 
 * To plot with populations labels 
 
@@ -136,7 +136,7 @@ plotRuns(files=flist1[1:2], imgoutput="join", poplab=labs1)
 ```
 
 ![plotRuns example 2](screenshots/Fig6.jpg)  
-__Fig 5.__ Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.
+__Fig 5.__ *Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.*
 
 * To plot only joined files from table files (combined/aligned/merged)  
 
@@ -151,7 +151,7 @@ plotRuns(files=tabs1, imgoutput="tab")
 ```
 
 ![PlotRuns example 3](screenshots/Fig7.jpg)  
-__Fig 6.__ Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).
+__Fig 6.__ *Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).*
 
 ### 8. Plot Multiline  
 This function is also used to create barplots from STRUCTURE, TESS or table files. The output is created as A4 format by default. The barplot is broken down to multiple rows to enable easier identification of individuals. The number of samples per line (`spl`) and number of lines per page (`lpp`) can be defined manually if required.
@@ -166,13 +166,13 @@ plotMultiline(files=flist[1], spl=75, lpp=10)
 plotMultiline(files=flist1[1], spl=75, lpp=11)
 ```
 ![plotMultiline example](screenshots/Fig11.jpg)  
-__Fig 7.__ Left: `plotMultiline` default output. Right: Modified output where `spl` and `lpp` were defined manually.
+__Fig 7.__ *Left: `plotMultiline` default output. Right: Modified output where `spl` and `lpp` were defined manually.*
 
 #### 8.1 Sample plot outputs
 
 ![Multiple colours](screenshots/Fig12.jpg)  
 
-__Fig 8.__ Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.
+__Fig 8.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
 
 
 ### 9. Collect TESS runs
@@ -195,12 +195,14 @@ cd1 <- system.file("/files/coords75.txt",package="pophelper")
 plotRunsInterpolate(datafile=df1,coordsfile=cd1)
 #adjusting legend size and legend text
 plotRunsInterpolate(datafile,coordsfile,legendsize=0.4,legendtextsize=6)
+#removing legend
+plotRunsInterpolate(datafile,coordsfile,legend=FALSE)
 ```
-The default interpolation algorithm is Kriging (`method="krig"`). By default, `exportplot=T` which exports an image to the working directory. By default `clusters=NA` which means that all clusters in the file are plotted. By default, `imgoutput="join"`, therefore all clusters are plotted in a single figure.
+The default interpolation algorithm is Kriging (`method="krig"`). By default, `exportplot=T` exports an image to the working directory. By default `clusters=NA` which means that all clusters in the file are plotted. By default, `imgoutput="join"`, therefore all clusters are plotted in a single figure. The default `gridsize=60` produces rather pixellated grids. Increase gridsize to produce finer grid but at a higher computational cost.
 
 ![Interpolation sample 1](screenshots/Fig13.jpg)  
 
-__Fig 9.__ Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.
+__Fig 9.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
 
 We can choose only cluster 2 and try out different interpolation methods. Five methods are currently implemented: bilinear, bicubic, inverse distance weighting, nearest neighbour and kriging. Kriging is predictive while others are essentially direct spatial interpolation.
 
@@ -219,9 +221,9 @@ We specify `clusters=2` which plots only cluster 2. The `dataout=T` allows to sa
 
 ![Interpolation sample 2](screenshots/Fig14.jpg)  
 
-__Fig 10.__ Interpolated plot of one cluster (Cluster 2) one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.
+__Fig 10.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
 
-The colours can be easily changed by feeding in required colours to the argument `colours`. The R package `RColorBrewer` has a wide range of nice colours. The clusters to plot can be defined using the argument `clusters`.
+The colours can be easily changed by feeding in required colours to the argument `colours`. The R package `RColorBrewer` has a wide range of nice colours.
 
 ```coffee
 #view Colorbrewer colours
@@ -238,7 +240,7 @@ dev.off()
 ```
 ![Interpolation sample 3](screenshots/Fig15.jpg)  
 
-__Fig 11.__ Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3rd plot is `brewer.pal(8,"Spectral")` and 4th plot is brewer.pal(8,"BuPu").
+__Fig 11.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3rd plot is `brewer.pal(8,"Spectral")` and 4th plot is `brewer.pal(8,"BuPu")`.*
 
 ## List of Functions  
 ### STRUCTURE
@@ -279,7 +281,7 @@ plotRunsInterpolate()
 [STRUCTURE program](http://pritchardlab.stanford.edu/structure.html)  
 [TESS program](http://membres-timc.imag.fr/Olivier.Francois/tess.html)  
 [CLUMPP program](http://www.stanford.edu/group/rosenberglab/clumpp.html)  
-[Structure Harvester](http://taylor0.biology.ucla.edu/structureHarvester)
+[Structure Harvester](http://taylor0.biology.ucla.edu/structureHarvester)  
 [Adegenet R package](http://adegenet.r-forge.r-project.org/)  
 
 ### Further work
