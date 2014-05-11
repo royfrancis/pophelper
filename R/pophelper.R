@@ -747,7 +747,11 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
     for (f in 1:runs)
     {
       sel <- grep(as.character(df1$file[p]), files,fixed=T)
+<<<<<<< HEAD
       dframe1 <- pophelper::runsToDfStructure(files[sel])
+=======
+      dframe1 <- runsToDfStructure(files[sel])
+>>>>>>> 6fef3f1b519cf6c897ae4b28eaab0e1ea0df07c7
       
       #generate df
       dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
@@ -910,7 +914,11 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
     for (f in 1:runs)
     {
       sel <- grep(as.character(df1$file[p]), files,fixed=T)
+<<<<<<< HEAD
       dframe1 <- pophelper::runsToDfTess(files[sel])
+=======
+      dframe1 <- runsToDfTess(files[sel])
+>>>>>>> 6fef3f1b519cf6c897ae4b28eaab0e1ea0df07c7
       
       #generate df
       dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
@@ -2336,4 +2344,8 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
 # Option to have custom labels in plotMultiline
 # Use labels for plotMultiline from input file
 # Plot structure results to spatial
+<<<<<<< HEAD
 cat("pophelper v1.0.3 loaded\n")
+=======
+cat("pophelper v1.0.1 loaded\n")
+>>>>>>> 6fef3f1b519cf6c897ae4b28eaab0e1ea0df07c7

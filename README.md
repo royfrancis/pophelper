@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # pophelper 1.0.3
 
 `pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, perform the Evanno method, export files for CLUMPP and generate barplot figures. A detailed demonstration was prepared for `pophelper v1.0.0`, refer the [vignette](https://github.com/royfrancis/pophelper/blob/master/inst/doc/Vignette.pdf). Newer versions and updates is shown only on the github page (this page).
+=======
+# pophelper 1.0.1
+
+`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, perform the Evanno method, export files for CLUMPP and generate barplot figures. A brief introduction and tutorial is provided here. For more detailed demonstration, refer the [vignette](https://github.com/royfrancis/pophelper/blob/master/inst/doc/Vignette.pdf).
+>>>>>>> 6fef3f1b519cf6c897ae4b28eaab0e1ea0df07c7
 
 Also, try the short video demo [here](https://www.youtube.com/watch?v=iOqxXcQReJI).
 
@@ -287,10 +293,17 @@ plotRunsInterpolate()
 If you have an issues, suggestions, new useful ideas or ways to improve this, feel free to contact me, or add a comment to the issues section here on github.  
 Current ideas:
 
+<<<<<<< HEAD
 > Web app under construction.  
 > Option to have custom labels in plotMultiline.  
 > Use labels for plotMultiline from input structure file.  
 > Scatterplot structure/tess run files spatially with points coloured by clusters.
+=======
+> NEW! Web app under construction.  
+> Option to have custom labels in plotMultiline.  
+> Use labels for plotMultiline from input structure file.  
+> Plot structure/tess run files spatially on map/interpolate.
+>>>>>>> 6fef3f1b519cf6c897ae4b28eaab0e1ea0df07c7
 
 
 ### Disclaimer
