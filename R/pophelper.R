@@ -5,7 +5,7 @@ require(utils)
 pkgCheck <- function()
 {
   i <- 1
-  pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra")
+  pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra", "akima","fields","mgcv","spatstat","sp")
   for (i in 1:length(pakvec))
   {
     if (!pakvec[i] %in% installed.packages()) install.packages(pakvec[i], repos="http://cran.rstudio.com/", dependencies=TRUE)
@@ -22,13 +22,14 @@ rm(pkgCheck)
 #' @param k Number of colours required
 #' @return Returns a vector of k colours in hexadecimal format
 #' @details Colours 1 to 12 are custom unique colours. Colours beyond 15 are generated from colour ramp \code{rich.colors()}.
+#' @export
 #' 
 getColours <- function(k)
 {
   if (!is.numeric(k)) stop("Non-numeric input passed to getColours(). \n")
   col1 <- c("#2121D9", "#9999FF", "#DF0101", "#04B404", "#FFFB23", "#FF9326", "#A945FF", "#0089B2", "#B26314", "#610B5E", "#FE2E9A", "#BFF217")
   if (k <= 12) return(col1[1:k])
-  if (k > 12) return(rich.colors(k))
+  if (k > 12) return(gplots::rich.colors(k))
 }
 
 
@@ -86,30 +87,30 @@ tabulateRunsStructure <- function(files=NULL, writetable=FALSE, sorttable=TRUE, 
     if (length(chk1) == 0) stop("Input not suitable STRUCTURE file/Incorrect input format.\n")
     
     #find individuals and get number of individuals
-    ind[i] <- as.numeric(gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    ind[i] <- as.numeric(base::gsub("\\D", "", grep("\\d individuals", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
     if (is.na(ind[i])) cat(paste("Number of individuals is NA in file: ", filenames[i], sep=""))
     #get value of k & error check
-    k[i] <- as.numeric(gsub("\\D", "", grep("\\d populations assumed", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    k[i] <- as.numeric(base::gsub("\\D", "", grep("\\d populations assumed", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
     if (is.na(k[i])) cat(paste("Value of K is NA in file: ", filenames[i], sep=""))
     #get number of loci & error check
-    loci[i] <- as.numeric(gsub("\\D", "", grep("\\d loci", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    loci[i] <- as.numeric(base::gsub("\\D", "", grep("\\d loci", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
     if (is.na(loci[i])) cat(paste("Number of Loci is NA in file: ", filenames[i], "\n", sep=""))
     #get burn-in value & error check
-    burnin[i] <- as.numeric(gsub("\\D", "", grep("\\d Burn-in period", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    burnin[i] <- as.numeric(base::gsub("\\D", "", grep("\\d Burn-in period", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
     if (is.na(burnin[i])) cat(paste("Burn-in value is NA in file: ", filenames[i], "\n", sep=""))
     #get burn-in value & error check
-    reps[i] <- as.numeric(gsub("\\D", "", grep("\\d Reps", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
+    reps[i] <- as.numeric(base::gsub("\\D", "", grep("\\d Reps", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1]))
     if (is.na(reps[i])) cat(paste("Reps value is NA in file: ", filenames[i], "\n", sep=""))
     #get est ln prob of data & error check
-    elpd[i] <- as.numeric(gsub("=", "", gsub("Estimated Ln Prob of Data", "", grep("Estimated Ln Prob of Data", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    elpd[i] <- as.numeric(base::gsub("=", "", base::gsub("Estimated Ln Prob of Data", "", grep("Estimated Ln Prob of Data", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(elpd[i])) cat(paste("Estimated Ln Prob of Data is NA in file: ", filenames[i], sep=""))
     #get mn value of ln likelihood & error check
-    mvll[i] <- as.numeric(gsub("=", "", gsub("Mean value of ln likelihood", "", grep("Mean value of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    mvll[i] <- as.numeric(base::gsub("=", "", base::gsub("Mean value of ln likelihood", "", grep("Mean value of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(mvll[i])) cat(paste("Mean value of ln likelihood is NA in file: ", filenames[i], sep=""))
     #get Variance of ln likelihood else NA
-    vll[i] <- as.numeric(gsub("=", "", gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    vll[i] <- as.numeric(base::gsub("=", "", base::gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     #get Mean value of alpha
-    mva[i] <- as.numeric(gsub("=", "", gsub("Mean value of alpha", "", grep("Mean value of alpha", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
+    mva[i] <- as.numeric(base::gsub("=", "", base::gsub("Mean value of alpha", "", grep("Mean value of alpha", file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     #add values to rows in main table
   }
   
@@ -174,7 +175,7 @@ tabulateRunsTess <- function(files=NULL, writetable=FALSE, sorttable=TRUE, quiet
   for (i in i:number)
   {
     #read file & error check
-    df1 <- runsToDfTess(files[i])
+    df1 <- pophelper::runsToDfTess(files[i])
     #get k
     k[i] <- ncol(df1)
     #get ind
@@ -720,8 +721,8 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
   prefix <- paste(prefix, "_K", sep="")
   
   #get tabulated runs
-  df1 <- tabulateRunsStructure(files=files)
-  df2 <- summariseRunsStructure(df1)
+  df1 <- pophelper::tabulateRunsStructure(files=files)
+  df2 <- pophelper::summariseRunsStructure(df1)
   
   #k val duplicated
   if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. 
@@ -745,8 +746,8 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
     f <- 1
     for (f in 1:runs)
     {
-      sel <- grep(as.character(df1$file[p]), files)
-      dframe1 <- runsToDfStructure(files[sel])
+      sel <- grep(as.character(df1$file[p]), files,fixed=T)
+      dframe1 <- pophelper::runsToDfStructure(files[sel])
       
       #generate df
       dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
@@ -793,7 +794,7 @@ clumppExportStructure <- function(files=NULL, prefix=NA, parammode=NA, paramrep=
         if(is.na(parammode)) parammode <- 3
         if(is.na(paramrep)) paramrep <- 500
       }
-      out1 <- gsub(".txt","",out)
+      out1 <- base::gsub(".txt","",out)
       params <- c("DATATYPE 1 ",
                   "INDFILE NOTNEEDED.indfile ",
                   paste("POPFILE ",out," ",sep=""),
@@ -886,8 +887,8 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
   prefix <- paste(prefix, "_K", sep="")
   
   #get tabulated runs
-  df1 <- tabulateRunsTess(files=files)
-  df2 <- summariseRunsTess(df1)
+  df1 <- pophelper::tabulateRunsTess(files=files)
+  df2 <- pophelper::summariseRunsTess(df1)
   
   #k val duplicated
   if (any(duplicated(df2$k)) == TRUE) stop("clumppExport not computed. 
@@ -908,8 +909,8 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
     f <- 1
     for (f in 1:runs)
     {
-      sel <- grep(as.character(df1$file[p]), files)
-      dframe1 <- runsToDfTess(files[sel])
+      sel <- grep(as.character(df1$file[p]), files,fixed=T)
+      dframe1 <- pophelper::runsToDfTess(files[sel])
       
       #generate df
       dframe3 <- as.matrix(data.frame(V1=paste(1:ind, ":", sep=""), 
@@ -956,7 +957,7 @@ clumppExportTess <- function(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
         if(is.na(parammode)) parammode <- 3
         if(is.na(paramrep)) paramrep <- 500
       }
-      out1 <- gsub(".txt","",out)
+      out1 <- base::gsub(".txt","",out)
       params <- c("DATATYPE 1 ",
                   "INDFILE NOTNEEDED.indfile ",
                   paste("POPFILE ",out," ",sep=""),
@@ -1030,12 +1031,12 @@ runsToDfStructure <- function(files=NA)
     if (length(file1)<1) stop("Cannot read file.\n")
     
     #find individuals and get number of individuals
-    ind <- as.numeric(as.character(gsub("\\D", "", grep("\\d individuals", 
+    ind <- as.numeric(as.character(base::gsub("\\D", "", grep("\\d individuals", 
                                                         file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(ind)) cat(paste("Number of individuals is NA in file: ", name, sep=""))
     
     #get value of k & error check
-    k <- as.numeric(as.character(gsub("\\D", "", grep("\\d populations assumed", 
+    k <- as.numeric(as.character(base::gsub("\\D", "", grep("\\d populations assumed", 
                                                       file1, perl=TRUE, ignore.case=TRUE, value=TRUE)[1])))
     if (is.na(k)) cat(paste("Value of K is NA in file: ", name, sep=""))
     
@@ -1043,7 +1044,7 @@ runsToDfStructure <- function(files=NA)
     cend <- charmatch("Estimated Allele Frequencies in each cluster", file1)
     file1 <- file1[(cstart+2):(cend-1)]
     file_a <- file1[file1 != ""]
-    file_b <- gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), 
+    file_b <- base::gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), 
                                      nchar(file_a)-1))
     file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b, " ")))))
     dframe <- as.data.frame(matrix(file_c, nrow=ind, byrow=TRUE),stringsAsFactors=FALSE)
@@ -1078,7 +1079,7 @@ runsToDfTess <- function(files=NA)
   dlist <- list(length=number)
   for (i in 1:length(files))
   {
-    name <- gsub(".txt", "", basename(files[i]))
+    name <- base::gsub(".txt", "", basename(files[i]))
     
     file1 <- readLines(files[i], warn=FALSE)
     #read TESS files
@@ -1114,6 +1115,7 @@ runsToDfTess <- function(files=NA)
 #' @param res Resolution of the figure.
 #' @param plotnum Number of plot in the figure.
 #' @return a vector with height and width.
+#' @export
 #'
 getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
 {
@@ -1329,7 +1331,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
     facetnames <- list()
     for (i in 1:flen)
     {
-      fname <- gsub(".txt", "", basename(files[i]))
+      fname <- base::gsub(".txt", "", basename(files[i]))
       
       #read Structure files
       chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[i], warn=FALSE))[1])
@@ -1345,19 +1347,19 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       df1$Num <- factor(rep(i, nrow(df1)))
       #df1$Lab <- poplab
       #df1 <- melt(df1, id.var=c("Ind", "Num", "Lab"))
-      df2 <- melt(df1, id.var=c("Ind", "Num"))
+      df2 <- reshape::melt(df1, id.var=c("Ind", "Num"))
       facetnames <- as.list(paste(fname, "\n", "K=", k, sep=""))
       
       #get Colours
       coll <- popcol
-      if (all(is.na(popcol))) coll <- getColours(k)
-      if (length(coll)!=k) stop("Number of colours not equal to number of populations.\n")
+      if (all(is.na(popcol))) coll <- pophelper::getColours(k)
+      if (length(coll) != k) stop("Number of colours not equal to number of populations.\n")
       
       #getDim
       #pnum <- 1
       #if (!all(is.na(poplab))) pnum <- 2
-      height1=getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=1)[1]
-      width1=getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=1)[2]
+      height1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=1)[1]
+      width1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=1)[2]
       
       if (all(is.na(poplab)))
       {
@@ -1387,7 +1389,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       {
         if (nrow(df1)!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
         
-        ppar <- getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
+        ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
                               labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, 
                               pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, 
                               fmar=fmar)
@@ -1447,10 +1449,10 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
     if (flen < 2) stop("Joined plot not processed. Number of selected files less than 2.\n")
     
     chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[1], warn=FALSE))[1])
-    if (length(chk) !=0 ) tempdf <- tabulateRunsTess(files=files, quiet=TRUE)
+    if (length(chk) !=0 ) tempdf <- pophelper::tabulateRunsTess(files=files, quiet=TRUE)
     #read TESS files
     chk1 <- grep("STRUCTURE", toupper(readLines(files[1], warn=FALSE))[4])
-    if (length(chk1) !=0 ) tempdf <- tabulateRunsStructure(files=files, quiet=TRUE)
+    if (length(chk1) !=0 ) tempdf <- pophelper::tabulateRunsStructure(files=files, quiet=TRUE)
     if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
     
     if (all(tempdf$ind[1] != tempdf$ind)) stop("Joined plot not processed. Number of individuals differ between selected runs.\n")
@@ -1464,38 +1466,38 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
     {
       #read files
       chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[i], warn=FALSE))[1])
-      if (length(chk) != 0) df1 <- runsToDfTess(files=files[i])
+      if (length(chk) != 0) df1 <- pophelper::runsToDfTess(files=files[i])
       #read TESS files
       chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn=FALSE))[4])
-      if (length(chk1) != 0) df1 <- runsToDfStructure(files=files[i])
+      if (length(chk1) != 0) df1 <- pophelper::runsToDfStructure(files=files[i])
       if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
       
       k <- ncol(df1)
       df1$Ind <- factor(1:nrow(df1))
       df1$Num <- factor(rep(i, nrow(df1)))
-      facetnames[[i]] <- paste(sub(".txt", "", basename(files[i])), "\n", "K=", k, sep="")
+      facetnames[[i]] <- paste(base::sub(".txt", "", basename(files[i])), "\n", "K=", k, sep="")
       kvec <- c(kvec, k)
       plist[[i]] <- df1
     }
     
     #combine list to one dataframe 
-    df2 <- rbind.fill(plist)
+    df2 <- plyr::rbind.fill(plist)
     #melt
-    df3 <- melt(df2, id.var=c("Ind", "Num"))
+    df3 <- reshape::melt(df2, id.var=c("Ind", "Num"))
     
     #get Dim
     pnum <- flen
     #if (!all(is.na(poplab))) pnum <- flen+1
-    height1 <- getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=pnum)[1]
-    width1 <- getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=pnum)[2]
+    height1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=pnum)[1]
+    width1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=pnum)[2]
     #Get Col
     coll <- popcol
-    if (all(is.na(popcol))) coll <- getColours(max(kvec))
+    if (all(is.na(popcol))) coll <- pophelper::getColours(max(kvec))
     if (length(coll)!=max(kvec)) stop("Number of colours not equal to number of populations.\n")
     
     
     #save plot
-    dt <- gsub(":", "", as.character(format(Sys.time(), "%H:%M:%S")))
+    dt <- base::gsub(":", "", as.character(format(Sys.time(), "%H:%M:%S")))
     
     if (all(is.na(poplab)))
     {
@@ -1529,15 +1531,12 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       
       df3 <- subset(df2, df2$Num == 1)
       df3$Num <- df3$Num[drop=TRUE]
-      df3.1 <- melt(df3, id.var=c("Ind", "Num"))
+      df3.1 <- reshape::melt(df3, id.var=c("Ind", "Num"))
       df4 <- subset(df2, df2$Num!=1)
       df4$Num <- df4$Num[drop=TRUE]
-      df4.1 <- melt(df4, id.var=c("Ind", "Num"))
+      df4.1 <- reshape::melt(df4, id.var=c("Ind", "Num"))
       
-      ppar <- getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
-                            labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, 
-                            pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, 
-                            fmar=fmar)
+      ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle,labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
       
       labangle <- ppar$labangle
       labjust <- ppar$labjust
@@ -1597,7 +1596,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
       if (imgtype == "pdf") pdf(paste("Joined", flen, "Files-", dt, ".pdf", sep=""), height=height1, width=width1)
       
-      grid.arrange(gp2, gp1, heights=c((flen-1)/flen, (1/flen)))
+      gridExtra::grid.arrange(gp2, gp1, heights=c((flen-1)/flen, (1/flen)))
       dev.off()
       
       if (imgtype == "png") cat(paste("Joined", flen, "Files-", dt, ".png exported\n", sep=""))
@@ -1612,7 +1611,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
     i=1
     for (i in 1:flen)
     {
-      fname <- gsub(".txt", "", basename(files[i]))
+      fname <- base::gsub(".txt", "", basename(files[i]))
       df1 <- read.table(files[i])
       if (class(df1)!="data.frame") stop("Incorrect input file type.\n")
       
@@ -1623,22 +1622,22 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       
       df2 <- data.frame(Num=factor(rep(1:tempc, 1, each=Ind)), Ind=factor(rep(1:Ind, tempc)), df1[, 2:(tempd+1)])
       rm(df1)
-      df3 <- melt(df2, id.var=c("Ind", "Num"))
+      df3 <- reshape::melt(df2, id.var=c("Ind", "Num"))
       facetnames <- as.list(rep(paste("K=", tempd, sep=""), tempc))
       
       #get Dim
       #pnum <- tempc
       #if (!all(is.na(poplab))) pnum <- tempc+1
-      height1=getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=tempc)[1]
-      width1=getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=tempc)[2]
+      height1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=tempc)[1]
+      width1 <- pophelper::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, plotnum=tempc)[2]
       #Get col
       coll <- popcol
-      if (all(is.na(popcol))) coll <- getColours(tempd)
-      if (length(coll)!=tempd) stop("Number of colours not equal to number of populations.\n")
+      if (all(is.na(popcol))) coll <- pophelper::getColours(tempd)
+      if (length(coll) != tempd) stop("Number of colours not equal to number of populations.\n")
       
       
       #save plot
-      dt <- gsub(":", "", as.character(format(Sys.time(), "%H:%M:%S")))
+      dt <- base::gsub(":", "", as.character(format(Sys.time(), "%H:%M:%S")))
       
       if (all(is.na(poplab)))
       {
@@ -1670,12 +1669,9 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
         if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
         df3 <- subset(df2, df2$Num == 1)
         df3$Num <- df3$Num[drop=TRUE]
-        df3.1 <- melt(df3, id.var=c("Ind", "Num"))
+        df3.1 <- reshape::melt(df3, id.var=c("Ind", "Num"))
         
-        ppar <- getPlotParams(poplab=poplab, plotnum=tempc, labpos=labpos, labsize=labsize, labangle=labangle, 
-                              labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, 
-                              pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, 
-                              fmar=fmar)
+        ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=tempc, labpos=labpos, labsize=labsize, labangle=labangle, labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
         
         labangle <- ppar$labangle
         labjust <- ppar$labjust
@@ -1714,7 +1710,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
         {
           df4 <- subset(df2, df2$Num!=1)
           df4$Num <- df4$Num[drop=TRUE]
-          df4.1 <- melt(df4, id.var=c("Ind", "Num"))
+          df4.1 <- reshape::melt(df4, id.var=c("Ind", "Num"))
           
           p2 <- ggplot()+
             geom_bar(data=df4.1, aes(x=Ind, y=value, fill=variable), width=1, space=0, stat="identity", position="stack", na.rm=na.rm)+
@@ -1739,8 +1735,8 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
         if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height=height1, width=width1)
         
-        if (tempc == 1) grid.draw(gp1)
-        if (tempc > 1) grid.arrange(gp2, gp1, heights=c(((tempc-1)/tempc)-0.08, (1/tempc)+0.08))
+        if (tempc == 1) grid::grid.draw(gp1)
+        if (tempc > 1) gridExtra::grid.arrange(gp2, gp1, heights=c(((tempc-1)/tempc)-0.08, (1/tempc)+0.08))
         #grid.arrange(gp2,gp1, heights=c(0.6,0.4))
         dev.off()
         
@@ -1886,13 +1882,13 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
   
   for (i in 1:length(files))
   {
-    fname <- gsub(".txt", "", basename(files[i]))
+    fname <- base::gsub(".txt", "", basename(files[i]))
     #read TESS file
     chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[i], warn=FALSE))[1])
-    if (length(chk) != 0) df1 <- runsToDfTess(files=files[i])
+    if (length(chk) != 0) df1 <- pophelper::runsToDfTess(files=files[i])
     #read STRUCTURE file
     chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn=FALSE))[4])
-    if (length(chk1) != 0) df1 <- runsToDfStructure(files=files[i])
+    if (length(chk1) != 0) df1 <- pophelper::runsToDfStructure(files=files[i])
     #read TAB files
     if (length(chk) == 0 & length(chk1) == 0) 
     {
@@ -1952,7 +1948,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
       
       #get colours
       coll <- popcol
-      if (is.na(popcol)) coll <- getColours(ncol(dff))
+      if (is.na(popcol)) coll <- pophelper::getColours(ncol(dff))
       
       dff$rows <- factor(c(rep(1:numrows, each=spl1), rep(nr2, each=numextra)))
       dff$ind <- as.factor(as.numeric(1:nr1))
@@ -1966,7 +1962,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
       {
         if (indlabs == TRUE)
         {
-          df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))
+          df2 <- reshape::melt(dlist[[i]], id.var=c("ind", "rows"))
           plist[[i]] <- ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
             geom_bar(width=barwidth, space=barspace, stat="identity", position="stack", na.rm=na.rm)+
             scale_x_discrete(expand=c(0, 0))+
@@ -1981,7 +1977,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
         
         if (indlabs == FALSE)
         {
-          df2 <- melt(dlist[[i]], id.var=c("ind", "rows"))
+          df2 <- reshape::melt(dlist[[i]], id.var=c("ind", "rows"))
           plist[[i]] <- ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
             geom_bar(width=barwidth, space=barspace, stat="identity", position="stack", na.rm=na.rm)+
             scale_x_discrete(expand=c(0, 0))+
@@ -2022,7 +2018,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
         if (imgtype == "jpeg") jpeg(paste(fname, "-Multiline-", j, "-", r, ".jpg", sep=""), height=height, width=width, res=res, units=units, quality=100)
         if (imgtype == "pdf") pdf(paste(fname, "-Multiline-", j, "-", r, ".pdf", sep=""), height=height, width=width)
         
-        do.call(grid.arrange, alist)
+        do.call(gridExtra::grid.arrange, alist)
         #grid.arrange(arrangeGrob(plist[start1:stop1]))
         #grid.arrange(plist[[1]], plist[[2]], nrow=2, widths=c(0.4, 0.6))
         #do.call(fn1, plist[[1]])
@@ -2040,9 +2036,304 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
   }
 }
 
+#FUNCTION detrmineRowsAndCols
+#' Internal: Determine rows and columns for arbitrary number of plots
+#' @description Determine rows and columns for figures from arbitrary number of plots
+#' @param numplots Number of plots available for plot
+#' @return A 2 value vector wih first value denoting row and second value as column.
+determineRowsAndCols <- function(numplots=NA)
+{
+  if(is.na(numplots)) stop("No input for number of plots.\n")
+  if (numplots==1) return(c(1,1))
+  if (numplots==2) return(c(1,2))
+  if (numplots==3) return(c(1,3))
+  if (numplots==4) return(c(2,2))
+  if (numplots==5) return(c(2,3))
+  if (numplots==6) return(c(2,3))
+  if (numplots==7) return(c(2,4))
+  if (numplots==8) return(c(2,4))
+  if (numplots==9) return(c(3,3))
+  if (numplots==10) return(c(2,5))
+  if (numplots==11) return(c(3,4))
+  if (numplots==12) return(c(3,4))
+  if (numplots==13) return(c(4,4))
+  if (numplots==14) return(c(4,4))
+  if (numplots==15) return(c(5,3))
+  if (numplots==16) return(c(4,4))
+  if (numplots==17) return(c(5,4))
+  if (numplots==18) return(c(6,3))
+  if (numplots==19) return(c(4,5))
+  if (numplots==20) return(c(4,5))
+  if (numplots>20) stop("Number of clusters > 20. Specify number of rows and columns for figures manually using the option nrow and ncol arguments.\n")
+}
+
+#FUNCTION Interpolate STRUCTURE and TESS runs spatially
+#' Interpolate STRUCTURE and TESS runs spatially
+#' @description Interpolate clusters from STRUCTURE and TESS runs spatially using coordinates.
+#' @param datafile One STRUCTURE or TESS output file. Input is either a character 
+#' or a dataframe. If character, then a path pointing to location of the datafile. Can use 
+#' `choose.files()`. If a dataframe, then an output from `runsToDfStructure()` or `
+#' runsToDfTess()`.
+#' @param coordsfile A character or a dataframe. If character, then a path pointing 
+#' to location of the coordsfile. It must be a tab-delimited text file with x and y 
+#' coordinates of the samples. The number of rows must be equal to the number of 
+#' samples in datafile. The coordsfiles must have no header and 2 columns in the 
+#' order: x (latitude) and then y (longitude).
+#' @param method The method employed for interpolation. Options are "bilinear",
+#' "bicubic", "krig" (Kriging), "idw" (Inverse distance weighting) or "nn" (nearest 
+#' neighbour). See Details for more information.
+#' @param duplicate How to deal with duplicate spatial locations. This is only 
+#' applicable to 'bilinear' and 'bicubic' methods. Options are "error" (error message
+#' if duplicate points), "strip" (remove all duplicate points), "mean" (mean of 
+#' duplicate points), "median" (median of duplicate points).
+#' @param idwpower The power of inverse distance weighting if method is set to "idw".
+#' @param clusters Which clusters to plot? If NA, all clusters are plotted. For ex.
+#' If set to 2, cluster 2 is plotted. If set to 2:4, clusters 2, 3 and 4 are plotted.
+#' If set to c(1,4,5), clusters 1, 4 and 5 are plotted.
+#' @param gridsize The size of the image grid on which interpolation is to be carried
+#' out. Set to 60 by default. Higher values produces less pixelated grids, but more
+#' computationally intensive.
+#' @param imgoutput To plot each cluster as a seperate figure, set to "sep". To plot 
+#' multiple clusters in a single figure, set to "join". If number of clusters is less
+#' than 2, then automatically set to "sep".
+#' @param colours A vector of colours. R colour names or hexadecimal values. Set to
+#' 9 value 'Blues' palette from RColorBrewer by default.
+#' @param nrow Number of rows of plots in a joined plot. Determined automatically
+#' if number of plots <20 and nrow=NA.
+#' @param ncol Number of columns of plots in a joined plot. Determined automatically
+#' if number of plots <20 and ncol=NA.
+#' @param exportplot If set to FALSE, no image is exported.
+#' @param imgtype The export format for figures. Options are "png", "jpeg" or "pdf".
+#' @param height The height of export figure in cm unless units are changed.
+#' @param width The width of export figure in cm unless units are changed.
+#' @param units The units of measurement for figure dimensions.
+#' @param res The pixel resolution of the export image. Set to 200 by default.
+#' @param showaxis If TRUE, then axis text, axis ticks and plot border are plotted.
+#' @param addpoints If TRUE, then sample coordinates are overplotted on interpolated grid.
+#' @param pointcol The colour of sample points. An R colour or hexadecimal value.
+#' @param pointtype The shape/pch of sample points. A numeric or a character.
+#' @param pointsize The size of sample points. A number usually 0.4,0.8,1,3 etc.
+#' @param legend If TRUE, the legend for the colours is plotted.
+#' @param legendpos Position of the legend. If "right","left","top" or "bottom", then,
+#' legend is plotted outside the plot area. To plot inside plot area use a 2 vale vector.
+#' If a vector like c(1,1), first value denotes x-axis from 0 to 1 and second value 
+#' denotes y-axis from 0 to 1. For ex. to plot in bottom left corner, use c(0,0).
+#' @param legendjust The x and y axis justification of the legend. A 2 value vector.
+#' @param legendsize The size of the legend in cm. Usually values like 0.5,0.7,1.2 etc.
+#' The legendsize does not control the text in the legend.
+#' @param legendtextsize The size of the text in the legend.
+#' @param dataout If set to TRUE, a list of one or more ggplot gtable elements are returned.
+#' This output can be modified using ggplot themes() for more figure control if required.
+#' @return If dataout=T, a list of one or more ggplot gtable output is returned for more theme 
+#' control if required.
+#' @details The "bilinear", "bicubic", "idw" and "nn" are essentially direct interpolation
+#' between spatial points. The "krig" option is predictive rather than direct interpolation.
+#' For more details of methods, see R package 'akima' function 'interp' for "bilinear" 
+#' and "bicubic" methods, see R package 'fields' function 'Krig' for "krig" method, see
+#' R package 'spatstat' function 'idw' for "idw" and function 'nnmark' for "nn" method. 
+#' The model for "krig" is automatically determined and may produce warning messages if
+#' the GCV algorithm does not converge optimally. This can be ignored for more purposes.
+#' All methods require full coordinate data. No missing data allowed in coordsfile.
+#' @export
+#' 
+plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", duplicate="mean",idwpower=2,clusters=NA,gridsize=60,imgoutput="join",colours=NA,nrow=NA,ncol=NA,exportplot=TRUE,imgtype="png",height=NA, width=NA, units="cm",res=200,showaxis=FALSE,addpoints=TRUE,pointcol="grey10",pointtype="+",pointsize=4,legend=TRUE,legendpos=c(1,1),legendjust=c(1,1),legendsize=NA,legendtextsize=NA,dataout=FALSE)
+{
+  #basic checks
+  if (is.null(datafile)) stop("No content in datafile.\n")
+  if (is.null(coordsfile)) stop("No content in coordsfile.\n")
+  method<-tolower(method)
+  if (method != "bilinear" && method != "bicubic" && method != "krig" && method != "idw" && method != "nn") stop("Argument 'method' set incorrectly. Set as 'bilinear', bicubic', 'krig', 'idw' or 'nn'.\n")
+  imgoutput <- tolower(imgoutput)
+  if (imgoutput != "sep" && imgoutput != "join") stop("Argument 'imgoutput' set incorrectly. Set as 'sep' to plot each cluster seperately. Set as 'join' to plot multiple clusters in one figure.\n")
+  imgtype <- tolower(imgtype)
+  if (imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
+  duplicate <- tolower(duplicate)
+  if (duplicate != "error" && duplicate != "strip" && duplicate != "mean" && duplicate != "median") stop("Argument 'duplicate' not set correctly. Set as 'error','strip','mean' or 'median'.\n")
+  
+  #declare colours
+  if(all(is.na(colours))) colours <- rev(c("#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6","#4292C6", "#2171B5", "#08519C", "#08306B"))
+  
+  #READ DATA FILES AND CHECK
+  if (is.data.frame(datafile)) {df1 <- datafile; fname <- format(Sys.Date(), format="%Y%m%d")}
+  if (is.character(datafile))
+  {
+    #get file name
+    fname <- gsub(".txt", "", basename(datafile))
+    #read Structure files
+    chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(datafile, warn=FALSE))[1])
+    if (length(chk) != 0) df1 <- pophelper::runsToDfTess(files=datafile)
+    #read TESS files
+    chk1 <- grep("STRUCTURE", toupper(readLines(datafile, warn=FALSE))[4])
+    if (length(chk1) != 0) df1 <- pophelper::runsToDfStructure(files=datafile)
+    if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
+  }
+  #data check
+  class1 <- lapply(df1,class)
+  if (all(unlist(class1) == "numeric") != "TRUE") warning("Non numeric content in datafile.\n")
+  
+  #READ COORDS AND CHECK
+  if(is.character(coordsfile)) coords <- read.delim(coordsfile,header=F)[,1:2]
+  if(is.data.frame(coordsfile)) coords <- coordsfile
+  #coords check
+  class2 <- lapply(coords,class)
+  if (all(unlist(class2) == "numeric") != "TRUE") warning("Non numeric content in coordsfile.\n")
+  if (any(is.na(coords)) == T) stop("Missing data detected in coordsfile. Methods cannot handle missing coordinate data.\n")
+  colnames(coords)<-c("X","Y")
+  
+  #determine clusters to plot
+  if (all(is.na(clusters))) flen <- 1:length(colnames(df1))
+  if (length(clusters) == 1) {if(is.numeric(clusters)) flen <- clusters:clusters}
+  if (length(clusters) > 1) flen <- clusters
+  if (!is.numeric(clusters) && !is.na(clusters)) stop("Argument clusters in non-numeric.\n")
+  
+  #determine if atleast 2 plots are available for joined option
+  if (length(flen) < 2 && imgoutput == "join")
+  {
+    imgoutput <- "sep";
+    cat("Less than 2 plots available for joined. Argument imgoutput changed to 'sep'.\n")
+  }
+  
+  #get dimensions for sep figures
+  height1 <- height
+  width1 <- width
+  #determine aspect ratio from coordinates
+  figaspect <- round((max(coords$X,na.rm=T)-min(coords$X,na.rm=T))/(max(coords$Y,na.rm=T)-min(coords$Y,na.rm=T)),2)
+  if (figaspect > 0)
+  {
+    if (is.na(height)) height1 <- 16
+    if (is.na(width)) width1 <- round(height1*abs(figaspect),2)
+  }else
+  {
+    if (is.na(width)) width1 <- 16
+    if (is.na(height)) height1 <- round(width1*abs(figaspect),2)
+  }
+  
+  plist <- vector("list", length(flen))
+  datalist <- vector("list", length(flen))
+  #start loop
+  i <- 1
+  while(i <= length(flen))
+  {
+    j <- flen[i]
+    plottitle <- paste("Cluster ",sub("Cluster","",colnames(df1)[j]),sep="")
+    
+    #bicubic and bilinear methods
+    if(method == "bilinear" | method == "bicubic")
+    {
+      X <- coords$X
+      Y <- coords$Y
+      interpX <- seq(min(X,na.rm=T), max(X,na.rm=T), le = gridsize)
+      interpY <- seq(min(Y,na.rm=T), max(Y,na.rm=T), le = gridsize) 
+      if (method == "bilinear") tempimg <- akima::interp(X, Y, df1[,j], xo = interpX, yo = interpY, duplicate=duplicate,linear=TRUE)
+      if (method == "bicubic") tempimg <- akima::interp(X, Y, df1[,j], xo = interpX, yo = interpY, duplicate=duplicate,linear=FALSE)
+      rm(X,Y,interpX,interpY)
+    }
+    
+    #kriging method
+    if (method == "krig")
+    {
+      sc <- mean(fields::rdist.earth(coords),miles=FALSE);
+      fit <- fields::Krig(x=coords,Y=df1[,j], theta= sc, m = 1, Distance="rdist.earth",na.rm=TRUE);
+      tempimg <- fields::predictSurface(fit,nx=gridsize,ny=gridsize)
+      rm(sc,fit)
+    }
+    
+    #inverse distance weighting
+    if (method == "idw")
+    {
+      pp1 <- spatstat::as.ppp(coords, c(min(coords$X,na.rm=T),max(coords$X,na.rm=T),min(coords$Y,na.rm=T),max(coords$Y,na.rm=T)))
+      pp1$marks <- as.vector(df1[,j])
+      pp1$markformat <- "vector"
+      pp2 <- spatstat::idw(pp1,power=idwpower,at="pixels",dimyx=c(gridsize,gridsize))
+      tempimg <- list(x=pp2$xcol,y=pp2$yrow,z=pp2$v)
+      rm(pp1,pp2)
+    }
+    
+    #nearest neighbour
+    if (method == "nn")
+    {
+      pp1 <- spatstat::as.ppp(coords, c(min(coords$X,na.rm=T),max(coords$X,na.rm=T),min(coords$Y,na.rm=T),max(coords$Y,na.rm=T)))
+      pp1$marks <- as.vector(df1[,j])
+      pp1$markformat <- "vector"
+      nn1 <- spatstat::nnmark(X=pp1,k=1,at="pixels",dimyx=c(gridsize,gridsize))
+      tempimg <- list(x=nn1$xcol,y=nn1$yrow,z=nn1$v)
+      rm(nn1)
+    }
+    
+    #expand grid over gridsize
+    tempimg1 <- expand.grid(x=tempimg$x, y=tempimg$y)
+    tempimg1$z <- as.vector(tempimg$z)
+    attr(tempimg1,"out.attrs") <- NULL
+    rm(tempimg)
+    
+    #store to a list
+    datalist[[i]] <- tempimg1
+    #name list item
+    names(datalist)[i] <- plottitle
+    tempimg1$plot <- rep(plottitle,length(tempimg1$z))
+    
+    #plot
+    p <- ggplot(tempimg1)+
+      geom_tile(aes(x=x,y=y,fill=z))+
+      scale_x_continuous(expand=c(0, 0))+
+      scale_y_continuous(expand=c(0, 0))+
+      scale_fill_gradientn(colours=rev(colours),na.value="#FFFFFF00")+
+      theme_bw()+labs(x=NULL, y=NULL, title=plottitle)+
+      theme(legend.title=element_blank(),plot.title=element_text(colour="grey40",hjust=0),axis.text=element_text(colour="grey30"),axis.ticks=element_line(colour="grey30"),legend.justification = legendjust, legend.position = legendpos)
+    
+    #edit plot conditionally
+    if (showaxis == FALSE) p <- p + theme(axis.text=element_blank(),axis.ticks=element_blank(), panel.border=element_blank())
+    if (addpoints == TRUE) p <- p + geom_point(data=coords,aes(x=X,y=Y),size=pointsize,shape=pointtype,fill=pointcol)
+    if (legend == FALSE) p <- p + theme(legend.position="none")
+    if (!is.na(legendsize)) p <- p + theme(legend.key.size=unit(legendsize, "cm"))
+    if (!is.na(legendtextsize)) p <- p + theme(legend.text=element_text(size=legendtextsize))
+    
+    plist[[i]] <- p
+    
+    if (exportplot == TRUE && imgoutput == "sep")
+    {
+      if (imgtype == "png") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png",sep=""),p,height=height1,width=width1,units=units,dpi=res)
+      if (imgtype == "jpeg") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg",sep=""),p,height=height1,width=width1,units=units,dpi=res)
+      if (imgtype == "pdf") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf",sep=""),p,height=height1,width=width1,units=units,dpi=res)
+      
+      if (imgtype == "png") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png exported.\n",sep=""))
+      if (imgtype == "jpeg") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg exported.\n",sep=""))
+      if (imgtype == "pdf") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf exported.\n",sep=""))
+    }
+    i=i+1
+  }
+  
+  if (exportplot == TRUE && imgoutput == "join")
+  {
+    #determine rows and cols
+    if (is.na(nrow)) nrow <- determineRowsAndCols(length(flen))[1]
+    if (is.na(ncol)) ncol <- determineRowsAndCols(length(flen))[2]
+    #determine height and width
+    height2 <- height
+    width2 <- width
+    if (is.na(height)) height2 <- (height1*nrow)/1.5
+    if (is.na(width)) width2 <- (width1*ncol)/1.5
+    
+    alist <- c(plist, nrow, ncol)
+    names(alist) <- c(as.character(flen), "nrow", "ncol")
+    
+    if (imgtype == "png") png(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.png", sep=""), height=height2, width=width2, res=res, units=units)
+    if (imgtype == "jpeg") jpeg(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.jpg", sep=""), height=height2, width=width2, res=res, units=units, quality=100)
+    if (imgtype == "pdf") pdf(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.pdf", sep=""), height=height2, width=width2)
+    
+    do.call(gridExtra::grid.arrange, alist)
+    dev.off()
+    
+    if (imgtype == "png") cat(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.png exported.\n", sep=""))
+    if (imgtype == "jpeg") cat(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.jpg exported.\n", sep=""))
+    if (imgtype == "pdf") cat(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.pdf exported.\n", sep=""))
+    
+  }
+  if (dataout == TRUE) return(plist)
+}
 
 # New concepts
 # Option to have custom labels in plotMultiline
 # Use labels for plotMultiline from input file
 # Plot structure results to spatial
-cat("pophelper v1.0.0 loaded\n")
+cat("pophelper v1.0.3 loaded\n")

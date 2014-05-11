@@ -1,9 +1,18 @@
+pophelper 1.0.3
+===========  
+* 11-May-2014
+* plotRunsInterpolate() function added. STRUCTURE and TESS run files can be used with a coordinate file to spatially interpolate clusters using several interpolation methods such as thin splines, inverse distance weighting and kriging.
+
+pophelper 1.0.2
+===========  
+* 25-Apr-2014
+* A bug in clumppExportStructure() and clumppExportTess() produced a 'No input' error. This has been fixed. Thanks to Micheal Panasci for pointing this out.
+
 pophelper 1.0.1
-===========
+===========  
 * parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
 
 pophelper 1.0.0
-===========
-
-* completed 16-02-2014
+===========  
+* completed 16-Feb-2014
 * the first version of the `pophelper` package
