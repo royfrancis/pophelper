@@ -68,7 +68,7 @@ runsToDfStructure(files=flist)
 runsToDfTess(files=flist1)
 ```
 ### 5. Generate CLUMPP output  
-This function can be used to create files for use with CLUMPP. The function creates a combined file and paramfile in separate directories by K.
+This function can be used to create files for use with CLUMPP. The function creates a combined file and paramfile in separate directories by K. If the CLUMPP executable takes more than a minute to run, set `parammode=3` when running clumppExport.
 
 ```coffee
 #convert STRUCTURE runs for CLUMPP
