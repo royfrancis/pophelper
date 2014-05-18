@@ -1,0 +1,24 @@
+\name{llToUtmzone}
+\alias{llToUtmzone}
+\title{Internal: Find UTM zone from a latitude and longitude}
+\usage{
+llToUtmzone(lat, long)
+}
+\arguments{
+  \item{lat}{The latitude in decimals. Southern hemisphere
+  must be negative.}
+
+  \item{long}{The longitude in decimals}
+}
+\value{
+A list of two values are returned namely UTMZone and
+Hemisphere.
+}
+\description{
+Find UTM zone from a given latitude and longitude
+}
+\details{
+For a given latitude and longitude, the UTM zone must be
+determined prior to UTM coordinate conversion.
+}
+

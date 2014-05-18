@@ -5,7 +5,7 @@ require(utils)
 pkgCheck <- function()
 {
   i <- 1
-  pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra", "akima","fields","mgcv","spatstat","sp")
+  pakvec <- c("Hmisc", "gplots", "Cairo", "ggplot2", "reshape", "grid", "gridExtra", "akima","fields","mgcv","spatstat","sp","PBSmapping","plyr")
   for (i in 1:length(pakvec))
   {
     if (!pakvec[i] %in% installed.packages()) install.packages(pakvec[i], repos="http://cran.rstudio.com/", dependencies=TRUE)
@@ -1167,6 +1167,7 @@ getDim <- function(ind, units="cm", height=NA, width=NA, res=300, plotnum=1)
 #' bottom and left margins. ex. c(0.2,0.2,0.2,0).
 #' @return A list with following plot parameters: poplab, plotnum, labpos, labsize, 
 #' labangle, labjust, labcol, pointsize, pointcol, pointtype, linepos, linethick, linecol, fmar
+#' @export
 #' 
 getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=NA, 
                           labjust=NA, labcol=NA,
@@ -1259,7 +1260,7 @@ getPlotParams <- function(poplab=NA, plotnum=1, labpos=NA, labsize=NA, labangle=
 #' @param height Height of individual run plot. By default, automatically generated based on number of Individuals. Ranges between 2.5cm and 4.6cm.
 #' @param width Width of individual run plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
 #' @param dpi Image resolution. Defaults to 300.
-#' @param units Units of height and width. Default set to "cm". If type is eps, units must be "in".
+#' @param units Units of height and width. Default set to "cm". If type is pdf, units must be "in".
 #' @param flabsize The size of the filename label. Defaults to 4.
 #' @param flabcol The colour of the filename label. Defaults to "grey10".
 #' @param flabbackcol The background colour of the filename label. Defaults to white
@@ -1377,10 +1378,11 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
                 strip.background=element_rect(colour=flabbackcol, fill=flabbackcol), 
                 plot.margin=unit(c(0.1, 0.1, 0, 0), "cm"))
         
-        if (imgtype == "png") ggsave(paste(fname, ".png", sep=""), p, height=height1, width=width1, dpi=dpi, units=units)
-        if (imgtype == "jpeg") ggsave(paste(fname, ".jpg", sep=""), p, height=height1, width=width1, dpi=dpi, units=units, quality=100)
-        if (imgtype == "pdf") ggsave(paste(fname, ".pdf", sep=""), p, height=height1, width=width1, units=units)
-        
+        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
+        if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height=height1, width=width1)
+        print(p)
+        dev.off()
         if (imgtype == "png") cat(paste(fname, ".png exported\n", sep=""))
         if (imgtype == "jpeg") cat(paste(fname, ".jpg exported\n", sep=""))
         if (imgtype == "pdf") cat(paste(fname, ".pdf exported\n", sep=""))
@@ -1389,7 +1391,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       {
         if (nrow(df1)!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
         
-        ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
+        ppar <- getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle, 
                               labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, 
                               pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, 
                               fmar=fmar)
@@ -1428,7 +1430,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
         p1$layout$clip[p1$layout$name == "panel"] <- "off"
         
         
-        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units)
+        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
         if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height=height1, width=width1)
         
@@ -1515,10 +1517,11 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
               strip.background=element_rect(colour=flabbackcol, fill=flabbackcol), 
               plot.margin=unit(c(0.1, 0.1, 0, 0), "cm"))
       
-      if (imgtype == "png") ggsave(paste("Joined", flen, "Files-", dt, ".png", sep=""), p, height=height1, width=width1, dpi=dpi, units=units)
-      if (imgtype == "jpeg") ggsave(paste("Joined", flen, "Files-", dt, ".jpg", sep=""), p, height=height1, width=width1, dpi=dpi, units=units, quality=100)
-      if (imgtype == "pdf") ggsave(paste("Joined", flen, "Files-", dt, ".pdf", sep=""), p, height=height1, width=width1, units=units)
-      
+      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
+      if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
+      if (imgtype == "pdf") pdf(paste("Joined", flen, "Files-", dt, ".pdf", sep=""), height=height1, width=width1)
+      print(p)
+      dev.off()
       if (imgtype == "png") cat(paste("Joined", flen, "Files-", dt, ".png exported\n", sep=""))
       if (imgtype == "jpeg") cat(paste("Joined", flen, "Files-", dt, ".jpg exported\n", sep=""))
       if (imgtype == "pdf") cat(paste("Joined", flen, "Files-", dt, ".pdf exported\n", sep=""))
@@ -1536,7 +1539,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       df4$Num <- df4$Num[drop=TRUE]
       df4.1 <- reshape::melt(df4, id.var=c("Ind", "Num"))
       
-      ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle,labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
+      ppar <- getPlotParams(poplab=poplab, plotnum=1, labpos=labpos, labsize=labsize, labangle=labangle,labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
       
       labangle <- ppar$labangle
       labjust <- ppar$labjust
@@ -1592,7 +1595,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
       gp1$widths[2:3] <- maxWidth
       gp2$widths[2:3] <- maxWidth
       
-      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep=""), height=height1, width=width1, res=dpi, units=units)
+      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
       if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
       if (imgtype == "pdf") pdf(paste("Joined", flen, "Files-", dt, ".pdf", sep=""), height=height1, width=width1)
       
@@ -1655,9 +1658,11 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
                 strip.background=element_rect(colour=flabbackcol, fill=flabbackcol), 
                 plot.margin=unit(c(0.1, 0.1, 0, 0), "cm"))
         
-        if (imgtype == "png") ggsave(paste(fname, ".png", sep=""), p, height=height1, width=width1, dpi=dpi, units=units)
-        if (imgtype == "jpeg") ggsave(paste(fname, ".jpg", sep=""), p, height=height1, width=width1, dpi=dpi, units=units, quality=100)
-        if (imgtype == "pdf") ggsave(paste(fname, ".pdf", sep=""), p, height=height1, width=width1, units=units)
+        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
+        if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height=height1, width=width1)
+        print(p)
+        dev.off()
         if (imgtype == "png") cat(paste(fname, ".png exported\n", sep=""))
         if (imgtype == "jpeg") cat(paste(fname, ".jpg exported\n", sep=""))
         if (imgtype == "pdf") cat(paste(fname, ".pdf exported\n", sep=""))
@@ -1671,7 +1676,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
         df3$Num <- df3$Num[drop=TRUE]
         df3.1 <- reshape::melt(df3, id.var=c("Ind", "Num"))
         
-        ppar <- pophelper::getPlotParams(poplab=poplab, plotnum=tempc, labpos=labpos, labsize=labsize, labangle=labangle, labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
+        ppar <- getPlotParams(poplab=poplab, plotnum=tempc, labpos=labpos, labsize=labsize, labangle=labangle, labjust=labjust, labcol=labcol,pointsize=pointsize, pointcol=pointcol, pointtype=pointtype, linepos=linepos, linethick=linethick, linecol=linecol, fmar=fmar)
         
         labangle <- ppar$labangle
         labjust <- ppar$labjust
@@ -1731,7 +1736,7 @@ plotRuns <- function(files=NULL, imgoutput="sep", poplab=NA, popcol=NA, na.rm=FA
           gp2$widths[2:3] <- maxWidth 
         }
         
-        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units)
+        if (imgtype == "png") png(paste(fname, ".png", sep=""), height=height1, width=width1, res=dpi, units=units, type="cairo")
         if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep=""), height=height1, width=width1, res=dpi, units=units, quality=100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height=height1, width=width1)
         
@@ -2014,7 +2019,7 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
         alist <- c(plist[start1:stop1], lpp1, 1)
         names(alist) <- c(as.character(start1:stop1), "nrow", "ncol")
         
-        if (imgtype == "png") png(paste(fname, "-Multiline-", j, "-", r, ".png", sep=""), height=height, width=width, res=res, units=units)
+        if (imgtype == "png") png(paste(fname, "-Multiline-", j, "-", r, ".png", sep=""), height=height, width=width, res=res, units=units, type="cairo")
         if (imgtype == "jpeg") jpeg(paste(fname, "-Multiline-", j, "-", r, ".jpg", sep=""), height=height, width=width, res=res, units=units, quality=100)
         if (imgtype == "pdf") pdf(paste(fname, "-Multiline-", j, "-", r, ".pdf", sep=""), height=height, width=width)
         
@@ -2041,6 +2046,8 @@ plotMultiline <- function(files=NA, spl=NA, lpp=NA, popcol=NA, na.rm=FALSE, barw
 #' @description Determine rows and columns for figures from arbitrary number of plots
 #' @param numplots Number of plots available for plot
 #' @return A 2 value vector wih first value denoting row and second value as column.
+#' @export
+#' 
 determineRowsAndCols <- function(numplots=NA)
 {
   if(is.na(numplots)) stop("No input for number of plots.\n")
@@ -2067,6 +2074,44 @@ determineRowsAndCols <- function(numplots=NA)
   if (numplots>20) stop("Number of clusters > 20. Specify number of rows and columns for figures manually using the option nrow and ncol arguments.\n")
 }
 
+#FUNCTION llToUtm
+#' Internal: Find UTM zone from a latitude and longitude
+#' @description Find UTM zone from a given latitude and longitude
+#' @param lat The latitude in decimals. Southern hemisphere must be negative.
+#' @param long The longitude in decimals
+#' @details For a given latitude and longitude, the UTM zone must be determined 
+#' prior to UTM coordinate conversion. 
+#' @return A list of two values are returned namely UTMZone and Hemisphere.
+#' @export
+#' 
+llToUtmzone <- function(lat,long)
+{
+  lat <- as.numeric(lat)
+  if(is.na(lat)) stop("Non-numeric input to latitude.\n")
+  long <- as.numeric(long)
+  if(is.na(long)) stop("Non-numeric input to longitude.\n")
+  
+  #basic UTM Zone calculation
+  utm = floor((long + 180)/6) + 1;
+  if( lat >= 56.0 && lat < 64.0 && long >= 3.0 && long < 12.0 )
+    utm = 32;
+  
+  #Special zones for Svalbard
+  if( lat >= 72.0 && lat < 84.0 )
+  {
+    if ( long >= 0.0  && long <  9.0 ) utm = 31;
+    if ( long >= 9.0  && long < 21.0 ) utm = 33;
+    if ( long >= 21.0 && long < 33.0 ) utm = 35;
+    if ( long >= 33.0 && long < 42.0 ) utm = 37;
+  }
+  
+  #Hemisphere calculation
+  if(lat>0) hem<-"N"
+  if(lat<0) hem<-"S"
+  
+  return(list(UTMZone=utm,Hemisphere=hem))
+}
+
 #FUNCTION Interpolate STRUCTURE and TESS runs spatially
 #' Interpolate STRUCTURE and TESS runs spatially
 #' @description Interpolate clusters from STRUCTURE and TESS runs spatially using coordinates.
@@ -2078,7 +2123,8 @@ determineRowsAndCols <- function(numplots=NA)
 #' to location of the coordsfile. It must be a tab-delimited text file with x and y 
 #' coordinates of the samples. The number of rows must be equal to the number of 
 #' samples in datafile. The coordsfiles must have no header and 2 columns in the 
-#' order: x (latitude) and then y (longitude).
+#' order: x (latitude) and then y (longitude). Coordinates must be in standard 
+#' longitude latitude (LL) decimals.
 #' @param method The method employed for interpolation. Options are "bilinear",
 #' "bicubic", "krig" (Kriging), "idw" (Inverse distance weighting) or "nn" (nearest 
 #' neighbour). See Details for more information.
@@ -2103,7 +2149,8 @@ determineRowsAndCols <- function(numplots=NA)
 #' @param ncol Number of columns of plots in a joined plot. Determined automatically
 #' if number of plots <20 and ncol=NA.
 #' @param exportplot If set to FALSE, no image is exported.
-#' @param imgtype The export format for figures. Options are "png", "jpeg" or "pdf".
+#' @param imgtype The export format for figures. Options are "png", "jpeg" or "pdf". 
+#' If pdf, height and width must be in inches and res argument is ignored (set to 300).
 #' @param height The height of export figure in cm unless units are changed.
 #' @param width The width of export figure in cm unless units are changed.
 #' @param units The units of measurement for figure dimensions.
@@ -2128,12 +2175,15 @@ determineRowsAndCols <- function(numplots=NA)
 #' control if required.
 #' @details The "bilinear", "bicubic", "idw" and "nn" are essentially direct interpolation
 #' between spatial points. The "krig" option is predictive rather than direct interpolation.
+#' The kriging function is same function provided by the TESS authors in their R script.
+#' The function uses great circle distances (`rdist.earth()`) from `fields` package to
+#' determine theta. Therefore coordinates must be in LL and not UTM.
 #' For more details of methods, see R package 'akima' function 'interp' for "bilinear" 
 #' and "bicubic" methods, see R package 'fields' function 'Krig' for "krig" method, see
 #' R package 'spatstat' function 'idw' for "idw" and function 'nnmark' for "nn" method. 
 #' The model for "krig" is automatically determined and may produce warning messages if
-#' the GCV algorithm does not converge optimally. This can be ignored for more purposes.
-#' All methods require full coordinate data. No missing data allowed in coordsfile.
+#' the GCV algorithm does not converge optimally. This shouldn't be an issue for exploratory
+#' analyses. All methods require full coordinate data. No missing data allowed in coordsfile.
 #' @export
 #' 
 plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", duplicate="mean",idwpower=2,clusters=NA,gridsize=60,imgoutput="join",colours=NA,nrow=NA,ncol=NA,exportplot=TRUE,imgtype="png",height=NA, width=NA, units="cm",res=200,showaxis=FALSE,addpoints=TRUE,pointcol="grey10",pointtype="+",pointsize=4,legend=TRUE,legendpos=c(1,1),legendjust=c(1,1),legendsize=NA,legendtextsize=NA,dataout=FALSE)
@@ -2172,13 +2222,16 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
   if (all(unlist(class1) == "numeric") != "TRUE") warning("Non numeric content in datafile.\n")
   
   #READ COORDS AND CHECK
-  if(is.character(coordsfile)) coords <- read.delim(coordsfile,header=F)[,1:2]
-  if(is.data.frame(coordsfile)) coords <- coordsfile
+  if (is.character(coordsfile)) coords <- read.delim(coordsfile,header=F)[,1:2]
+  if (is.data.frame(coordsfile)) coords <- coordsfile
   #coords check
   class2 <- lapply(coords,class)
   if (all(unlist(class2) == "numeric") != "TRUE") warning("Non numeric content in coordsfile.\n")
   if (any(is.na(coords)) == T) stop("Missing data detected in coordsfile. Methods cannot handle missing coordinate data.\n")
   colnames(coords)<-c("X","Y")
+  
+  #data coords length check
+  if (nrow(df1) != nrow(coords)) stop("Number of rows of datafile not equal to number of rows of coordsfile.\n")
   
   #determine clusters to plot
   if (all(is.na(clusters))) flen <- 1:length(colnames(df1))
@@ -2198,7 +2251,7 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
   width1 <- width
   #determine aspect ratio from coordinates
   figaspect <- round((max(coords$X,na.rm=T)-min(coords$X,na.rm=T))/(max(coords$Y,na.rm=T)-min(coords$Y,na.rm=T)),2)
-  if (figaspect > 0)
+  if (figaspect > 1)
   {
     if (is.na(height)) height1 <- 16
     if (is.na(width)) width1 <- round(height1*abs(figaspect),2)
@@ -2207,6 +2260,8 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
     if (is.na(width)) width1 <- 16
     if (is.na(height)) height1 <- round(width1*abs(figaspect),2)
   }
+  if (imgtype == "pdf" && any(!is.na(height) | !is.na(width))) warning("Height and width will be taken as inches if argument imgtype is set to pdf.\n")
+  if (imgtype == "pdf" && all(is.na(height) && is.na(width))) {height1 <- round(height1*0.394,2); width1 <- round(width1*0.394,2); units <- "in"}
   
   plist <- vector("list", length(flen))
   datalist <- vector("list", length(flen))
@@ -2232,9 +2287,11 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
     #kriging method
     if (method == "krig")
     {
-      sc <- mean(fields::rdist.earth(coords),miles=FALSE);
+      sc <- mean(fields::rdist.earth(data.frame(Y=coords$Y,X=coords$X)),miles=FALSE);
       fit <- fields::Krig(x=coords,Y=df1[,j], theta= sc, m = 1, Distance="rdist.earth",na.rm=TRUE);
+      #fit <- fields::Krig(x=coords,Y=df1[,j], m = 1,na.rm=TRUE);
       tempimg <- fields::predictSurface(fit,nx=gridsize,ny=gridsize)
+      #surface(tempimg)
       rm(sc,fit)
     }
     
@@ -2292,10 +2349,11 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
     
     if (exportplot == TRUE && imgoutput == "sep")
     {
-      if (imgtype == "png") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png",sep=""),p,height=height1,width=width1,units=units,dpi=res)
-      if (imgtype == "jpeg") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg",sep=""),p,height=height1,width=width1,units=units,dpi=res)
-      if (imgtype == "pdf") ggsave(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf",sep=""),p,height=height1,width=width1,units=units,dpi=res)
-      
+      if (imgtype == "png") png(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png",sep=""),height=height1,width=width1,units=units,res=res,type="cairo")
+      if (imgtype == "jpeg") jpeg(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg",sep=""),height=height1,width=width1,units=units,res=res)
+      if (imgtype == "pdf") pdf(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf",sep=""),height=height1,width=width1)
+      print(p)
+      dev.off()
       if (imgtype == "png") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png exported.\n",sep=""))
       if (imgtype == "jpeg") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg exported.\n",sep=""))
       if (imgtype == "pdf") cat(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf exported.\n",sep=""))
@@ -2317,7 +2375,7 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
     alist <- c(plist, nrow, ncol)
     names(alist) <- c(as.character(flen), "nrow", "ncol")
     
-    if (imgtype == "png") png(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.png", sep=""), height=height2, width=width2, res=res, units=units)
+    if (imgtype == "png") png(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.png", sep=""), height=height2, width=width2, res=res, units=units, type="cairo")
     if (imgtype == "jpeg") jpeg(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.jpg", sep=""), height=height2, width=width2, res=res, units=units, quality=100)
     if (imgtype == "pdf") pdf(paste(fname, "-Interpolation-",method,"-", length(flen), "Clusters.pdf", sep=""), height=height2, width=width2)
     
@@ -2332,8 +2390,296 @@ plotRunsInterpolate<- function(datafile=NULL, coordsfile=NULL,method="krig", dup
   if (dataout == TRUE) return(plist)
 }
 
+#FUNCTION ellipseCI
+#' Internal: ellipseCI
+#' @description Calculate ellipse for bivariate quantile
+#' @param x vector 1
+#' @param y vector 2
+#' @param conf confidence interval
+#' @param np number of points
+#' @details  Obtained from Claude J (2008) Morphometrics with R, Springer
+#' @return A dataframe with x and y coordinates of the ellipse. Number of 
+#' rows is equal to argument np.
+#' @export
+#' 
+ellipseCI<-function(x,y,conf=0.95,np=100)
+{
+  centroid <- apply(cbind(x,y),2,mean)
+  ang <- seq(0,2*pi,length=np)
+  z <- cbind(cos(ang),sin(ang))
+  radiuscoef <- qnorm((1-conf)/2, lower.tail=F)
+  vcvxy <- var(cbind(x,y))
+  r <- cor(x,y)
+  M1 <- matrix(c(1,1,-1,1),2,2)
+  M2 <- matrix(c(var(x), var(y)),2,2)
+  M3 <- matrix(c(1+r, 1-r),2,2, byrow=T)
+  ellpar <- M1*sqrt(M2*M3/2)
+  t1 <- t(centroid + radiuscoef * ellpar %*% t(z))
+  t1 <- as.data.frame(t1)
+  colnames(t1) <- c("x","y")
+  return(t1)
+}
+
+#FUNCTION plotRunsSpatial
+#' plotRunsSpatial
+#' @description Plot STRUCTURE or TESS runs spatial and colour by population clusters
+#' @param datafile One STRUCTURE or TESS output file. Input is either a character 
+#' or a dataframe. If character, then a path pointing to location of the datafile. Can use 
+#' `choose.files()`. If a dataframe, then an output from `runsToDfStructure()` or `
+#' runsToDfTess()`.
+#' @param coordsfile A character or a dataframe. If character, then a path pointing 
+#' to location of the coordsfile. It must be a tab-delimited text file with x and y 
+#' coordinates of the samples. The number of rows must be equal to the number of 
+#' samples in datafile. The coordsfiles must have no header and 2 columns in the 
+#' order: x (latitude) and then y (longitude). Coordinates must be in standard 
+#' longitude latitude (LL) decimals.
+#' @param popcol A vector of colours for the clusters. R colour names or hexadecimal 
+#' values. If NA, colours are automatically generated. K 1 to 12 are custom unique 
+#' colours while K>12 are coloured by function rich.color().
+#' @param exportplot If set to FALSE, no image is exported.
+#' @param imgtype The export format for figures. Options are "png", "jpeg" or "pdf". 
+#' If pdf, height and width must be in inches and res argument is ignored (set to 300).
+#' @param height The height of export figure in cm unless units are changed. If `imgtype`
+#' is pdf, then height must be in inches.
+#' @param width The width of export figure in cm unless units are changed. If `imgtype`
+#' is pdf, then height must be in inches.
+#' @param units The units of measurement for figure dimensions. "cm", "mm" or "in".
+#' @param res The pixel resolution of the export image. Set to 200 by default.
+#' @param showaxis If TRUE, then axis text, axis ticks and plot border are plotted.
+#' @param pointcol The colour of sample points. An R colour or hexadecimal value.
+#' @param pointtype The shape/pch of sample points. A numeric or a character. By default,
+#' "+" is used for all points. If NA, then each cluster is plotted using a different shape.
+#' If a numeric or character of length one is used, then it is used for all points. 
+#' If a vector is used, then it must be equal to number clusters.
+#' @param pointsize The size of sample points. A number usually 0.4,0.8,1,3 etc.
+#' @param pointtransp The transparency of points. A value betwwen 0 to 1.
+#' @param chull If TRUE, then the convex hull is computed for each cluster. The outer
+#' points of each cluster are connected by lines. If less than 3 points are available
+#' in a cluster, then convex hull is not computed and a warning is shown.
+#' @param chulltransp The transparency of the convex hull. A value between 0 and 1.
+#' @param chullsize The thickness of the convex hull border.
+#' @param chulltype The line type of the convex hull border.
+#' @param ellipse If TRUE, draws an ellipse around the clusters.
+#' @param ellconf The confidence interval of the ellipse. Defaults to 0.95.
+#' @param ellsize The thickness of the ellipse line.
+#' @param elltype The linetype for the ellipse.
+#' @param ellpoints The number of points on the ellipse.
+#' @param legend If TRUE, the legend for the colours is plotted.
+#' @param legendlabels A vector of labels for the clusters. Defaults to cluster numbers.
+#' @param legendpos Position of the legend. If "right","left","top" or "bottom", then,
+#' legend is plotted outside the plot area. To plot inside plot area use a 2 vale vector.
+#' If a vector like c(1,1), first value denotes x-axis from 0 to 1 and second value 
+#' denotes y-axis from 0 to 1. For ex. to plot in bottom left corner, use c(0,0).
+#' @param legendjust The x and y axis justification of the legend. A 2 value vector.
+#' @param legendsize The size of the legend in cm. Usually values like 0.5,0.7,1.2 etc.
+#' The legendsize does not control the text in the legend.
+#' @param legendtextsize The size of the text in the legend.
+#' @param plottitle The title for the plot. NULL by default.
+#' @param filename A name for the export figure. Automatically computed if NA.
+#' @param setutm If TRUE, then LL coordinates are converted to UTM coordinates. The midpoint
+#' of the longitude within the dataset is used to determine the UTM zone.
+#' @param dataout If set to TRUE, a list of one or more ggplot gtable elements are returned.
+#' This output can be modified using ggplot themes() for more figure control if required.
+#' @return If dataout=T, a list of one or more ggplot gtable output is returned for more theme 
+#' control if required.
+#' @details The coordinates must always be provided as standard longitude-latitude (LL) decimal
+#' format.
+#' @export
+#' 
+plotRunsSpatial <- function(datafile=NULL, coordsfile=NULL,popcol=NA,exportplot=TRUE,imgtype="png",height=NA, width=NA, units="cm",res=200,showaxis=FALSE,pointcol="grey10",pointtype="+",pointsize=4,pointtransp=0.9,chull=FALSE,chulltransp=0.02,chullsize=0.4,chulltype=1,ellipse=TRUE,ellconf=0.95,ellsize=0.4,elltype=1,ellpoints=100,legend=TRUE,legendlabels=NA,legendpos=c(1,1),legendjust=c(1,1),legendsize=NA,legendtextsize=NA,plottitle=NULL,filename=NA,setutm=FALSE,dataout=FALSE)
+  
+{
+  #basic checks
+  if (is.null(datafile)) stop("No content in datafile.\n")
+  if (is.null(coordsfile)) stop("No content in coordsfile.\n")
+  #   method<-tolower(method)
+  #   if (method != "bilinear" && method != "bicubic" && method != "krig" && method != "idw" && method != "nn") stop("Argument 'method' set incorrectly. Set as 'bilinear', bicubic', 'krig', 'idw' or 'nn'.\n")
+  #   imgoutput <- tolower(imgoutput)
+  #   if (imgoutput != "sep" && imgoutput != "join") stop("Argument 'imgoutput' set incorrectly. Set as 'sep' to plot each cluster seperately. Set as 'join' to plot multiple clusters in one figure.\n")
+  imgtype <- tolower(imgtype)
+  if (imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
+  #   duplicate <- tolower(duplicate)
+  #   if (duplicate != "error" && duplicate != "strip" && duplicate != "mean" && duplicate != "median") stop("Argument 'duplicate' not set correctly. Set as 'error','strip','mean' or 'median'.\n")
+  
+  #READ DATA FILES AND CHECK
+  if (is.data.frame(datafile)) {df1 <- datafile; fname <- format(Sys.Date(), format="%Y%m%d")}
+  if (is.character(datafile))
+  {
+    #get file name
+    fname <- gsub(".txt", "", basename(datafile))
+    #read Structure files
+    chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(datafile, warn=FALSE))[1])
+    if (length(chk) != 0) df1 <- pophelper::runsToDfTess(files=datafile)
+    #read TESS files
+    chk1 <- grep("STRUCTURE", toupper(readLines(datafile, warn=FALSE))[4])
+    if (length(chk1) != 0) df1 <- pophelper::runsToDfStructure(files=datafile)
+    if (length(chk) == 0 & length(chk1) == 0) stop("Incorrect input file type.\n")
+  }
+  #data check
+  class1 <- lapply(df1,class)
+  if (all(unlist(class1) == "numeric") != "TRUE") warning("Non numeric content in datafile.\n")
+  
+  #READ COORDS AND CHECK
+  if (is.character(coordsfile)) coords <- read.delim(coordsfile,header=F)[,1:2]
+  if (is.data.frame(coordsfile)) coords <- coordsfile
+  #coords check
+  class2 <- lapply(coords,class)
+  if (all(unlist(class2) == "numeric") != "TRUE") warning("Non numeric content in coordsfile.\n")
+  if (any(is.na(coords)) == T) stop("Missing data detected in coordsfile. Cannot handle missing coordinate data.\n")
+  colnames(coords)<-c("X","Y")
+  
+  #data coords length check
+  if (nrow(df1) != nrow(coords)) stop("Number of rows of datafile not equal to number of rows of coordsfile.\n")
+  
+  #copy to new variable
+  if (setutm == TRUE)
+  {
+    utmval <- llToUtmzone(mean(coords$X,na.rm=T),mean(coords$Y,na.rm=T))
+    attr(coords,"projection") <- "LL"
+    attr(coords,"zone") <- utmval$UTMZone
+    df2 <- convUL(coords,km=T)
+  }else{
+    df2 <- coords 
+  }
+  
+  #find max value cluster
+  fun_maxprob <- function(x) match(max(x),x)
+  df2$Clusters <- factor(as.numeric(apply(df1,1,fun_maxprob)))
+  clev <- levels(factor(as.character(df2$Clusters)))
+  len <- length(clev)
+  
+  #Convex hull calculation
+  if (chull == TRUE)
+  {
+    slist <- vector("list",length=len)
+    i=1
+    while(i <= len)
+    {
+      j <- as.numeric(clev[i])
+      s1 <- as.data.frame(subset(df2,df2$Clusters==j,drop=T))
+      #compute chull only if >2 coordinates are present
+      if (nrow(s1) > 2) {slist[[i]] <- s1[chull(s1$X,s1$Y),]}else{warning(paste("Less than 3 coordinates in cluster",j,". Convex hull not computed.\n"))}
+      i=i+1
+    }
+    s2 <- plyr::rbind.fill(slist)
+    s2$X <- as.numeric(s2$X)
+    s2$Y <- as.numeric(s2$Y)
+    s2$Clusters <- factor(as.numeric(as.character(s2$Clusters)))
+    #levels of chull clusters
+    llev <- levels(s2$Clusters)
+  }
+  
+  #ellipse calculation
+  if (ellipse == TRUE)
+  {
+    slist <- vector("list",length=len)
+    i=1
+    while(i <= len)
+    {
+      j <- as.numeric(clev[i])
+      s1 <- as.data.frame(subset(df2,df2$Clusters==j,drop=T))
+      #compute ellipse only if >2 coordinates are present
+      if (nrow(s1) > 2) 
+      {
+        el1 <- ellipseCI(x=s1$X, y=s1$Y, conf=ellconf, np=ellpoints)
+        el1$group <- rep(i,ellpoints)
+        slist[[i]] <- el1
+      }else{warning(paste("Less than 3 coordinates in cluster",j,". Ellipse not computed.\n"))}
+      i=i+1
+    }
+    s3 <- plyr::rbind.fill(slist)
+    s3$x <- as.numeric(s3$x)
+    s3$y <- as.numeric(s3$y)
+    s3$group <- factor(as.numeric(as.character(s3$group)))
+    #levels of chull clusters
+    elev <- levels(s3$group)
+  }
+
+  #legend details
+  #if (is.na(legendheader)) legendheader <- "Clusters"
+  if (all(is.na(legendlabels))) legendlabels <- clev
+  if (length(legendlabels) != length(clev)) stop(paste("Number of provided legendlabels (",length(legendlabels),") is not equal to number of clusters (",length(levels(df2$Clusters)),").\n",sep=""))
+  llp <- legendlabels
+  #chull legend
+  if (chull == TRUE) llc <- llp[match(llev,clev)]
+  #ellipse legend
+  if (ellipse == TRUE) lle <- llp[match(elev,clev)]
+  
+  #get colours
+  popcol1 <- popcol
+  if (all(is.na(popcol))) popcol1 <- pophelper::getColours(len)
+  #chull colours
+  if (chull == TRUE) popcol2 <- popcol1[match(llev,clev)]
+  if (ellipse == TRUE) popcol3 <- popcol1[match(elev,clev)]
+  
+  #get dimensions for sep figures
+  height1 <- height
+  width1 <- width
+  if (length(height) > 1) stop("Height must be a single numeric and not a vector.\n")
+  if (length(width) > 1) stop("Width must be a single numeric and not a vector.\n")
+  
+  #determine aspect ratio from coordinates
+  figaspect <- round((max(coords$X,na.rm=T)-min(coords$X,na.rm=T))/(max(coords$Y,na.rm=T)-min(coords$Y,na.rm=T)),2)
+  if (figaspect > 1)
+  {
+    if (is.na(height)) height1 <- 12
+    if (is.na(width)) width1 <- round(height1*abs(figaspect),2)
+  }else
+  {
+    if (is.na(width)) width1 <- 12
+    if (is.na(height)) height1 <- round(width1*abs(figaspect),2)
+  }
+  if (imgtype == "pdf" && any(!is.na(height) | !is.na(width))) warning("Height and width will be taken as inches if argument imgtype is set to pdf.\n")
+  if (imgtype == "pdf" && all(is.na(height) && is.na(width))) {height1 <- round(height1*0.394,2); width1 <- round(width1*0.394,2); units <- "in"}
+  
+  #plotting
+  p <- ggplot()
+  #pointtype adjustment
+  if(all(is.na(pointtype))) p <- p + geom_point(data=df2,aes(x=X,y=Y,colour=Clusters,shape=Clusters),size=pointsize,fill=pointcol,alpha=pointtransp)
+  if(!all(is.na(pointtype)) && length(pointtype) == 1) p <- p + geom_point(data=df2,aes(x=X,y=Y,colour=Clusters),size=pointsize,shape=pointtype,fill=pointcol,alpha=pointtransp)
+  if(!all(is.na(pointtype)) && length(pointtype) > 1) p <- p + geom_point(data=df2,aes(x=X,y=Y,colour=Clusters,shape=Clusters),size=pointsize,fill=pointcol,alpha=pointtransp) + scale_shape_manual(values=pointtype)
+  
+  p <-  p + scale_colour_manual(values=popcol1,labels=llp)+
+    theme_bw()+labs(x=NULL, y=NULL, title=plottitle)+
+    theme(plot.title=element_text(colour="grey40",hjust=0),axis.text=element_text(colour="grey30"),axis.ticks=element_line(colour="grey30"),legend.justification=legendjust,legend.position=legendpos,legend.text=element_text(colour="grey30"),legend.title=element_blank())
+  
+  #show convex hulls if true
+  if (chull == TRUE) p <- p + geom_polygon(data=s2,aes(x=X,y=Y,group=Clusters,colour=Clusters,fill=Clusters),alpha=chulltransp,linetype=chulltype,size=chullsize)+
+    scale_fill_manual(values=popcol2,labels=llc)
+  if (ellipse == TRUE) p <- p + geom_path(data=s3, aes(x=x, y=y,colour=group),size=ellsize,linetype=elltype)
+  #hide axis if false
+  if (showaxis == FALSE) p <- p + theme(axis.text=element_blank(),axis.ticks=element_blank())
+  #hide legend if true
+  if (legend == FALSE) p <- p + theme(legend.position="none")
+  #adjust legend size if not NA
+  if (!is.na(legendsize)) p <- p + theme(legend.key.size=unit(legendsize, "cm"))
+  #adjust legend text size if not NA
+  if (!is.na(legendtextsize)) p <- p + theme(legend.text=element_text(size=legendtextsize))
+  
+  if (exportplot == TRUE)
+  {
+    fname1 <- paste(fname,"-Spatial",sep="")
+    if (!is.na(filename)) fname1 <- filename
+    
+    cat(paste("Height: ",height1,"\n"))
+    cat(paste("Width: ",width1,"\n"))
+    cat(paste("Res: ",res,"\n"))
+    cat(paste("Units: ",units,"\n"))
+
+    if (imgtype == "png") png(paste(fname1,".png",sep=""), height=height1, width=width1, res=res, units=units,type="cairo")
+    if (imgtype == "jpeg") jpeg(paste(fname1,".jpg",sep=""), height=height1, width=width1, res=res, units=units, quality=100)
+    if (imgtype == "pdf") pdf(paste(fname1,".pdf",sep=""), height=height1, width=width1)
+    print(p)
+    dev.off()
+    if (imgtype == "png") cat(paste(fname1,".png exported.\n",sep=""))
+    if (imgtype == "jpeg") cat(paste(fname1,".jpg exported.\n",sep=""))
+    if (imgtype == "pdf") cat(paste(fname1,".pdf exported.\n",sep=""))
+  }
+  if (dataout == TRUE) return(p)
+}
+
 # New concepts
 # Option to have custom labels in plotMultiline
 # Use labels for plotMultiline from input file
-# Plot structure results to spatial
-cat("pophelper v1.0.3 loaded\n")
+
+cat("pophelper v1.0.4 loaded\n")

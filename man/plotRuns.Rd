@@ -50,7 +50,7 @@ plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
   \item{dpi}{Image resolution. Defaults to 300.}
 
   \item{units}{Units of height and width. Default set to
-  "cm". If type is eps, units must be "in".}
+  "cm". If type is pdf, units must be "in".}
 
   \item{flabsize}{The size of the filename label. Defaults
   to 4.}

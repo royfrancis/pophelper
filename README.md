@@ -1,4 +1,4 @@
-# pophelper 1.0.3
+# pophelper 1.0.4
 
 `pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, perform the Evanno method, export files for CLUMPP and generate barplot figures. A detailed demonstration was prepared for `pophelper v1.0.0`, refer the [vignette](https://github.com/royfrancis/pophelper/blob/master/inst/doc/Vignette.pdf). Newer versions and updates is shown only on the github page (this page).
 
@@ -18,6 +18,36 @@ For help on any function, use
 `?evannoMethodStructure`
 
 For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use `choose.files(multi=T)`. Mac users can use `file.choose()` for single selection and `tk_choose.files()` from `tcltk` package for multiple selection.
+
+## List of Functions  
+### STRUCTURE  
+```coffee
+tabulateRunsStructure()   #get a tabulation of a large number of STRUCTURE files
+summariseRunsStructure()  #summarise runs by repeats for each K
+evannoMethodStructure()   #perform the Evanno method on summarised data
+runsToDfStructure()       #convert STRUCTURE run files to R dataframe
+clumppExportStructure()   #Export data file and parameter file for use with CLUMPP
+collectClumppOutput()     #Collect CLUMPP output into a common folder
+plotRuns()                #Plot a barplot from STRUCTURE run files
+PlotMultiline()           #Plot a multi-line barplot from STRUCTURE run file
+plotRunsInterpolate()     #Interpolate clusters in a STRUCTURE run spatially
+plotRunsSpatial()         #Cluster by max assignment and plot points spatially
+```
+
+### TESS  
+```coffee
+collectRunsTess()         #collect TESS output from multiple folders into one
+tabulateRunsTess()        #get a tabulation of a large number of TESS files
+summariseRunsTess()       #summarise runs by repeats for each K
+runsToDfTess()            #convert TESS run files to R dataframe
+clumppExportTess()        #Export data file and parameter file for use with CLUMPP
+collectClumppOutput()     #Collect CLUMPP output into a common folder
+plotRuns()                #Plot a barplot from TESS run files
+plotMultiline()           #Plot a multi-line barplot from TESS run file
+plotRunsInterpolate()     #Interpolate clusters in a TESS run spatially  
+plotRunsSpatial()         #Cluster by max assignment and plot points spatially
+```  
+A long demo script with usage of all functions, see [here](https://github.com/royfrancis/pophelper/blob/master/inst/files/PophelperDemo.R)  
 
 ## Functions and workflow 
 A list of important functions are shown below. Once the package is installed, and you have set a working directory, you can follow the mini tutorial below.
@@ -183,8 +213,8 @@ TESS run files are generated from TESS into multiple folders. These file can be 
 collectRunsTess(runsdir = choose.dir())
 ```
 
-### 10. Plot Interpolation  
-This function allows to spatially interpolate STRUCTURE and TESS clusters. Files needed are STRUCTURE or TESS run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available.
+### 10. Plot Interpolate Clusters in run files 
+This function allows to spatially interpolate STRUCTURE and TESS clusters. Files needed are STRUCTURE or TESS run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg:21.0232, 43.0232).
 
 ```coffee
 #specify path for datafile and coordsfile
@@ -240,34 +270,39 @@ dev.off()
 ```
 ![Interpolation sample 3](screenshots/Fig15.jpg)  
 
-__Fig 11.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3rd plot is `brewer.pal(8,"Spectral")` and 4th plot is `brewer.pal(8,"BuPu")`.*
+__Fig 11.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3rd plot is `brewer.pal(8,"Spectral")` and 4th plot is `brewer.pal(8,"BuPu")`.*  
 
-## List of Functions  
-### STRUCTURE
-```coffee
-tabulateRunsStructure()  
-summariseRunsStructure()  
-evannoMethodStructure()  
-runsToDfStructure()  
-clumppExportStructure()  
-collectClumppOutput()  
-plotRuns()
-PlotMultiline()
-plotRunsInterpolate()
-```
+### 10. Plot Runs Spatial  
+Find the highest probability of assignment for each individual and plot these clusters to spatial coordinates. The clusters are identified by colour or point shape. The clusters can also be marked by confidence ellipses or convex hulls.
 
-### TESS
 ```coffee
-collectRunsTess()  
-tabulateRunsTess()
-summariseRunsTess()
-runsToDfTess()  
-clumppExportTess()  
-collectClumppOutput()  
-plotRuns()  
-plotMultiline()
-plotRunsInterpolate()
+#basic usage
+plotRunsSpatial(datafile=sfile239,coordsfile=cfile239)
+#needs more height. set height and width as required in cm.
+plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,height=12)
+#set UTM coordinates. Better geographic distance representation over a scale such as normal countries.
+plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,height=12,setutm=T)
+#without ellipses
+plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,height=12,ellipse=F)
+
+#Create a 2x2 montage with varying parameters
+#don't export, export data, add title
+p1 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout=T, plottitle="Fig 1")
+#without ellipse, with square points and transparency added
+p2 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout=T, plottitle="Fig 2",ellipse=F,pointtype=15,pointtransp=0.4)
+#without ellipse, with convex hulls, coordinates in UTM, points by cluster, custom colours,show axis
+p3 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout=T, plottitle="Fig 3",ellipse=F,chull=T, setutm=T,pointtype=NA,pointsize=2,popcol=brewer.pal(5,"Dark2"),showaxis=T)
+#no ellipse, with convex hull, decreased convexhull transparency, convexhull linetype, change cluster labels, custom colours, show axis
+p4 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout=T, plottitle="Fig 4",ellipse=F,chull=T,chulltransp=0.2,chulltype=3,legendlabels=c("PopA","PopB","PopC","PopD","PopE"),popcol=brewer.pal(5,"Set1"),showaxis=T)
+
+png("PlotRunsSpatial.png",height=20,width=20,res=250,units="cm",type="cairo")
+grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
+dev.off()
 ```
+![plotRunsSpatial sample 1](screenshots/Fig16.jpg)  
+
+__Fig 12.__ *Some of the plots created using the function `plotRunsSpatial()`. Fig 1: The basic usage of the function with title added `plottitle="Fig 1"`. Fig 2: The ellipses are turned off `ellipse=F` and the point shape is changed `pointtype=15` and transparency added to points `pointtransp=0.4`. Fig 3: Convex hulls are turned on `chull=T and coordinates are transformed to UTM `setutm=T`. The points shapes are based on clusters `pointtype=NA`. Custom colours are used `brewer.pal(5,"Dark2") and axis are shown `showaxis=T`. Fig 4: Convex hull transparency is lowered `chulltransp=0.2`, convex hull linetype is changed `chulltype=3`, legend labels are changed `legendlabels=c("PopA","PopB","PopC","PopD","PopE")`. Custom colours are used `brewer.pal(5,"Set1")`.*  
+
 ## References
 [Evanno, G., Regnaut, S., and Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620](http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract)
 
@@ -292,7 +327,6 @@ Current ideas:
 > Web app under construction.  
 > Option to have custom labels in plotMultiline.  
 > Use labels for plotMultiline from input structure file.  
-> Scatterplot structure/tess run files spatially with points coloured by clusters.
 
 
 ### Disclaimer

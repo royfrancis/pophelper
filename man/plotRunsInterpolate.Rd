@@ -24,7 +24,8 @@ plotRunsInterpolate(datafile = NULL, coordsfile = NULL, method = "krig",
   and y coordinates of the samples. The number of rows must
   be equal to the number of samples in datafile. The
   coordsfiles must have no header and 2 columns in the
-  order: x (latitude) and then y (longitude).}
+  order: x (latitude) and then y (longitude). Coordinates
+  must be in standard longitude latitude (LL) decimals.}
 
   \item{method}{The method employed for interpolation.
   Options are "bilinear", "bicubic", "krig" (Kriging),
@@ -71,7 +72,8 @@ plotRunsInterpolate(datafile = NULL, coordsfile = NULL, method = "krig",
   \item{exportplot}{If set to FALSE, no image is exported.}
 
   \item{imgtype}{The export format for figures. Options are
-  "png", "jpeg" or "pdf".}
+  "png", "jpeg" or "pdf". If pdf, height and width must be
+  in inches and res argument is ignored (set to 300).}
 
   \item{height}{The height of export figure in cm unless
   units are changed.}
@@ -136,15 +138,20 @@ using coordinates.
 \details{
 The "bilinear", "bicubic", "idw" and "nn" are essentially
 direct interpolation between spatial points. The "krig"
-option is predictive rather than direct interpolation. For
-more details of methods, see R package 'akima' function
-'interp' for "bilinear" and "bicubic" methods, see R
-package 'fields' function 'Krig' for "krig" method, see R
+option is predictive rather than direct interpolation. The
+kriging function is same function provided by the TESS
+authors in their R script. The function uses great circle
+distances (`rdist.earth()`) from `fields` package to
+determine theta. Therefore coordinates must be in LL and
+not UTM. For more details of methods, see R package 'akima'
+function 'interp' for "bilinear" and "bicubic" methods, see
+R package 'fields' function 'Krig' for "krig" method, see R
 package 'spatstat' function 'idw' for "idw" and function
 'nnmark' for "nn" method. The model for "krig" is
 automatically determined and may produce warning messages
-if the GCV algorithm does not converge optimally. This can
-be ignored for more purposes. All methods require full
-coordinate data. No missing data allowed in coordsfile.
+if the GCV algorithm does not converge optimally. This
+shouldn't be an issue for exploratory analyses. All methods
+require full coordinate data. No missing data allowed in
+coordsfile.
 }
 

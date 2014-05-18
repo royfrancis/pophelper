@@ -1,3 +1,12 @@
+pophelper 1.0.4
+===========
+* 18-May-2014
+* Cairo plotting for png exports. Better anti-aliasing.
+* fig aspect ratio issue fixed in plotRunsInterpolate()
+* Namespace error resolved for some functions.
+* Minor changes to plotRunsInterpolate().
+* plotRunsSpatial() function added. STRUCTURE and TESS runs can be used with a coordinate file to spatially plot the points and colour them into clusters based on the highest probability value. The coordinates can be transformed to UTM coordinates for a better spatial representation.
+
 pophelper 1.0.3
 ===========  
 * 11-May-2014
@@ -11,8 +20,6 @@ pophelper 1.0.2
 pophelper 1.0.1
 ===========  
 * parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
-
-* grep error [Error in runsToDfTess(files[sel]) : No input files.] in clumppExportStructure() and clumppExportTess() fixed. Thanks to Michael Panasci.
 
 pophelper 1.0.0
 ===========  
