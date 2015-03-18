@@ -22,30 +22,30 @@ For functions where one or more files need to be selected, the selection can be 
 ## List of Functions  
 ### STRUCTURE  
 ```coffee
-tabulateRunsStructure()   #get a tabulation of a large number of STRUCTURE files
-summariseRunsStructure()  #summarise runs by repeats for each K
-evannoMethodStructure()   #perform the Evanno method on summarised data
-runsToDfStructure()       #convert STRUCTURE run files to R dataframe
-clumppExportStructure()   #Export data file and parameter file for use with CLUMPP
-collectClumppOutput()     #Collect CLUMPP output into a common folder
-plotRuns()                #Plot a barplot from STRUCTURE run files
-PlotMultiline()           #Plot a multi-line barplot from STRUCTURE run file
-plotRunsInterpolate()     #Interpolate clusters in a STRUCTURE run spatially
-plotRunsSpatial()         #Cluster by max assignment and plot points spatially
+tabulateRunsStructure()   # Get a tabulation of a large number of STRUCTURE files
+summariseRunsStructure()  # Summarise runs by repeats for each K
+evannoMethodStructure()   # Perform the Evanno method on summarised data
+runsToDfStructure()       # Convert STRUCTURE run files to R dataframe
+clumppExportStructure()   # Export data file and parameter file for use with CLUMPP
+collectClumppOutput()     # Collect CLUMPP output into a common folder
+plotRuns()                # Plot a barplot from STRUCTURE run files
+PlotMultiline()           # Plot a multi-line barplot from STRUCTURE run file
+plotRunsInterpolate()     # Interpolate clusters in a STRUCTURE run spatially
+plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 ```
 
 ### TESS  
 ```coffee
-collectRunsTess()         #collect TESS output from multiple folders into one
-tabulateRunsTess()        #get a tabulation of a large number of TESS files
-summariseRunsTess()       #summarise runs by repeats for each K
-runsToDfTess()            #convert TESS run files to R dataframe
-clumppExportTess()        #Export data file and parameter file for use with CLUMPP
-collectClumppOutput()     #Collect CLUMPP output into a common folder
-plotRuns()                #Plot a barplot from TESS run files
-plotMultiline()           #Plot a multi-line barplot from TESS run file
-plotRunsInterpolate()     #Interpolate clusters in a TESS run spatially  
-plotRunsSpatial()         #Cluster by max assignment and plot points spatially
+collectRunsTess()         # Collect TESS output from multiple folders into one
+tabulateRunsTess()        # Get a tabulation of a large number of TESS files
+summariseRunsTess()       # Summarise runs by repeats for each K
+runsToDfTess()            # Convert TESS run files to R dataframe
+clumppExportTess()        # Export data file and parameter file for use with CLUMPP
+collectClumppOutput()     # Collect CLUMPP output into a common folder
+plotRuns()                # Plot a barplot from TESS run files
+plotMultiline()           # Plot a multi-line barplot from TESS run file
+plotRunsInterpolate()     # Interpolate clusters in a TESS run spatially  
+plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 ```  
 A long demo script with usage of all functions, see [here](https://github.com/royfrancis/pophelper/blob/master/inst/files/PophelperDemo.R)  
 
