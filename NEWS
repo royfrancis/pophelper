@@ -1,0 +1,50 @@
+pophelper 1.1.0
+===========
+
+* 16-Mar-2015
+* Several changes in code to enable faster runtime.
+* New HTML vignette created.
+* Corrections to NAMESPACE and DESCRIPTION
+* Function tabulateRunsStructure() modified.
+* Function tabulateRunsTess() modified.
+* Function summariseRunsStructure() function modified. 2.5x faster.
+    + ddply() from plyr() package used to summarise table.
+    + na.rm argument added for summarising table. na.rm is passed to min(), max(), mean() and sd() functions.
+    + Output table variable order changed. Current column order is loci, ind, k, runs, elpdmean, elpdsd, elpdmin, elpdmax.
+* Function summariseRunsTess() function modified.
+    + Function ddply() from plyr() package used to summarise table.
+    + Output table variable order changed. Current column order is ind, k, runs.
+* evannoMethodStructure() has an improved plot theme.
+* Function plotRuns() modified.
+    + Argument 'labcol' didn't change colour of labels. Fixed.
+    + Argument 'pointbgcol' added for background colour of marker points
+    + Argument 'linetype' added for changing line type of marker line
+* Function analyseRuns() function added. A wrapper for several other functions. Performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
+
+pophelper 1.0.4
+===========
+* 18-May-2014
+* Cairo plotting for png exports. Better anti-aliasing.
+* fig aspect ratio issue fixed in function plotRunsInterpolate()
+* Namespace error resolved for some functions.
+* Minor changes to plotRunsInterpolate().
+* plotRunsSpatial() function added. STRUCTURE and TESS runs can be used with a coordinate file to spatially plot the points and colour them into clusters based on the highest probability value. The coordinates can be transformed to UTM coordinates for a better spatial representation.
+
+pophelper 1.0.3
+===========  
+* 11-May-2014
+* Function plotRunsInterpolate() added. STRUCTURE and TESS run files can be used with a coordinate file to spatially interpolate clusters using several interpolation methods such as thin splines, inverse distance weighting and kriging.
+
+pophelper 1.0.2
+===========  
+* 25-Apr-2014
+* A bug in functions clumppExportStructure() and clumppExportTess() produced a 'No input' error. This has been fixed. Thanks to Micheal Panasci for pointing this out.
+
+pophelper 1.0.1
+===========  
+* parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
+
+pophelper 1.0.0
+===========  
+* completed 16-Feb-2014
+* the first version of the `pophelper` package
