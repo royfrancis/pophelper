@@ -5,14 +5,12 @@
 Also, try the short video demo based on`pophelper v1.0.0` [here](https://www.youtube.com/watch?v=iOqxXcQReJI). This is an old video and sorry for the bad quality.
 
 ## Installation  
-You need to have R (> 3.0.0) statistical package installed on your system. R is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
+You need to have R (> 3.1.0) statistical package installed on your system. R is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
 
+The new version v1.1.0 is on trial now as a new branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.0, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling. The new version is just a new branch now on GitHub. It will be merged to master perhaps later on.
 ```coffee
 install.packages('devtools',dep=T)
 library(devtools)
-install_github('royfrancis/pophelper')
-
-#The new version v1.1.0 is on trial now as a new branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.0, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling. The new version is just a new branch now on GitHub. It will be merged to master perhaps later on.
 
 for new version v1.1.0, use
 install_github('royfrancis/pophelper',ref="v110")
