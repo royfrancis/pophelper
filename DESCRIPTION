@@ -1,8 +1,8 @@
 Package: pophelper
 Type: Package
 Title: Tabulate, analyse and plot STRUCTURE and TESS output files
-Version: 1.1.0
-Date: 2015-03-18
+Version: 1.1.1
+Date: 2015-03-31
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
@@ -15,14 +15,15 @@ URL: https://github.com/royfrancis/pophelper
 Depends:
     R(>= 3.1.0),
     ggplot2,
-    Cairo
+    Cairo,
+    plyr
 Imports: 
     akima,
     fields,
     grid,
     gridExtra,
+    gtable,
     PBSmapping,
-    plyr,
     reshape2,
     spatstat
 Suggests: knitr

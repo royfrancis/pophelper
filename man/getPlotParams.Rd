@@ -4,16 +4,13 @@
 \alias{getPlotParams}
 \title{Internal: Generate parameters for plots with labels}
 \usage{
-getPlotParams(poplab = NA, plotnum = 1, labpos = NA, labsize = NA,
-  labangle = NA, labjust = NA, pointsize = NA, linepos = NA,
-  linethick = NA, fmar = NA)
+getPlotParams(poplab = NA, plotnum = 1, labsize = NA, labangle = NA,
+  labjust = NA, pointsize = NA, linethick = NA)
 }
 \arguments{
 \item{poplab}{A character vector of labels same length as number of individuals.}
 
 \item{plotnum}{A numeric indicating the number of plots on the figure.}
-
-\item{labpos}{A numeric indicating the y position of the labels.}
 
 \item{labsize}{A numeric indicating the size of the labels.}
 
@@ -24,16 +21,11 @@ labangle between 20 and 135.}
 
 \item{pointsize}{A numeric indicating the size of points on label marker line.}
 
-\item{linepos}{A numeric indicating the y position of the label marker line and the points.}
-
 \item{linethick}{A numeric indicating the thickness of the label marker line.}
-
-\item{fmar}{A numeric vector with four elements indicating the figure margins in 'lines' unit. A vector of 4 numbers for top, right,
-bottom and left margins. ex. c(0.2,0.2,0.2,0).}
 }
 \value{
-A list with following plot parameters: poplab, plotnum, labpos, labsize,
-labangle, labjust, pointsize, linepos, linethick and fmar.
+A list with following plot parameters: poplab, plotnum, labsize,
+labangle, labjust, pointsize, linethick.
 }
 \description{
 Generates various parameters required for plotting with labels. Internal function.

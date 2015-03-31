@@ -23,10 +23,10 @@ sf2 <- summariseRunsStructure(sf1)
 sf2 <- summariseRunsStructure(sf1, writetable = T)
 tf2 <- summariseRunsTess(tf1, writetable = T)
 #perform evanno method
-evannoMethodStructure(sf2, doplot=F)
+evannoMethodStructure(sf2)
 evannoMethodStructure(sf2, writetable = T, exportplot = T)
-evannoMethodStructure(sf2, writetable = T, exportplot = T, height = 1000, width = 1000)
-evannoMethodStructure(sf2, doplot = F)
+evannoMethodStructure(sf2, writetable = T, exportplot = T, height = 15, width = 15)
+evannoMethodStructure(sf2, height = 20, width = 20, basesize=8)
 #convert STRUCTURE run files to R dataframe
 runsToDfStructure(files=sfiles)
 #convert TESS run files to R dataframe
@@ -46,7 +46,7 @@ plotRuns(files=sfiles[1:2], imgoutput = "sep", height = 5, width = 15)
 #plot separate figures TESS
 plotRuns(files=tfiles[1:2]) 
 #plot joined figures STRUCTURE
-plotRuns(files=sfiles[1:2], imgoutput="join")
+plotRuns(files=sfiles[1:2], imgoutput="join",na.rm=T)
 #plot joined figures TESS
 plotRuns(files=tfiles[1:2], imgoutput="join")
 #read labels for STRUCTURE

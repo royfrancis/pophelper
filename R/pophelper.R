@@ -1,5 +1,5 @@
-#pophelper v1.1.0
-#18-Mar-2015
+#pophelper v1.1.1
+#31-Mar-2015
 #Functions
 
 #load or install required libraries
@@ -57,22 +57,115 @@ checkRuns <- function(files=NULL, warn =FALSE)
 {
   if (is.null(files)) stop("Input is empty.\n")
   len1 <- length(files)
-  checkvec <- vector(length=len1)
+  checkvec <- rep(NA,length=len1)
   for (i in 1:len1)
   {
-    chk <- NULL
+    chk <- 0
     fname <- base::gsub(".txt", "", basename(files[i]))
     #read TESS file
     chk <- grep("CLUSTERING PROBABILITIES", toupper(readLines(files[i], warn = FALSE))[1])
     if (length(chk) != 0) checkvec[i] <- "TESS"
+    
     #read STRUCTURE file
-    chk1 <- grep("STRUCTURE", toupper(readLines(files[i], warn = FALSE))[4])
-    if (length(chk1) != 0) checkvec[i] <- "STRUCTURE"
+    if (length(chk)==0)
+    {
+      chk <- grep("STRUCTURE", toupper(readLines(files[i], warn = FALSE))[4])
+      if (length(chk) != 0) checkvec[i] <- "STRUCTURE"
+    }
+    
     #read TAB files
-    if (is.null(chk)) checkvec <-"UNIDENTIFIED"
-    if (is.null(chk) && warn == TRUE) warning(paste("File ",fname[i], " is not a STRUCTURE or TESS file.\n"))
+    #ncol(read.table(files[i],header=F,sep="\t"))
+    if (length(chk)==0)
+    {
+      chk <- ncol(read.table(files[i],header=F,sep=""))
+      if (chk > 2) checkvec[i] <- "TAB"
+    }
+
+    if (length(chk)==0) checkvec[i] <-"UNIDENTIFIED"
+    if (length(chk)==0 && warn == TRUE) warning(paste("File ",fname[i], " is not a STRUCTURE or TESS file.\n"))
   }
   return(checkvec)
+}
+
+# FUNCTION unitConverter
+#' Internal: Convert between dimension units
+#' @description Convert value between dimension units
+#' @param value A numeric value or numeric vector to convert
+#' @param fromunit A character indicating the current unit of the value. Options are "cm", "mm", "in" or "px".
+#' @param tounit A character indicating the unit to change to. Options are "cm", "mm", "in" or "px".
+#' @param res A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).
+#' @return Returns a numeric value or numeric vector in changed units.
+#' @export
+unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
+{
+  #check
+  if (all(is.na(value))) stop("Argument value is empty.\n")
+  if (is.na(fromunit)) stop("Argument fromunit is empty.\n")
+  if (is.na(tounit)) stop("Argument tounit is empty.\n")
+  
+  if (fromunit=="cm")
+  {
+    if (tounit == "cm") outvalue <- value
+    if (tounit == "mm") outvalue <- round(value*10,2)
+    if (tounit == "in") outvalue <- round(value*0.3937,2)
+    if (tounit == "px")
+    {
+      if (is.na(res)) stop("Argument res is empty.\n")
+      #convert res to 1 cm
+      pxpercm <- res/2.54
+      outvalue <- round(pxpercm*value,0)
+    }
+  }
+  
+  if (fromunit=="mm")
+  {
+    if (tounit == "mm") outvalue <- value
+    if (tounit == "cm") outvalue <- round(value/10,2)
+    if (tounit == "in") outvalue <- round(value*0.03937,2)
+    if (tounit == "px")
+    {
+      if (is.na(res)) stop("Argument res is empty.\n")
+      #convert res to 1 mm
+      pxpermm <- res/25.4
+      outvalue <- round(pxpermm*value,0)
+    }
+  }
+  
+  if (fromunit=="in")
+  {
+    if (tounit == "in") outvalue <- value
+    if (tounit == "cm") outvalue <- round(value*2.54,2)
+    if (tounit == "mm") outvalue <- round(value*0.254,2)
+    if (tounit == "px")
+    {
+      if (is.na(res)) stop("Argument res is empty.\n")
+      outvalue <- round(res*value,0)
+    }
+  }
+  
+  #check this part
+  if (fromunit=="px")
+  {
+    if (tounit == "px") outvalue <- value
+    if (is.na(res)) stop("Argument res is empty.\n")
+    
+    if (tounit == "cm")
+    {
+      pxpercm <- res/2.54
+      outvalue <- value/pxpercm
+    }
+    
+    if (tounit == "mm")
+    {
+      pxpermm <- res/25.4
+      outvalue <- value/pxpermm
+    }
+    
+    if (tounit == "in") outvalue <- value/res
+    
+  }
+  
+  return(outvalue)
 }
 
 #FUNCTION tabulateRunsStructure
@@ -273,7 +366,7 @@ tabulateRunsTess <- function(files = NULL, writetable = FALSE, sorttable = TRUE,
 #' probability of data minus standard deviation.
 #' @seealso \code{\link{summariseRunsTess}}
 # @import xlsx
-#' @import plyr
+# @import plyr
 #' @export
 #' 
 summariseRunsStructure <- function(data = NULL, writetable = FALSE)
@@ -298,7 +391,7 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  data1 <- plyr::ddply(data,.(loci,ind,k),runs = as.numeric(table(k)),elpdmean = mean(elpd,na.rm = T) ,elpdsd = sd(elpd,na.rm = T),elpdmin = min(elpd,na.rm = T),elpdmax = max(elpd,na.rm = T),summarise)
+  data1 <- plyr::ddply(data,.(loci,ind,k),runs = as.numeric(table(k)),elpdmean = mean(elpd,na.rm = T) ,elpdsd = sd(elpd,na.rm = T),elpdmin = min(elpd,na.rm = T),elpdmax = max(elpd,na.rm = T),here(summarise))
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
@@ -328,7 +421,7 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
 #' @return Returns a dataframe with all values of K sorted by K. The table has 3 columns namely value of K, number of runs for each K and number of individuals.
 #' @seealso \code{\link{summariseRunsStructure}}
 # @import xlsx
-#' @import plyr
+# @import plyr
 #' @export
 #' 
 summariseRunsTess <- function(data = NULL, writetable = FALSE)
@@ -378,13 +471,13 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
 #' @param data A dataframe with summarised runs. An output from \code{summariseRunsStructure()}. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.
 #' @param writetable A logical indicating if the output table is to be exported as a file in the working directory.
 # @param exportdataformat A character to indicate format of exported data. Set as 'excel' to export an Excel .xlsx file or set as 'txt' to export a tab-delimited .txt text file.
-#' @param doplot A logical indicating if the Evanno plots needs to be computed. If Evanno method cannot be computed, a kPlot (elpd over k) is shown instead. Set this to FALSE to avoid computation of plots and only return data table (1000x faster).
 #' @param exportplot A logical indicating if the Evanno plots are to be exported as an image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.
 #' @param na.rm Default set to FALSE. Does not remove NAs for plot and this 
 #' generates warnings from \code{ggplot}. If set to TRUE, NAs are removed before 
 #' plotting and warning messages from \code{ggplot} are avoided.
 #' @param imgtype A character indicating the type of exported image. Default set to png. Other possible 
 #' options are jpeg or pdf.
+#' @param basesize A numeric indicating the base size of various plot elementsw such as point size, line thickness etc. Increase basesize with larger figure dimensions. Defaults to 5.
 #' @param height A numeric denoting the height of exported image. Default units in 'cm'. If imgtype is 
 #' pdf, height must be in inches.
 #' @param width A numeric denoting the width of exported image. Default units in 'cm'. If imgtype is 
@@ -407,10 +500,11 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
 #' 2611-2620. The Evanno plot generated from this function can be recreated 
 #' from the returned dataframe if furthur customisation is required.
 # @import xlsx
+#' @import grid
 #' @import gridExtra
 #' @export
 #' 
-evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE, exportplot = FALSE, na.rm = TRUE, imgtype = "png", height = NA, width = NA, res = NA, units = NA)
+evannoMethodStructure <- function(data = NULL, writetable = FALSE, exportplot = FALSE, na.rm = TRUE, imgtype = "png", basesize=NA, height = NA, width = NA, res = NA, units = NA)
 {
   height1 <- height
   width1 <- width
@@ -418,7 +512,6 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
   if (is.na(res)) res <- 300
   
   #checks
-  doplot <- toupper(doplot)
   exportplot <- toupper(exportplot)
   imgtype <- tolower(imgtype)
   if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg' or 'pdf'.\n")
@@ -464,37 +557,39 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
   #repeats of k<2
   if (all(data$runs < 2)) warning("Results may not be meaningful if repeats (runs) for any value of K is less than 2. \n")
   
-  linewd <- 0.20
+  base_size <- basesize
   plotcol <- "grey30"
   plotcol1 <- "steelblue"
-  pointsz <- 1.5
   pointsh <- 20
-  base_size <- 5
-  
+  #linewd <- 0.20
+  #pointsz <- 1.5
+  #linewd <- base_size*0.04
+  #pointsz <- base_size*0.3
   
   if (err == 1)
   {
-    if (doplot == TRUE | doplot == "T" | doplot == "TRUE")
+    if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
     {      
       #create plots list
       plist <- vector("list",1)
       
       #settings for kPlot
-      if (is.na(height) && imgtype == "pdf") height1 <- 4
-      if (is.na(width) && imgtype =="pdf") width1 <- 4
-      if (is.na(height && imgtype != "pdf")) height1 <- 7
-      if (is.na(width && imgtype != "pdf")) width1 <- 7
+      if (is.na(height)) height1 <- 7
+      if (is.na(width)) width1 <- 7
+      if(is.na(basesize)) base_size <- round((5*height1)/7,1)
+      
+      if (is.na(height) && imgtype == "pdf") height1 <- unitConverter(value = height1, fromunit = "cm", tounit = "in", res = res)
+      if (is.na(width) && imgtype =="pdf") width1 <- unitConverter(value = width1, fromunit = "cm", tounit = "in", res = res)
+      if (!is.na(height) && imgtype == "pdf" && units != "in") height1 <- unitConverter(value = height, fromunit = units, tounit = "in", res = res)
+      if (!is.na(width) && imgtype =="pdf" && units != "in") width1 <- unitConverter(value = width, fromunit = units, tounit = "in", res = res)
       
       plist[[1]] <- ggplot2::ggplot(data, aes(x = k, y = elpdmean))+
-        geom_path(colour = plotcol1, size = linewd, na.rm = na.rm)+
-        #geom_point(colour = "white", size = pointsz+1.5, shape = pointsh, na.rm = na.rm)+
-        geom_point(colour = plotcol1,fill = plotcol1, size = pointsz, shape = pointsh, na.rm = na.rm)+
-        geom_errorbar(aes(x = k, ymax = elpdmax, ymin = elpdmin, width = 0.2), size = linewd, colour = plotcol, na.rm = na.rm)+
-        #scale_x_continuous(breaks = 1:max(data$k))+
+        geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
+        geom_point(colour = plotcol1,fill = plotcol1, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
+        geom_errorbar(aes(x = k, ymax = elpdmax, ymin = elpdmin, width = 0.2), size = base_size*0.04, colour = plotcol, na.rm = na.rm)+
         theme_bw(base_size = base_size)+
         labs(x = expression(paste(italic(K))), 
-             y = expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep = "")),
-             title = "A")+
+             y = expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep = "")))+
         theme(legend.position = "none",
               axis.text.y = element_text(angle = 90, hjust = 0.5,size = base_size, colour = plotcol),
               axis.text.x = element_text(size = base_size, colour = plotcol),
@@ -502,24 +597,21 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
               plot.title = element_text(size = base_size+3, hjust = 0, colour = plotcol),
               axis.ticks = element_blank(),
               panel.border = element_blank(),
-              plot.margin = unit(c(0.15,0.15,0.15,0.15),"cm"))
+              plot.margin = grid::unit(c(0.15,0.15,0.15,0.15),"cm"))
       
       #show plot
       print(plist[[1]])
-      
-      if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-      {
+
         #check image imgtype
         if (imgtype == "pdf") pdf(file = "kPlot.pdf", height = height1, width = width1)
         if (imgtype == "png") png(filename = "kPlot.png", height = height1, width = width1, res = res, units = units, type = "cairo")
-        if (imgtype == "jpeg") jpeg(filename = "kPlot.jpg", height = height1, width = width1, res = res, units = units, quality = 100, type = "cairo")
+        if (imgtype == "jpeg") jpeg(filename = "kPlot.jpg", height = height1, width = width1, res = res, units = units, quality = 100)
         print(plist[[1]])
         dev.off()
         
         if (imgtype == "pdf") cat("kPlot.pdf exported.\n")
         if (imgtype == "png") cat("kPlot.png exported.\n")
         if (imgtype == "jpeg") cat("kPlot.jpg exported.\n")
-      }
     }
     stop("Evanno method not computed.\n")
   }
@@ -589,38 +681,43 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
   }
   
   #show plot
-  if (doplot == TRUE | doplot == "T" | doplot == "TRUE")
+  if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
   {
+    if (is.na(height)) height1 <- 8
+    if (is.na(width)) width1 <- 8
+    if(is.na(basesize)) base_size <- round((5*height1)/7,1)
+    
+    if (is.na(height) && imgtype == "pdf") height1 <- unitConverter(value = height1, fromunit = "cm", tounit = "in", res = res)
+    if (is.na(width) && imgtype =="pdf") width1 <- unitConverter(value = width1, fromunit = "cm", tounit = "in", res = res)
+    if (!is.na(height) && imgtype == "pdf" && units != "in") height1 <- unitConverter(value = height, fromunit = units, tounit = "in", res = res)
+    if (!is.na(width) && imgtype =="pdf" && units != "in") width1 <- unitConverter(value = width, fromunit = units, tounit = "in", res = res)
+    
     #create plots list
     plist <- vector("list",4)
     
     #plot1
     plist[[1]] <- ggplot2::ggplot(data, aes(x = k, y = elpdmean))+
-      geom_path(colour = plotcol1, size = linewd, na.rm = na.rm)+
-      #geom_point(colour = "white", size = pointsz+1.5, shape = pointsh, na.rm = na.rm)+
-      geom_point(colour = plotcol1,fill = plotcol1, size = pointsz, shape = pointsh, na.rm = na.rm)+
-      geom_errorbar(aes(x = k, ymax = elpdmax, ymin = elpdmin, width = 0.2), size = linewd, colour = plotcol, na.rm = na.rm)+
-      #scale_x_continuous(breaks = 1:max(data$k))+
+      geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
+      geom_point(colour = plotcol1,fill = plotcol1, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
+      geom_errorbar(aes(x = k, ymax = elpdmax, ymin = elpdmin, width = 0.2), size = base_size*0.04, colour = plotcol, na.rm = na.rm)+
       theme_bw(base_size = base_size)+
       labs(x = expression(paste(italic(K))), y = expression(paste("Mean L(", italic(K), ") " %+-% " SD", sep = "")),title = "A")
     
     #plot 2
     plist[[2]] <- ggplot2::ggplot(data, aes(x = k, y = lnk1))+
-      geom_path(colour = plotcol1, size = linewd, na.rm = na.rm)+
-      #geom_point(colour = "white", size = 4, shape = 16, na.rm = na.rm)+
-      geom_point(colour = plotcol1, fill = plotcol1, size = pointsz, shape = pointsh, na.rm = na.rm)+
+      geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
+      geom_point(colour = plotcol1, fill = plotcol1, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
       geom_errorbar(aes(x = k, ymax = lnk1max, ymin = lnk1min, width = 0.2), 
-                    size = linewd, colour = plotcol, na.rm = na.rm)+
+                    size = base_size*0.04, colour = plotcol, na.rm = na.rm)+
       theme_bw(base_size = base_size)+
       labs(x = expression(paste(italic(K))), y = expression(paste("L'(", italic(K), ") " %+-% " SD", sep = "")), title = "B")
     
     #plot 3
     plist[[3]] <- ggplot2::ggplot(data, aes(x = k, y = lnk2))+
-      geom_path(colour = plotcol1, size = linewd, na.rm = na.rm)+
-      #geom_point(colour = "white", size = 4, shape = 16, na.rm = na.rm)+
-      geom_point(colour = plotcol1, fill = plotcol1,, size = pointsz, shape = pointsh, na.rm = na.rm)+
+      geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
+      geom_point(colour = plotcol1, fill = plotcol1,, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
       geom_errorbar(aes(x = k, ymax = lnk2max, ymin = lnk2min, width = 0.2), 
-                    size = linewd, colour = plotcol, na.rm = na.rm)+
+                    size = base_size*0.04, colour = plotcol, na.rm = na.rm)+
       theme_bw(base_size = base_size)+
       labs(x = expression(paste(italic(K))), y = expression(paste("|L\"(", italic(K), ")| " %+-% " SD", sep = "")), title = "C")
     
@@ -628,9 +725,8 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
     if (is.finite(sum(data$drv3, na.rm = TRUE)))
     {
       plist[[4]] <- ggplot2::ggplot(data, aes(x = k, y = deltaK))+
-        geom_path(colour = plotcol1, size = linewd, na.rm = na.rm)+
-        #geom_point(colour = "white", size = 4, shape = 16, na.rm = na.rm)+
-        geom_point(colour = plotcol1, fill = plotcol1, size = pointsz, shape = pointsh, na.rm = na.rm)+
+        geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
+        geom_point(colour = plotcol1, fill = plotcol1, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
         theme_bw(base_size = base_size)+
         labs(x = expression(paste(italic(K))), y = expression(paste(Delta, italic(K), sep = "")), title = "D")
     }
@@ -645,34 +741,23 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, doplot = TRUE
                                        plot.title = element_text(size = base_size+2.5, hjust = 0, colour = plotcol),
                                        panel.border = element_blank(),
                                        axis.ticks = element_blank(),
-                                       plot.margin = unit(c(0.01,0.1,0.01,0.01),"cm"))
+                                       plot.margin = grid::unit(c(0.01,0.1,0.01,0.01),"cm"))
     }
-    
-    #combine images
-    if (plen == 3) pall <- gridExtra::arrangeGrob(plist[[1]],plist[[2]],plist[[3]], ncol = 2, nrow = 2)
-    if (plen == 4) pall <- gridExtra::arrangeGrob(plist[[1]],plist[[2]],plist[[3]], plist[[4]], ncol = 2, nrow = 2)
-    
-    #show plots
-    print(pall)
-    
+       
     #export image
-    if (exportplot == TRUE | exportplot == "T" | exportplot == "TRUE")
-    { 
-      if (is.na(height) && imgtype == "pdf") height1 <- 4
-      if (is.na(width) && imgtype =="pdf") width1 <- 4
-      if (is.na(height && imgtype != "pdf")) height1 <- 8
-      if (is.na(width && imgtype != "pdf")) width1 <- 8
-      
+
       #check image imgtype  
       if (imgtype == "pdf") pdf("evannoMethodStructure.pdf", height = height1, width = width1)
-      if (imgtype  == "png") png("evannoMethodStructure.png", height = height1, width = width1, res = res, units = units, type = "cairo", antialias = "subpixel")
-      if (imgtype == "jpeg") jpeg("evannoMethodStructure.jpg", height = height1, width = width1, res = res, units = units, quality = 100, type = "cairo", antialias = "subpixel")
-      print(pall)
+      if (imgtype  == "png") png("evannoMethodStructure.png", height = height1, width = width1, res = res, units = units, type = "cairo")
+      if (imgtype == "jpeg") jpeg("evannoMethodStructure.jpg", height = height1, width = width1, res = res, units = units, quality = 100)
+      
+      if (plen == 3) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]], ncol = 2, nrow = 2)
+      if (plen == 4) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]], plist[[4]], ncol = 2, nrow = 2)
+      
       dev.off()
       if (imgtype == "pdf") cat("evannoMethodStructure.pdf exported\n")
       if (imgtype == "png") cat("evannoMethodStructure.png exported\n")
       if (imgtype == "jpeg") cat("evannoMethodStructure.jpg exported\n")
-    }
   }
   
   #return table
@@ -1227,7 +1312,6 @@ collectClumppOutput <- function(prefix = "STRUCTUREpop", filetype = "aligned", r
   return(c(k, l))
 }
 
-
 #FUNCTION getDim
 #' Internal: Get dimensions for figures.
 #' @description Generate height and width of figure based on number of individuals. 
@@ -1237,63 +1321,89 @@ collectClumppOutput <- function(prefix = "STRUCTUREpop", filetype = "aligned", r
 #' @param height A numeric indicating the height of each plot.
 #' @param width A numeric indicating the width of each plot.
 #' @param res A numeric indicating the resolution of the figure.
+#' @param imgtype A character denoting image format. "png", "jpeg" or "pdf".
+#' @param labpanelheight A numeric denoting the height of the label panel.
 #' @param plotnum A numeric indicating the number of plots in the figure.
 #' @return a vector with height and width.
 #' @export
 #'
-getDim <- function(ind, units = NA, height = NA, width = NA, res = NA, plotnum = NA)
+getDim <- function(ind=NA, units = NA, height = NA, width = NA, res = NA, imgtype=NA, labpanelheight=NA, plotnum = NA)
 {
   if (is.na(units)) units <- "cm"
+  if (is.na(units) && imgtype=="pdf") units <- "in"
   if (is.na(res)) res <- 300
   if (is.na(plotnum)) plotnum <- 1
 
-  #in cm
+  #height
   if (is.na(height))
   {
-    height <- ind*0.0028 
-    if (height < 2.5) height <- 2.5
-    if (height > 4.6) height <- 4.6
-    if (plotnum > 1) height  <-  height-((height*plotnum)/90)
-    if (units == "in") height <- round(height*0.3937, 2)
-    if (units == "mm") height <- height*10
-    if (units == "px") height <- round((height*res)/2.54, 0)
+    if (plotnum == 1) height <- 2
+    if (plotnum > 1) height <- 1.2
+    if (imgtype=="pdf") height <- unitConverter(value=height, fromunit="cm", tounit="in", res=res)
+  }else{
+    if (units=="mm" && imgtype != "pdf") height <- unitConverter(value=height, fromunit="mm", tounit="cm", res=res)
+    if (units=="px" && imgtype != "pdf") height <- unitConverter(value=height, fromunit="px", tounit="cm", res=res)
+    if (units=="in" && imgtype != "pdf") height <- unitConverter(value=height, fromunit="in", tounit="cm", res=res)
+    if (units=="cm" && imgtype == "pdf") height <- unitConverter(value=height, fromunit="cm", tounit="in", res=res)
+    if (units=="mm" && imgtype == "pdf") height <- unitConverter(value=height, fromunit="mm", tounit="in", res=res)
+    if (units=="px" && imgtype == "pdf") height <- unitConverter(value=height, fromunit="px", tounit="in", res=res)
   }
   height <- height*plotnum
   
+  #width
   if (is.na(width))
   {
+    if (is.na(ind)) stop("Argument ind is empty.\n")
     width <- ind*0.020 
     if (width < 5) width <- 5
     if (width > 30) width <- 30
-    if (units == "in") width <- round(width*0.3937, 2)
-    if (units == "mm") width <- width*10
-    if (units == "px") width <- round((width*res)/2.54, 0)
+    if (imgtype=="pdf") width <- unitConverter(value=width, fromunit="cm", tounit="in", res=res)
+  }else{
+    if (units=="mm" && imgtype != "pdf") width <- unitConverter(value=width, fromunit="mm", tounit="cm", res=res)
+    if (units=="px" && imgtype != "pdf") width <- unitConverter(value=width, fromunit="px", tounit="cm", res=res)
+    if (units=="in" && imgtype != "pdf") width <- unitConverter(value=width, fromunit="in", tounit="cm", res=res)
+    if (units=="cm" && imgtype == "pdf") width <- unitConverter(value=width, fromunit="cm", tounit="in", res=res)
+    if (units=="mm" && imgtype == "pdf") width <- unitConverter(value=width, fromunit="mm", tounit="in", res=res)
+    if (units=="px" && imgtype == "pdf") width <- unitConverter(value=width, fromunit="px", tounit="in", res=res)
   }
   
-  return(c(round(height,2), round(width,2)))
+  #labpanelheight
+  if (is.na(labpanelheight)) 
+  {
+    labpanelheight <- 0.4
+    if (imgtype=="pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="cm", tounit="in", res=res)
+  }else{
+    if (units=="mm" && imgtype != "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="mm", tounit="cm", res=res)
+    if (units=="in" && imgtype != "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="in", tounit="cm", res=res)
+    if (units=="px" && imgtype != "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="px", tounit="cm", res=res)
+    if (units=="mm" && imgtype == "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="mm", tounit="in", res=res)
+    if (units=="cm" && imgtype == "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="cm", tounit="in", res=res)
+    if (units=="px" && imgtype == "pdf") labpanelheight <- unitConverter(value=labpanelheight, fromunit="px", tounit="in", res=res)
+  }
+  
+  if (imgtype!="pdf") units1 <- "cm"
+  if (imgtype=="pdf") units1 <- "in"
+  
+  lst <- list(height=round(height,2), width=round(width,2), labpanelheight=round(labpanelheight,2),units=units1)
+  return(lst)
 }
-
 
 # FUNCTION getPlotParams
 #' Internal: Generate parameters for plots with labels
 #' @description Generates various parameters required for plotting with labels. Internal function.
 #' @param poplab A character vector of labels same length as number of individuals.
 #' @param plotnum A numeric indicating the number of plots on the figure.
-#' @param labpos A numeric indicating the y position of the labels.
 #' @param labsize A numeric indicating the size of the labels.
 #' @param labangle A numeric indicating the angle/rotation of labels. 0 is horizontal while 90 is vertical.
 #' @param labjust A numeric indicating the justification of labels. Defaults to 0.5 if labangle = 0  or 1 if 
 #' labangle between 20 and 135.
 #' @param pointsize  A numeric indicating the size of points on label marker line.
-#' @param linepos A numeric indicating the y position of the label marker line and the points.
 #' @param linethick A numeric indicating the thickness of the label marker line.
-#' @param fmar A numeric vector with four elements indicating the figure margins in 'lines' unit. A vector of 4 numbers for top, right, 
-#' bottom and left margins. ex. c(0.2,0.2,0.2,0).
-#' @return A list with following plot parameters: poplab, plotnum, labpos, labsize, 
-#' labangle, labjust, pointsize, linepos, linethick and fmar.
+#' @return A list with following plot parameters: poplab, plotnum, labsize, 
+#' labangle, labjust, pointsize, linethick.
 #' @export
 #' 
-getPlotParams <- function(poplab = NA, plotnum = 1, labpos = NA, labsize = NA, labangle = NA, labjust = NA,pointsize = NA,linepos = NA, linethick = NA, fmar = NA)
+getPlotParams <- function(poplab = NA, plotnum = 1, labsize = NA, labangle = NA, labjust = NA,pointsize = NA, linethick = NA)
 {
   if (all(is.na(poplab))) stop("Labels are empty.\n")
   
@@ -1305,44 +1415,44 @@ getPlotParams <- function(poplab = NA, plotnum = 1, labpos = NA, labsize = NA, l
   if (labangle == 0)
   {
     if (is.na(labjust)) labjust <- 0.5
-    if (all(is.na(fmar))) fmar <- c(0.2, 0.2, 0.2, 0)
   }
   
   if (abs(labangle) > 20 & abs(labangle) < 135)
   {
     if (is.na(labjust)) labjust <- 1
-    bmar <- round(max(nchar(as.character(poplab)))/8, 2)+round(lp/900, 3)
-    if (all(is.na(fmar))) fmar <- c(0.2, 0.2, bmar, 0)
+    #bmar <- round(max(nchar(as.character(poplab)))/8, 2)+round(lp/900, 3)
+    #if (all(is.na(fmar))) fmar <- c(0.2, 0.2, bmar, 0)
   }
   
-  if (plotnum > 1) fmar[1] <- 0
   
-  linepos1 <- linepos
-  labpos1 <- labpos
+  #linepos1 <- linepos
+  #labpos1 <- labpos
   labsize1 <- labsize
   pointsize1 <- pointsize
   linethick1 <- linethick
   
-  if (is.na(linepos)) linepos1 <- lp*-0.000035
-  if (is.na(labpos)) labpos1 <- linepos1*2.4
+  #if (is.na(linepos)) linepos1 <- lp*-0.000035
+  #if (is.na(linepos)) linepos1 <- 1
+  #if (is.na(labpos)) labpos1 <- linepos1*2.4
+  #if (is.na(labpos)) labpos1 <- 0.2
   if (is.na(labsize)) labsize1 <- lp*0.00125
   if (is.na(pointsize)) pointsize1 <- lp*0.0016
   if (is.na(linethick)) linethick1 <- lp*0.0003
   
-  if (is.na(linepos)) {if (linepos1 < -0.08) linepos1 <- -0.08}
-  if (is.na(labpos)) {if (linepos1 < -0.192) labpos1 <- linepos1*2.4}
+  #if (is.na(linepos)) {if (linepos1 < -0.08) linepos1 <- -0.08}
+  #if (is.na(labpos)) {if (linepos1 < -0.192) labpos1 <- linepos1*2.4}
   if (is.na(labsize)) {if (labsize1 < 1.5) labsize1 <- 1.5}
   if (is.na(pointsize)) {if (pointsize1 < 1.5) pointsize1 <- 1.5}
   if (is.na(linethick)) {if (linethick1 < 0.3) linethick1 <- 0.3}
   
-  if (is.na(linepos)) {if (linepos1 > -0.07) linepos1 <- -0.07}
-  if (is.na(labpos)) {if (labpos1 > -0.168) labpos1 <- linepos1*2.4}
+  #if (is.na(linepos)) {if (linepos1 > -0.07) linepos1 <- -0.07}
+  #if (is.na(labpos)) {if (labpos1 > -0.168) labpos1 <- linepos1*2.4}
   if (is.na(labsize))  {if (labsize1 > 2.5) labsize1 <- 2.5}
   if (is.na(pointsize)) {if (pointsize1 > 3.2) pointsize1 <- 3.2}
   if (is.na(linethick)) {if (linethick1 > 0.6) linethick1 <- 0.6}
   
-  dlist <- list(poplab = poplab, plotnum = plotnum, labpos = labpos1, labsize = labsize1, labangle = labangle, labjust = labjust, 
-                pointsize = pointsize1, linepos = linepos1, linethick = linethick1, fmar = fmar)
+  dlist <- list(poplab = poplab, plotnum = plotnum, labsize = labsize1, labangle = labangle, labjust = labjust, 
+                pointsize = pointsize1, linethick = linethick1)
   return(dlist)
 }
 
@@ -1353,18 +1463,22 @@ getPlotParams <- function(poplab = NA, plotnum = 1, labpos = NA, labsize = NA, l
 #' @param files A character vector of one or more STRUCTURE/TESS/table files
 #' @param imgoutput A character with options: 'sep','join' or'tab'.If set to "sep", STRUCTURE/TESS run files are plotted as separate image files. If set to "join", STRUCTURE/TESS run files are joined into a single image. If set to "tab", combined/aligned/merged files are plotted into separate or joined plots based on number of tables within each file.
 #' @param poplab A character vector of population labels equal to length of individuals. Each pop name must repeat to the number of individuals present in each pop.
-#' @param popcol A vector of colours (representing populations) for colouring clusters. If NA, colours are automatically generated. K 1 to 12 are custom unique colours while K>12 are coloured by function rich.color().
+#' @param popcol A vector of colours (representing populations) for colouring clusters. If NA, colours are automatically generated. K=1 to 12 are custom unique colours while K>12 are coloured by function rich.color().
 #' @param na.rm A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
 #' @param imgtype A character indicating image file type. Possible options are "png","jpeg" or "pdf". For pdf, height and width are in inches and res does not apply.
 #' @param height A numeric indicating the height of individual run plot. By default, automatically generated based on number of Individuals. Ranges between 2.5cm and 4.6cm.
 #' @param width A numeric indicating the width of individual run plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
-#' @param dpi A numeric indicating the image resolution. Defaults to 300.
-#' @param units A numeric indicating the units of height and width. Default set to "cm". If type is pdf, units must be "in".
-#' @param flabsize A numeric indicating the size of the filename label. Defaults to 4.
-#' @param flabcol A colour character indicating the colour of the filename label. Defaults to "grey10".
-#' @param flabbackcol A colour character denoting the background colour of the filename label. Defaults to white
-#' @param labpos A numeric indicating the y position of the labels.
-#' @param labsize A numeric indicating the size of the labels.
+#' @param dpi A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300.
+#' @param units A numeric indicating the units of height and width. Default set to "cm".
+#' @param panelspacer A numeric indicating the space at the bottom of one or more barplot panels.
+#' @param flab A logical indicating if strip panels on right side must be shown. Strip panels display file name and K value. Defaults to TRUE.
+#' @param flabsize A numeric indicating the size of the filename label. Defaults to 4. Applicable only if flab=T.
+#' @param flabcol A colour character indicating the colour of the filename label. Defaults to "grey10". Applicable only if flab=T.
+#' @param flabbackcol A colour character denoting the background colour of the filename label. Defaults to white. Applicable only if flab=T.
+#' @param labspacer A numeric indicating the space between the plots and the label area. Applicable only with population labels.
+#' @param labpanelheight A numeric indicating the height of the label area in cm. Default is 0.4 cm. If units are different, cm will be be converted automatically. Applicable only with population labels.
+#' @param labpos A numeric indicating the y position of the labels. Applicable only with population labels.
+#' @param labsize A numeric indicating the size of the labels. 
 #' @param labangle A numeric indicating the angle/rotation of labels. 0 is horizontal while 90 is vertical.
 #' @param labjust A numeric indicating the justification of labels. Defaults to 0.5 if labangle = 0  or 1 if labangle between 20 and 135.
 #' @param labcol A colour character for the colour of labels. Defaults to "grey30".
@@ -1375,29 +1489,38 @@ getPlotParams <- function(poplab = NA, plotnum = 1, labpos = NA, labsize = NA, l
 #' @param linepos A numeric indicating the y position of the label marker line and the points.
 #' @param linethick A numeric indicating the thickness of the label marker line.
 #' @param linecol A colour character for the label marker line. Defaults to "grey30".
-#' @param linetype A numeric indicating the type of line for marker line. Same as lty in standard R.
-#' @param fmar Figure margins in 'lines' unit. A vector of 4 numbers for top, right, bottom and left margins. ex. c(0.2,0.2,0.2,0).
+#' @param linetype A numeric indicating the type of line for marker line. Same as lty in standard R. Default value is 1.
+#' @param div A logical indicating if divider lines between population clusters must be drawn. Applicable only with population labels.
+#' @param divcol A character or hexadecimal colour denoting the colour of the divider line. Default is white.
+#' @param divtype A numeric indicating the type of line for the divider line. Same as lty in standard R. Default value is 1.
+#' @param divthick A numeric indicating the thickness of the divider line. Default is 0.25
 #' @return Nothing is returned.
-#' @details It is possible to set either height or width and leave other as default.
+#' @details It is possible to set either height or width and leave other as default. 
 #' @seealso \code{\link{plotMultiline}}
+#' @import gtable
 #' @import grid
 #' @import gridExtra
 #' @import plyr
 #' @import reshape2
 #' @export
 #' 
-plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, na.rm = TRUE, imgtype = "png", height = NA, width = NA, dpi = NA, units = NA, 
-                     flabsize = NA, flabcol = NA, flabbackcol = NA, labpos = NA, labsize = NA, labangle = NA, labjust = NA, labcol = NA, 
-                     pointsize = NA, pointcol = NA, pointbgcol = NA, pointtype = NA, linepos = NA, linethick = NA, linecol = NA, linetype = NA, fmar = NA)
+plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, na.rm = TRUE, imgtype = "png", height = NA, width = NA, dpi = NA, units = NA,
+                     panelspacer=NA, flab=TRUE, flabsize = NA, flabcol = NA, flabbackcol = NA,
+                     labspacer=NA,labpanelheight=NA,labpos = NA, labsize = NA, labangle = NA, labjust = NA, labcol = NA,
+                     pointsize = NA, pointcol = NA, pointbgcol = NA, pointtype = NA, linepos = NA, linethick = NA, linecol = NA, linetype = NA,
+                     div=TRUE, divcol = NA, divtype = NA, divthick = NA)
 { 
   #if no files chosen, stop excecution, give error message
   if (length(files) == 0) stop("No input files.\n")
+  if (any(files=="")) stop("Input has no filename.\n")
   #check imgoutput
   imgoutput <- tolower(imgoutput)
   if (imgoutput != "sep" && imgoutput != "join" && imgoutput != "tab") stop("Argument 'imgoutput' set incorrectly. Set as 'sep' to export as separate plots. Set as 'join' to export as one joined plot. Set as 'tab' if input is aligned/combined/merged files.\n")
   #check image
   imgtype <- tolower(imgtype)
   if (imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
+  if (!is.na(poplab) && !is.na(labpos)) {if(labpos > 1 | labpos < 0) stop("Argument 'labpos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'labpanelheight'.\n")}
+  if (!is.na(poplab) && !is.na(linepos)) {if(linepos > 1 | linepos < 0) stop("Argument 'linepos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'labpanelheight'.\n")}
   
   col3 <- "grey30"
   if (is.na(dpi)) dpi <- 300
@@ -1405,12 +1528,19 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
   if (is.na(flabsize)) flabsize <- 4
   if (is.na(flabcol)) flabcol <- "grey10"
   if (is.na(flabbackcol)) flabbackcol <- "white"
+  if (is.na(labpos)) labpos <- 0
   if (is.na(labcol)) labcol <- col3
   if (is.na(pointcol)) pointcol <- col3
   if (is.na(pointbgcol)) pointbgcol <- col3
   if (is.na(pointtype)) pointtype <- "|"
+  if (is.na(linepos)) linepos <- 1
   if (is.na(linecol)) linecol <- col3
   if (is.na(linetype)) linetype <- 1
+  if (is.na(panelspacer)) panelspacer <- 0.05
+  if (is.na(labspacer)) labspacer <- 0
+  if (is.na(divcol)) divcol <- "white"
+  if (is.na(divtype)) divtype <- 1
+  if (is.na(divthick)) divthick <- 0.25
   
   if (!all(is.na(poplab)))
   {    
@@ -1449,7 +1579,8 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       chk <- checkRuns(files[i])
       if (chk == "STRUCTURE") df1 <- runsToDfStructure(files = files[i])
       if (chk == "TESS") df1 <- runsToDfTess(files = files[i])
-      if (chk == "UNIDENTIFIED") stop("Unidentified input format. If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
+      if (chk == "TAB") stop("If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
+      if (chk == "UNIDENTIFIED") stop("Unidentified input format.\n")
       
       k <- ncol(df1)
       Ind <- nrow(df1)
@@ -1462,14 +1593,15 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       
       #get Colours
       coll <- popcol
-      if (all(is.na(popcol))) coll <- pophelper::getColours(k)
+      if (all(is.na(popcol))) coll <- getColours(k)
       if (length(coll) != k) stop("Number of colours not equal to number of populations.\n")
       
       #getDim
-      #pnum <- 1
-      #if (!all(is.na(poplab))) pnum <- 2
-      height1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = 1)[1]
-      width1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = 1)[2]
+      dimtemp <- getDim(ind = Ind, height = height, width = width, res = dpi, units = units, imgtype=imgtype, labpanelheight=labpanelheight, plotnum = 1)
+      height1 <- as.numeric(dimtemp[1])
+      width1 <- as.numeric(dimtemp[2])
+      labpanelheight1 <- as.numeric(dimtemp[3])
+      units1 <- as.character(dimtemp[4])
       
       if (all(is.na(poplab)))
       {
@@ -1485,10 +1617,14 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
                 axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
                 axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
                 strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-                plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"))
+                plot.margin = grid::unit(c(0.1, 0, 0, 0), "lines"),
+                panel.margin=grid::unit(panelspacer,"lines"))
         
-        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100)
+        #remove strip panels on right
+        if(flab==FALSE) p <- p + theme(strip.text=element_blank())
+        
+        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep = ""), height = height1, width = width1)
         print(p)
         dev.off()
@@ -1498,46 +1634,85 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       }
       if (!all(is.na(poplab)))
       {
-        if (nrow(df1)!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
+        if (Ind!=length(as.character(poplab))) stop(paste("Length of labels (", length(as.character(poplab)),") do not match number of individuals in input file (",Ind,").\n",sep=""))
         
-        ppar <- pophelper::getPlotParams(poplab = poplab, plotnum = 1, labpos = labpos, labsize = labsize, labangle = labangle, 
-                              labjust = labjust,pointsize = pointsize,linepos = linepos, linethick = linethick,fmar = fmar)
+        ppar <- getPlotParams(poplab = poplab, plotnum = 1, labsize = labsize, labangle = labangle, 
+                              labjust = labjust,pointsize = pointsize, linethick = linethick)
         
         labangle <- ppar$labangle
         labjust <- ppar$labjust
-        labpos <- ppar$labpos
         labsize <- ppar$labsize
         labjust <- ppar$labjust
         pointsize <- ppar$pointsize
-        linepos <- ppar$linepos
         linethick <- ppar$linethick
         fmar <- ppar$fmar
         
-        p <- ggplot2::ggplot()+
+        #add labpos to lframe df
+        lframe$labpos <- as.numeric(rep(labpos,nrow(lframe)))
+        pos1$linepos <- as.numeric(rep(linepos,nrow(pos1)))
+        
+        p1 <- ggplot2::ggplot()+
           geom_bar(data = df2, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
           scale_x_discrete(expand = c(0, 0))+
           scale_y_continuous(expand = c(0, 0))+
           scale_fill_manual(values = coll)+
           facet_grid(Num~., labeller = plotlabeller)+
           labs(x = NULL, y = NULL)+
-          geom_text(data = lframe, aes_string(x = "pos", y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
-          geom_line(data = pos1, aes_string(x = "pos", y = linepos), colour = linecol, size = linethick, linetype = linetype)+
-          geom_point(data = pos1, aes_string(x = "pos", y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
           theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
                 axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
                 axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
                 strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-                plot.margin = unit(fmar, "lines"))
+                plot.margin = grid::unit(c(0.1, 0, -0.3, 0), "lines"),
+                panel.margin=grid::unit(panelspacer,"lines"))
         
-        p1 <- ggplot_gtable(ggplot_build(p))
-        p1$layout$clip[p1$layout$name == "panel"] <- "off"
+        #add pop divider lines only if 2 pops or more
+        if(div==TRUE)
+        {
+          if(nrow(pos1 > 2)) p1 <- p1+geom_vline(xintercept = pos1$pos[-c(1,length(pos1$pos))],colour=divcol,linetype=divtype, size=divthick)
+        }
         
+        #remove strip panels on right
+        if(flab==FALSE) p1 <- p1+theme(strip.text=element_blank())
         
-        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100)
+        #create bottom plot with labels
+        p2 <- ggplot2::ggplot()+
+          geom_blank(data = lframe, aes(x = pos, y = labpos))+
+          geom_text(data = lframe, aes(x = pos, y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
+          geom_line(data = pos1, aes(x = pos, y = linepos), colour = linecol, size = linethick, linetype = linetype)+
+          geom_point(data = pos1, aes(x = pos, y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
+          scale_x_continuous(expand = c(0, 0))+
+          scale_y_continuous(limits=c(0,1))+
+          labs(x = NULL, y = NULL)+
+          #facet_grid(temp~., labeller = plotlabeller)+
+          theme(legend.position = "none", panel.grid = element_blank(), 
+                panel.background = element_rect(fill="white"), plot.background=element_rect(fill="white"),
+                axis.ticks = element_blank(), axis.text = element_blank(), 
+                axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
+                strip.background = element_rect(colour = flabbackcol, fill = flabbackcol),
+                axis.line = element_blank(), panel.border=element_blank(),
+                plot.margin = grid::unit(c(labspacer,0,0,0), "lines"), panel.margin=grid::unit(0,"lines"))
+        
+        #gtable conversion
+        gp1 <- ggplot_gtable(ggplot_build(p1))
+        #turn off clipping for panel
+        gp1$layout$clip[gp1$layout$name == "panel"] <- "off"
+        
+        #gtable conversion
+        gp2 <- ggplot_gtable(ggplot_build(p2))
+        #turn off clipping for panel
+        gp2$layout$clip[gp2$layout$name == "panel"] <- "off"
+        #change width of bottom plot to that of top plot
+        gp2 <- gtable::gtable_add_cols(gp2, gp1$widths[5])
+        
+        #calculate size of panels
+        height2 <- height1 - labpanelheight1
+        #if (imgtype == "pdf") height2 <- height1-(unitConverter(value=labpanelheight,fromunit="cm",tounit="in",res=res))
+        
+        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep = ""), height = height1, width = width1)
         
-        grid::grid.draw(p1)
+        gridExtra::grid.arrange(gp1, gp2, heights = grid::unit(c(height2,labpanelheight1),units1))
         dev.off()
         
         if (imgtype == "png") cat(paste(fname, ".png exported\n", sep = ""))
@@ -1557,9 +1732,11 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     chk <- unique(checkRuns(files))
     if (length(chk) > 1) stop("Input contains mixed formats.\n") 
     if (chk == "UNIDENTIFIED") stop("Unidentified input format. If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
+    if (chk == "TAB") stop("If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
     if (chk == "STRUCTURE") tempdf <- tabulateRunsStructure(files = files)
     if (chk == "TESS") tempdf <- tabulateRunsTess(files = files)
-
+    
+    #checks if num of individuals differ between runs
     if (all(tempdf$ind[1] != tempdf$ind)) stop("Joined plot not processed. Number of individuals differ between selected runs.\n")
     Ind <- tempdf$ind[1]
     rm(tempdf)
@@ -1570,11 +1747,11 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     kvec <- vector()
     for (i in 1:flen)
     {
-      
       #check files
       chk <- checkRuns(files[i])
       if (chk == "STRUCTURE") df1 <- runsToDfStructure(files = files[i])
       if (chk == "TESS") df1 <- runsToDfTess(files = files[i])
+      if (chk == "TAB") stop("If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
       if (chk == "UNIDENTIFIED") stop("Unidentified input format. If using table files (combined/aligned/merged), set argument imgoutput = 'tab'.\n")
       
       k <- ncol(df1)
@@ -1591,20 +1768,23 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     df3 <- reshape2::melt(df2, id.var = c("Ind", "Num"))
     
     #get Dim
-    pnum <- flen
-    #if (!all(is.na(poplab))) pnum <- flen+1
-    height1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = pnum)[1]
-    width1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = pnum)[2]
+    dimtemp <- getDim(ind = Ind, height = height, width = width, res = dpi, units = units, imgtype=imgtype, labpanelheight=labpanelheight, plotnum = flen)
+    height1 <- as.numeric(dimtemp[1])
+    width1 <- as.numeric(dimtemp[2])
+    labpanelheight1 <- as.numeric(dimtemp[3])
+    units1 <- as.character(dimtemp[4])
+    
     #Get Col
     coll <- popcol
-    if (all(is.na(popcol))) coll <- pophelper::getColours(max(kvec))
-    if (length(coll)!=max(kvec)) stop("Number of colours not equal to number of populations.\n")
+    if (all(is.na(popcol))) coll <- getColours(max(kvec))
+    if (length(coll) < max(kvec)) stop(paste("Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),").\n",sep=""))
     
     #save plot
     dt <- as.character(format(Sys.time(), "%Y%m%d%H%M%S"))
     
     if (all(is.na(poplab)))
     {
+      
       #ggplot
       p <- ggplot2::ggplot(data = df3, aes(x = Ind, y = value, fill = variable))+
         geom_bar(width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
@@ -1617,10 +1797,14 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
               axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
               axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
               strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-              plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"))
+              plot.margin = grid::unit(c(0.1, 0, 0, 0), "lines"),
+              panel.margin=grid::unit(panelspacer,"lines"))
       
-      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-      if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100)
+      #remove strip panels on right
+      if(flab==FALSE) p <- p + theme(strip.text=element_blank())
+      
+      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+      if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
       if (imgtype == "pdf") pdf(paste("Joined", flen, "Files-", dt, ".pdf", sep = ""), height = height1, width = width1)
       print(p)
       dev.off()
@@ -1632,76 +1816,87 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     if (!all(is.na(poplab)))
     {
       #plot with labels
-      if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
+      if (Ind!=length(as.character(poplab))) stop(paste("Length of labels (", length(as.character(poplab)),") do not match number of individuals in input file (",Ind,").\n",sep=""))
       
-      df3 <- subset(df2, df2$Num == 1)
-      df3$Num <- df3$Num[drop=TRUE]
-      df3.1 <- reshape2::melt(df3, id.var = c("Ind", "Num"))
-      df4 <- subset(df2, df2$Num!=1)
-      df4$Num <- df4$Num[drop=TRUE]
-      df4.1 <- reshape2::melt(df4, id.var = c("Ind", "Num"))
       
-      ppar <- pophelper::getPlotParams(poplab = poplab, plotnum = 1, labpos = labpos, labsize = labsize, labangle = labangle,labjust = labjust,
-                            pointsize = pointsize,linepos = linepos, linethick = linethick, fmar = fmar)
+      ppar <- getPlotParams(poplab = poplab, plotnum = flen, labsize = labsize, labangle = labangle,labjust = labjust,
+                            pointsize = pointsize, linethick = linethick)
       
       labangle <- ppar$labangle
       labjust <- ppar$labjust
-      labpos <- ppar$labpos
       labsize <- ppar$labsize
       labjust <- ppar$labjust
       pointsize <- ppar$pointsize
-      linepos <- ppar$linepos
       linethick <- ppar$linethick
-      fmar <- ppar$fmar
       
-      p <- ggplot2::ggplot()+
-        geom_bar(data = df3.1, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
+      #add labpos to lframe df
+      lframe$labpos <- as.numeric(rep(labpos,nrow(lframe)))
+      pos1$linepos <- as.numeric(rep(linepos,nrow(pos1)))
+      
+      #create top plot with multiple barplots
+      p1 <- ggplot2::ggplot()+
+        geom_bar(data = df3, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
         scale_x_discrete(expand = c(0, 0))+
         scale_y_continuous(expand = c(0, 0))+
         scale_fill_manual(values = coll)+
         facet_grid(Num~., labeller = plotlabeller)+
         labs(x = NULL, y = NULL)+
-        geom_text(data = lframe, aes_string(x = "pos", y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
-        geom_line(data = pos1, aes_string(x = "pos", y = linepos), colour = linecol, size = linethick, linetype = linetype)+
-        geom_point(data = pos1, aes_string(x = "pos", y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
-        theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
+        theme(legend.position = "none", panel.grid = element_blank(), 
+              panel.background = element_rect(fill="white"), plot.background=element_rect(fill="white"),
+              axis.ticks = element_blank(), axis.text = element_blank(),
+              axis.line = element_blank(), panel.border=element_blank(),
+              axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
+              strip.background = element_rect(colour = flabbackcol, fill = flabbackcol),
+              plot.margin = grid::unit(c(0.1, 0, -0.3, 0), "lines"),
+              panel.margin=grid::unit(panelspacer,"lines"))
+      
+      #add pop divider lines only if 2 pops or more
+      if(div==TRUE)
+      {
+        if(nrow(pos1 > 2)) p1 <- p1+geom_vline(xintercept = pos1$pos[-c(1,length(pos1$pos))],colour=divcol,linetype=divtype, size=divthick)
+      }
+      
+      #remove strip panels on right
+      if(flab==FALSE) p1 <- p1+theme(strip.text=element_blank())
+      
+      #create bottom plot with labels
+      p2 <- ggplot2::ggplot()+
+        geom_blank(data = lframe, aes(x = pos, y = labpos))+
+        geom_text(data = lframe, aes(x = pos, y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
+        geom_line(data = pos1, aes(x = pos, y = linepos), colour = linecol, size = linethick, linetype = linetype)+
+        geom_point(data = pos1, aes(x = pos, y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
+        scale_x_continuous(expand = c(0, 0))+
+        scale_y_continuous(limits=c(0,1))+
+        labs(x = NULL, y = NULL)+
+        #facet_grid(temp~., labeller = plotlabeller)+
+        theme(legend.position = "none", panel.grid = element_blank(), 
+              panel.background = element_rect(fill="white"), plot.background=element_rect(fill="white"),
               axis.ticks = element_blank(), axis.text = element_blank(), 
               axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
-              strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-              plot.margin = unit(fmar, "lines"),
-              axis.line = element_blank(),
-              plot.background=element_blank())
+              strip.background = element_rect(colour = flabbackcol, fill = flabbackcol),
+              axis.line = element_blank(), panel.border=element_blank(),
+              plot.margin = grid::unit(c(labspacer,0,0,0), "lines"), panel.margin=grid::unit(0,"lines"))
       
-      gp1 <- ggplot_gtable(ggplot_build(p))
+      #gtable conversion
+      gp1 <- ggplot_gtable(ggplot_build(p1))
+      #turn off clipping for panel
       gp1$layout$clip[gp1$layout$name == "panel"] <- "off"
       
-      #fix facet names. take out first and change all others to start from 1
-      facetnames <- as.list(unlist(facetnames)[-1])
-      
-      p2 <- ggplot2::ggplot()+
-        geom_bar(data = df4.1, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
-        scale_x_discrete(expand = c(0, 0))+
-        scale_y_continuous(expand = c(0, 0))+
-        scale_fill_manual(values = coll)+
-        facet_grid(Num~., labeller = plotlabeller)+
-        labs(x = NULL, y = NULL)+
-        theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
-              axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
-              axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
-              strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-              plot.margin = unit(c(ppar$fmar[1], ppar$fmar[2], 0.1, ppar$fmar[4]), "lines"),
-              plot.background=element_blank())
-      
+      #gtable conversion
       gp2 <- ggplot_gtable(ggplot_build(p2))
-      maxWidth <- grid::unit.pmax(gp1$widths[2:3], gp2$widths[2:3])
-      gp1$widths[2:3] <- maxWidth
-      gp2$widths[2:3] <- maxWidth
+      #turn off clipping for panel
+      gp2$layout$clip[gp2$layout$name == "panel"] <- "off"
+      #change width of bottom plot to that of top plot
+      gp2 <- gtable::gtable_add_cols(gp2, gp1$widths[5]) 
       
-      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-      if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100, type = "cairo")
+      #calculate size of panels
+      height2 <- height1-labpanelheight1
+      height3 <- height2/flen
+      if (imgtype == "png") png(paste("Joined", flen, "Files-", dt, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+      if (imgtype == "jpeg") jpeg(paste("Joined", flen, "Files-", dt, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
       if (imgtype == "pdf") pdf(paste("Joined", flen, "Files-", dt, ".pdf", sep = ""), height = height1, width = width1)
       
-      gridExtra::grid.arrange(gp2, gp1, heights = c((flen-1)/flen, (1/flen)))
+      gridExtra::grid.arrange(gp1, gp2, heights = grid::unit(c(height2,labpanelheight1),units1))
       dev.off()
       
       if (imgtype == "png") cat(paste("Joined", flen, "Files-", dt, ".png exported\n", sep = ""))
@@ -1719,31 +1914,34 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       chk <- checkRuns(files[i], warn=FALSE)
       if (chk == "STRUCTURE") stop("Incorrect input format. For STRUCTURE files, use imgoutput='sep' or imgoutput='join'.\n'")
       if (chk == "TESS") stop("Incorrect input format. For TESS files, use imgoutput='sep' or imgoutput='join'.\n'")
+      if (chk != "TAB") stop("Incorrect input format. Not a TAB input file. Perhaps error in separator.\n")
+      if (chk == "UNIDENTIFIED") stop("Unidentified input format.\n")
       
       fname <- base::gsub(".txt", "", basename(files[i]))
-      df1 <- read.table(files[i],header = F, sep = "\t", dec = ".", quote = "")
+      df1 <- read.table(files[i],header = F, sep = "", dec = ".", quote = "")
       if (class(df1)!="data.frame") stop("Input is not a dataframe. Incorrect input file type.\n")
       
       Ind <- as.numeric(as.character(length(levels(df1[, 1]))))
       tempb <- as.numeric(nrow(df1))
-      tempc <- as.numeric(tempb/Ind)
-      tempd <- ncol(df1) - 2
+      numruns <- as.numeric(tempb/Ind)
+      numk <- ncol(df1) - 2
       
-      df2 <- data.frame(Num = factor(rep(1:tempc, 1, each = Ind)), Ind = factor(rep(1:Ind, tempc)), df1[, 2:(tempd+1)])
+      df2 <- data.frame(Num = factor(rep(1:numruns, 1, each = Ind)), Ind = factor(rep(1:Ind, numruns)), df1[, 2:(numk+1)])
       rm(df1)
       df3 <- reshape2::melt(df2, id.var = c("Ind", "Num"))
-      facetnames <- as.list(rep(paste("K=", tempd, sep = ""), tempc))
+      facetnames <- as.list(rep(paste("K=", numk, sep = ""), numruns))
       
       #get Dim
-      #pnum <- tempc
-      #if (!all(is.na(poplab))) pnum <- tempc+1
-      height1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = tempc)[1]
-      width1 <- pophelper::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, plotnum = tempc)[2]
+      dimtemp <- getDim(ind = Ind, height = height, width = width, res = dpi, units = units, imgtype=imgtype, labpanelheight=labpanelheight, plotnum = numruns)
+      height1 <- as.numeric(dimtemp[1])
+      width1 <- as.numeric(dimtemp[2])
+      labpanelheight1 <- as.numeric(dimtemp[3])
+      units1 <- as.character(dimtemp[4])
+      
       #Get col
       coll <- popcol
-      if (all(is.na(popcol))) coll <- pophelper::getColours(tempd)
-      if (length(coll) != tempd) stop("Number of colours not equal to number of populations.\n")
-      
+      if (all(is.na(popcol))) coll <- getColours(numk)
+      if (length(coll) < max(numk)) stop(paste("Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),").\n",sep=""))
       
       #save plot
       dt <- base::gsub(":", "", as.character(format(Sys.time(), "%H:%M:%S")))
@@ -1756,16 +1954,20 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
           scale_x_discrete(expand = c(0, 0))+
           scale_y_continuous(expand = c(0, 0))+
           scale_fill_manual(values = coll)+
-          facet_grid(Num~., labeller = plotlabeller)+
+          facet_grid(Num~.)+
           labs(x = NULL, y = NULL)+
           theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
                 axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
                 axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
                 strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-                plot.margin = unit(c(0.1, 0.1, 0, 0), "cm"))
+                plot.margin = grid::unit(c(0.1, 0, 0, 0), "lines"),
+                panel.margin=grid::unit(panelspacer,"lines"))
         
-        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100)
+        #remove strip panels on right
+        if(flab==FALSE) p <- p + theme(strip.text=element_blank())
+        
+        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep=""), height = height1, width = width1)
         print(p)
         dev.off()
@@ -1777,74 +1979,89 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       if (!all(is.na(poplab)))
       {
         #plot with labels
-        if (Ind!=length(as.character(poplab))) stop("Length of labels do not match number of individuals in input file.\n")
-        df3 <- subset(df2, df2$Num == 1)
-        df3$Num <- df3$Num[drop=TRUE]
-        df3.1 <- reshape2::melt(df3, id.var = c("Ind", "Num"))
+        if (Ind!=length(as.character(poplab))) stop(paste("Length of labels (", length(as.character(poplab)),") do not match number of individuals in input file (",Ind,").\n",sep=""))
         
-        ppar <- pophelper::getPlotParams(poplab = poplab, plotnum = tempc, labpos = labpos, labsize = labsize, labangle = labangle, labjust = labjust,
-                              pointsize = pointsize, linepos = linepos, linethick = linethick, fmar = fmar)
+        ppar <- getPlotParams(poplab = poplab, plotnum = numruns, labsize = labsize, labangle = labangle, labjust = labjust, pointsize = pointsize, linethick = linethick)
         
         labangle <- ppar$labangle
         labjust <- ppar$labjust
-        labpos <- ppar$labpos
         labsize <- ppar$labsize
         labjust <- ppar$labjust
         pointsize <- ppar$pointsize
-        linepos <- ppar$linepos
         linethick <- ppar$linethick
-        fmar <- ppar$fmar
         
-        p <- ggplot2::ggplot()+
-          geom_bar(data = df3.1, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
+        #add labpos to lframe df
+        lframe$labpos <- as.numeric(rep(labpos,nrow(lframe)))
+        pos1$linepos <- as.numeric(rep(linepos,nrow(pos1)))
+        
+        #create top plot with multiple barplots
+        p1 <- ggplot2::ggplot()+
+          geom_bar(data = df3, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
           scale_x_discrete(expand = c(0, 0))+
           scale_y_continuous(expand = c(0, 0))+
           scale_fill_manual(values = coll)+
           facet_grid(Num~., labeller = plotlabeller)+
           labs(x = NULL, y = NULL)+
-          geom_text(data = lframe, aes_string(x = "pos", y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
-          geom_line(data = pos1, aes_string(x = "pos", y = linepos), colour = linecol, size = linethick, linetype = linetype)+
-          geom_point(data = pos1, aes_string(x = "pos", y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
-          theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
-                axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
+          theme(legend.position = "none", panel.grid = element_blank(), 
+                panel.background = element_rect(fill="white"), plot.background=element_rect(fill="white"),
+                axis.ticks = element_blank(), axis.text = element_blank(),
+                axis.line = element_blank(), panel.border=element_blank(),
                 axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
-                strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-                plot.margin = unit(fmar, "lines"))
+                strip.background = element_rect(colour = flabbackcol, fill = flabbackcol),
+                plot.margin = grid::unit(c(0.1, 0, -0.3, 0), "lines"),
+                panel.margin=grid::unit(panelspacer,"lines"))
         
-        gp1 <- ggplot_gtable(ggplot_build(p))
-        gp1$layout$clip[gp1$layout$name == "panel"] <- "off"
         
-        if (tempc>1)
+        #add pop divider lines only if 2 pops or more
+        if(div==TRUE)
         {
-          df4 <- subset(df2, df2$Num!=1)
-          df4$Num <- df4$Num[drop = TRUE]
-          df4.1 <- reshape2::melt(df4, id.var = c("Ind", "Num"))
-          
-          p2 <- ggplot2::ggplot()+
-            geom_bar(data = df4.1, aes(x = Ind, y = value, fill = variable), width = 1, space = 0, stat = "identity", position = "stack", na.rm = na.rm)+
-            scale_x_discrete(expand = c(0, 0))+
-            scale_y_continuous(expand = c(0, 0))+
-            scale_fill_manual(values = coll)+
-            facet_grid(Num~., labeller = plotlabeller)+
-            labs(x = NULL, y = NULL)+
-            theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
-                  axis.ticks = element_blank(), axis.text = element_blank(), axis.line = element_blank(), 
-                  axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
-                  strip.background = element_rect(colour = flabbackcol, fill = flabbackcol), 
-                  plot.margin = unit(c(0.2, ppar$fmar[2], 0, ppar$fmar[4]), "lines"))
-          
-          gp2 <- ggplot_gtable(ggplot_build(p2))
-          maxWidth <- grid::unit.pmax(gp1$widths[2:3], gp2$widths[2:3])
-          gp1$widths[2:3] <- maxWidth
-          gp2$widths[2:3] <- maxWidth 
+          if(nrow(pos1 > 2)) p1 <- p1 + geom_vline(xintercept = pos1$pos[-c(1,length(pos1$pos))],colour=divcol,linetype=divtype, size=divthick)
         }
         
-        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units, type = "cairo")
-        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units, quality = 100)
+        #remove strip panels on right
+        if(flab==FALSE) p1 <- p1 + theme(strip.text=element_blank())
+        
+        #create bottom plot with labels
+        p2 <- ggplot2::ggplot()+
+          geom_blank(data = lframe, aes(x = pos, y = labpos))+
+          geom_text(data = lframe, aes(x = pos, y = labpos), label = labs, angle = labangle, hjust = labjust, size = labsize, colour = labcol)+
+          geom_line(data = pos1, aes(x = pos, y = linepos), colour = linecol, size = linethick, linetype = linetype)+
+          geom_point(data = pos1, aes(x = pos, y = linepos), size = pointsize, colour = pointcol, shape = pointtype, fill = pointbgcol)+
+          scale_x_continuous(expand = c(0, 0))+
+          scale_y_continuous(limits=c(0,1))+
+          labs(x = NULL, y = NULL)+
+          #facet_grid(temp~., labeller = plotlabeller)+
+          theme(legend.position = "none", panel.grid = element_blank(), 
+                panel.background = element_rect(fill="white"), plot.background=element_rect(fill="white"),
+                axis.ticks = element_blank(), axis.text = element_blank(), 
+                axis.title = element_blank(), strip.text = element_text(size = flabsize, colour = flabcol), 
+                strip.background = element_rect(colour = flabbackcol, fill = flabbackcol),
+                axis.line = element_blank(), panel.border=element_blank(),
+                plot.margin = grid::unit(c(labspacer,0,0,0), "lines"), panel.margin=grid::unit(0,"lines"))
+        
+        #gtable conversion
+        gp1 <- ggplot_gtable(ggplot_build(p1))
+        #turn off clipping for panel
+        gp1$layout$clip[gp1$layout$name == "panel"] <- "off"
+        
+        #gtable conversion
+        gp2 <- ggplot_gtable(ggplot_build(p2))
+        #turn off clipping for panel
+        gp2$layout$clip[gp2$layout$name == "panel"] <- "off"
+        #change width of bottom plot to that of top plot
+        gp2 <- gtable::gtable_add_cols(gp2, gp1$widths[5]) 
+        
+        #calculate size of panels
+        height2 <- height1-labpanelheight1
+        height3 <- height2/flen
+        
+        if (imgtype == "png") png(paste(fname, ".png", sep = ""), height = height1, width = width1, res = dpi, units = units1, type = "cairo")
+        if (imgtype == "jpeg") jpeg(paste(fname, ".jpg", sep = ""), height = height1, width = width1, res = dpi, units = units1, quality = 100)
         if (imgtype == "pdf") pdf(paste(fname, ".pdf", sep = ""), height = height1, width = width1)
         
-        if (tempc == 1) grid::grid.draw(gp1)
-        if (tempc > 1) gridExtra::grid.arrange(gp2, gp1, heights = c(((tempc-1)/tempc)-0.08, (1/tempc)+0.08))
+        #if (numruns == 1) grid::grid.draw(gp1)
+        #if (numruns > 1) gridExtra::grid.arrange(gp2, gp1, heights = c(((numruns-1)/numruns)-0.08, (1/numruns)+0.08))
+        gridExtra::grid.arrange(gp1, gp2, heights = grid::unit(c(height2,labpanelheight1),units1))
         dev.off()
         
         if (imgtype == "png") cat(paste(fname, ".png exported\n", sep=""))
@@ -2431,7 +2648,7 @@ plotRunsInterpolate<- function(datafile = NULL, coordsfile = NULL,method = "krig
     if (exportplot == TRUE && imgoutput == "sep")
     {
       if (imgtype == "png") png(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".png",sep = ""),height = height1,width = width1,units = units,res = res,type = "cairo")
-      if (imgtype == "jpeg") jpeg(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg",sep = ""),height = height1,width = width1,units = units,res = res)
+      if (imgtype == "jpeg") jpeg(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".jpg",sep = ""),height = height1,width = width1,units = units,res = res, quality = 100)
       if (imgtype == "pdf") pdf(paste(fname,"-Interpolation-",method,"-",colnames(df1)[i],".pdf",sep = ""),height = height1,width = width1)
       print(p)
       dev.off()
@@ -2782,7 +2999,7 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
 .onLoad <- function(...) {
   packageStartupMessage
   (
-    cat("** pophelper v1.1.0 loaded.\n** Note that in pophelper v1.1.0, output format from summariseRunsStructure() and\nsummariseRunsTess() are different from previous versions. Consequently, input\nrequirements for evannoMethodStructure are also different.\n** See NEWS for more detailed changes.\n** help(package='pophelper')")
+    cat("** pophelper v1.1.1 loaded.\n** Note that in pophelper v1.1.1, output format from summariseRunsStructure() and summariseRunsTess() are different from previous version before v1.1.0. Consequently, input requirements for evannoMethodStructure are also different.\n** See NEWS for more detailed changes.\n** help(package='pophelper')")
   )
 }
 

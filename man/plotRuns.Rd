@@ -6,11 +6,12 @@
 \usage{
 plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
   na.rm = TRUE, imgtype = "png", height = NA, width = NA, dpi = NA,
-  units = NA, flabsize = NA, flabcol = NA, flabbackcol = NA,
+  units = NA, panelspacer = NA, flab = TRUE, flabsize = NA,
+  flabcol = NA, flabbackcol = NA, labspacer = NA, labpanelheight = NA,
   labpos = NA, labsize = NA, labangle = NA, labjust = NA, labcol = NA,
   pointsize = NA, pointcol = NA, pointbgcol = NA, pointtype = NA,
   linepos = NA, linethick = NA, linecol = NA, linetype = NA,
-  fmar = NA)
+  div = TRUE, divcol = NA, divtype = NA, divthick = NA)
 }
 \arguments{
 \item{files}{A character vector of one or more STRUCTURE/TESS/table files}
@@ -19,7 +20,7 @@ plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
 
 \item{poplab}{A character vector of population labels equal to length of individuals. Each pop name must repeat to the number of individuals present in each pop.}
 
-\item{popcol}{A vector of colours (representing populations) for colouring clusters. If NA, colours are automatically generated. K 1 to 12 are custom unique colours while K>12 are coloured by function rich.color().}
+\item{popcol}{A vector of colours (representing populations) for colouring clusters. If NA, colours are automatically generated. K=1 to 12 are custom unique colours while K>12 are coloured by function rich.color().}
 
 \item{na.rm}{A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.}
 
@@ -29,17 +30,25 @@ plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
 
 \item{width}{A numeric indicating the width of individual run plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.}
 
-\item{dpi}{A numeric indicating the image resolution. Defaults to 300.}
+\item{dpi}{A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300.}
 
-\item{units}{A numeric indicating the units of height and width. Default set to "cm". If type is pdf, units must be "in".}
+\item{units}{A numeric indicating the units of height and width. Default set to "cm".}
 
-\item{flabsize}{A numeric indicating the size of the filename label. Defaults to 4.}
+\item{panelspacer}{A numeric indicating the space at the bottom of one or more barplot panels.}
 
-\item{flabcol}{A colour character indicating the colour of the filename label. Defaults to "grey10".}
+\item{flab}{A logical indicating if strip panels on right side must be shown. Strip panels display file name and K value. Defaults to TRUE.}
 
-\item{flabbackcol}{A colour character denoting the background colour of the filename label. Defaults to white}
+\item{flabsize}{A numeric indicating the size of the filename label. Defaults to 4. Applicable only if flab=T.}
 
-\item{labpos}{A numeric indicating the y position of the labels.}
+\item{flabcol}{A colour character indicating the colour of the filename label. Defaults to "grey10". Applicable only if flab=T.}
+
+\item{flabbackcol}{A colour character denoting the background colour of the filename label. Defaults to white. Applicable only if flab=T.}
+
+\item{labspacer}{A numeric indicating the space between the plots and the label area. Applicable only with population labels.}
+
+\item{labpanelheight}{A numeric indicating the height of the label area in cm. Default is 0.4 cm. If units are different, cm will be be converted automatically. Applicable only with population labels.}
+
+\item{labpos}{A numeric indicating the y position of the labels. Applicable only with population labels.}
 
 \item{labsize}{A numeric indicating the size of the labels.}
 
@@ -63,9 +72,15 @@ plotRuns(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA,
 
 \item{linecol}{A colour character for the label marker line. Defaults to "grey30".}
 
-\item{linetype}{A numeric indicating the type of line for marker line. Same as lty in standard R.}
+\item{linetype}{A numeric indicating the type of line for marker line. Same as lty in standard R. Default value is 1.}
 
-\item{fmar}{Figure margins in 'lines' unit. A vector of 4 numbers for top, right, bottom and left margins. ex. c(0.2,0.2,0.2,0).}
+\item{div}{A logical indicating if divider lines between population clusters must be drawn. Applicable only with population labels.}
+
+\item{divcol}{A character or hexadecimal colour denoting the colour of the divider line. Default is white.}
+
+\item{divtype}{A numeric indicating the type of line for the divider line. Same as lty in standard R. Default value is 1.}
+
+\item{divthick}{A numeric indicating the thickness of the divider line. Default is 0.25}
 }
 \value{
 Nothing is returned.

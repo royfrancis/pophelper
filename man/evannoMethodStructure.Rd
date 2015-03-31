@@ -4,16 +4,14 @@
 \alias{evannoMethodStructure}
 \title{Perform the Evanno method}
 \usage{
-evannoMethodStructure(data = NULL, writetable = FALSE, doplot = TRUE,
-  exportplot = FALSE, na.rm = TRUE, imgtype = "png", height = NA,
+evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
+  na.rm = TRUE, imgtype = "png", basesize = NA, height = NA,
   width = NA, res = NA, units = NA)
 }
 \arguments{
 \item{data}{A dataframe with summarised runs. An output from \code{summariseRunsStructure()}. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.}
 
 \item{writetable}{A logical indicating if the output table is to be exported as a file in the working directory.}
-
-\item{doplot}{A logical indicating if the Evanno plots needs to be computed. If Evanno method cannot be computed, a kPlot (elpd over k) is shown instead. Set this to FALSE to avoid computation of plots and only return data table (1000x faster).}
 
 \item{exportplot}{A logical indicating if the Evanno plots are to be exported as an image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.}
 
@@ -23,6 +21,8 @@ plotting and warning messages from \code{ggplot} are avoided.}
 
 \item{imgtype}{A character indicating the type of exported image. Default set to png. Other possible
 options are jpeg or pdf.}
+
+\item{basesize}{A numeric indicating the base size of various plot elementsw such as point size, line thickness etc. Increase basesize with larger figure dimensions. Defaults to 5.}
 
 \item{height}{A numeric denoting the height of exported image. Default units in 'cm'. If imgtype is
 pdf, height must be in inches.}

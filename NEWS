@@ -1,6 +1,17 @@
+pophelper 1.1.1
+===========
+* 31-Mar-2015
+* Function plotRuns() modified.
+    + Spacing between bottom plot and second plot was larger than spacing between other plots. This has been corrected.
+    + New code to plotting labels
+    + Arguments to control label panel height (labpanelheight), spacing between plots (panelspacer), spacing between label area and plots (labspacer).
+    + Argument to include or exclude side panels on right side (flab).
+    + Argument to include a divider line between populations (flab). Further arguments to modify the divider line.
+    + Figure dimensions and conversions have been improved. Old dimension settings (length, height, res etc) may give different plot dimension in this version.
+* Internal helper functions for ploRuns() modified.
+
 pophelper 1.1.0
 ===========
-
 * 16-Mar-2015
 * Several changes in code to enable faster runtime.
 * New HTML vignette created.
