@@ -7,7 +7,6 @@ Also, try the short video demo based on`pophelper v1.0.0` [here](https://www.you
 ## Installation  
 You need to have R (> 3.1.0) statistical package installed on your system. R is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
 
-The new version v1.1.1 is available as a new branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.1, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling. The new version is just a new branch now on GitHub. It will be merged to master perhaps later on.
 ```coffee
 install.packages('devtools',dep=T)
 library(devtools)
@@ -15,20 +14,31 @@ library(devtools)
 #for new version v1.1.1, use
 install_github('royfrancis/pophelper',ref="v110")
 
-#for old version v1.0.0, use
-install_github('royfrancis/pophelper')
-
 #load library for use
 library(pophelper)
 ```
-For help on any function, use  
-`?tabulateRunsStructure`  
-`?evannoMethodStructure`
 
-For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use `choose.files(multi=T)`. Mac users can use `file.choose()` for single selection and `tk_choose.files()` from `tcltk` package for multiple selection.
+__A note on old versions__  
+
+The new version v1.1.1 is available as a new branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.1, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch. The new version is just a new branch now on GitHub. It will be merged to master perhaps later on.  
+
+Here is the page for the old stable version [v1.0.4](https://github.com/royfrancis/pophelper/tree/v104).  
+
+```coffee
+#to install the old stable version v1.0.4, use
+install_github('royfrancis/pophelper',ref="v104")
+```
+
 
 ## List of Functions  
   
+For help on any function, use  
+`?tabulateRunsStructure`  
+`?evannoMethodStructure`  
+
+For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use `choose.files(multi=T)`. Mac users can use `file.choose()` for single selection and `tk_choose.files()` from `tcltk` package for multiple selection.  
+
+
 ```coffee
 tabulateRunsStructure()   # Get a tabulation of several STRUCTURE files
 summariseRunsStructure()  # Summarise runs by repeats for each K
