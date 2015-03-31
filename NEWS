@@ -8,7 +8,11 @@ pophelper 1.1.1
     + Argument to include or exclude side panels on right side (flab).
     + Argument to include a divider line between populations (flab). Further arguments to modify the divider line.
     + Figure dimensions and conversions have been improved. Old dimension settings (length, height, res etc) may give different plot dimension in this version.
-* Internal helper functions for ploRuns() modified.
+* Internal helper functions for plotRuns() modified.
+* Function evannoMethodStructure() modified.
+    + Argument doplot is removed. Set plot off using exportplot=F.
+    + Argument basesize added to generally control size of figure elements.
+    + Conversion between units and dimensions have been modified.
 
 pophelper 1.1.0
 ===========
