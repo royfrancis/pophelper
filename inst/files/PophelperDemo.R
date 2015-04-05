@@ -1,4 +1,4 @@
-#POPHELPER 1.1.0
+#POPHELPER 1.1.1
 #DEMO SCRIPT
 library(pophelper)
 #create a new folder and set as wd
