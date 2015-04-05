@@ -11,8 +11,8 @@ You need to have R (> 3.1.0) statistical package installed on your system. R is 
 install.packages('devtools',dep=T)
 library(devtools)
 
-#for new version v1.1.1, use
-install_github('royfrancis/pophelper',ref="v110")
+#for the current stable version, use
+install_github('royfrancis/pophelper')
 
 #load library for use
 library(pophelper)
@@ -20,7 +20,7 @@ library(pophelper)
 
 __A note on old versions__  
 
-The new version v1.1.1 is available as a new branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.1, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch. The new version is just a new branch now on GitHub. It will be merged to master perhaps later on.  
+The new version v1.1.1 is the new master branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.1, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch.
 
 Here is the page for the old stable version [v1.0.4](https://github.com/royfrancis/pophelper/tree/v104).  
 
