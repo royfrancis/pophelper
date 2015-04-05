@@ -1,6 +1,6 @@
 # pophelper v1.1.1  
 
-__Roy M Francis__ | 31-Mar-2015
+__Roy M Francis__ | 04-Apr-2015
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
 options(rpubs.upload.method = "internal")
@@ -17,7 +17,7 @@ This vignette/tutorial aims to demonstrate the use of R package `pophelper`. Thi
 
 The programs STRUCTURE and TESS are two popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.
 
-This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.1.2 (2014-10-31)` on a 64-bit Windows 8.1 Platform. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
+This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.1.2 (2014-10-31)` on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
 
 ----
 
@@ -30,10 +30,10 @@ The first step is to install the `pophelper` library. The dependent R packages r
 install.packages('devtools',dep=T)
 library(devtools)
 
-# for new version v1.1.1, use
-install_github('royfrancis/pophelper',ref="v110")
+# for the stable version v 1.1.1, use
+install_github('royfrancis/pophelper')
 
-# for version v1.0.4, use
+# for previous stable version v1.0.4, use
 install_github('royfrancis/pophelper')
 
 #load library

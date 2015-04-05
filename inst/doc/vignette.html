@@ -75,12 +75,12 @@ img {
 
 <div id="pophelper-v1.1.1" class="section level1">
 <h1>pophelper v1.1.1</h1>
-<p><strong>Roy M Francis</strong> | 31-Mar-2015</p>
+<p><strong>Roy M Francis</strong> | 04-Apr-2015</p>
 <div id="introduction" class="section level3">
 <h3>1. Introduction</h3>
 <p>This vignette/tutorial aims to demonstrate the use of R package <code>pophelper</code>. This package contains functions that are useful for processing output results from two programs used in the analysis of population structure: STRUCTURE<sup>4</sup> and TESS<sup>2</sup>.</p>
 <p>The programs STRUCTURE and TESS are two popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (<em>K</em>). The assignment is usually run for a range of <em>K</em> such as from <em>K</em>=2 to <em>K</em>=10. Multiple repeats are also usually carried out for each <em>K</em>. Each output file for each repeat of <em>K</em> showing the assignment probabilities of all individuals is referred to as the run file or cluster file. <code>pophelper</code> has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.</p>
-<p>This vignette covers the use of all important functions in the <code>pophelper</code> package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using <code>R version 3.1.2 (2014-10-31)</code> on a 64-bit Windows 8.1 Platform. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like <code>this</code>.</p>
+<p>This vignette covers the use of all important functions in the <code>pophelper</code> package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using <code>R version 3.1.2 (2014-10-31)</code> on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like <code>this</code>.</p>
 <hr />
 </div>
 <div id="installation" class="section level3">
@@ -90,10 +90,10 @@ img {
 <span class="kw">install.packages</span>(<span class="st">'devtools'</span>,<span class="dt">dep=</span>T)
 <span class="kw">library</span>(devtools)
 
-<span class="co"># for new version v1.1.1, use</span>
-<span class="kw">install_github</span>(<span class="st">'royfrancis/pophelper'</span>,<span class="dt">ref=</span><span class="st">&quot;v110&quot;</span>)
+<span class="co"># for the stable version v 1.1.1, use</span>
+<span class="kw">install_github</span>(<span class="st">'royfrancis/pophelper'</span>)
 
-<span class="co"># for version v1.0.4, use</span>
+<span class="co"># for previous stable version v1.0.4, use</span>
 <span class="kw">install_github</span>(<span class="st">'royfrancis/pophelper'</span>)
 
 <span class="co">#load library</span>
