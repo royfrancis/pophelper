@@ -111,4 +111,4 @@ p4 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout
 analyseRuns(sfiles)
 analyseRuns(tfiles)
 
-
+setwd(currwd)
