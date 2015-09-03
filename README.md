@@ -28,8 +28,8 @@ Here is the page for the old stable version [v1.0.4](https://github.com/royfranc
 #to install the old stable version v1.0.4, use
 install_github('royfrancis/pophelper',ref="v104")
 ```
-__Web App__
-An online version of pophelper is now temporarily available [here](roymfrancis.com:3838/roy/structure). The app is currently in beta testing. Please let me know if you run into issues.
+__Web App__  
+An online version of pophelper is now temporarily available [here](https://roymfrancis.com:3838/roy/structure). The app is currently in beta testing. Please let me know if you run into issues.
 
 ## List of Functions  
   
