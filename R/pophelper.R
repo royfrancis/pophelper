@@ -1,5 +1,5 @@
-#pophelper v1.1.1
-#31-Mar-2015
+#pophelper v1.1.2
+#17-Sep-2015
 #Functions
 
 #load or install required libraries
@@ -16,6 +16,11 @@
 # pkgCheck()
 # rm(pkgCheck)
 #compiler::enableJIT(3)
+
+# utils::suppressForeignCheck(c("k", "elpdmean","geom_path","geom_point","geom_errorbar","elpdmax","elpdmin","theme_bw","labs","theme",
+#                             "element_text","element_blank","lnk1","lnk1max","lnk1min","lnk2","lnk2max","lnk2min","deltaK","aes","ind",
+#                             "value","variable","geom_bar","scale_x_discrete","scale_y_continuous","scale_fill_manual","labs","theme",
+#                             "element_blank","element_line","element_text"))
 
 #FUNCTION getColours
 #' Internal: Get Colours
@@ -264,7 +269,7 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
   {
     #if (exportdataformat == "txt")
     #{
-      write.table(prettyNum(main, preserve.width = "common"), "tabulateRunsStructure.txt", quote = FALSE, row.names = FALSE)
+      write.table(main, "tabulateRunsStructure.txt", quote = FALSE, row.names = FALSE)
       cat("tabulateRunsStructure.txt exported\n") 
     #}
     #if (exportdataformat == "excel")
@@ -337,7 +342,7 @@ tabulateRunsTess <- function(files = NULL, writetable = FALSE, sorttable = TRUE,
   {
     #if (exportdataformat == "txt")
     #{
-      write.table(prettyNum(main, preserve.width = "common"), "tabulateRunsTess.txt", quote = FALSE, row.names = FALSE)
+      write.table(main, "tabulateRunsTess.txt", quote = FALSE, row.names = FALSE)
       cat("tabulateRunsTess.txt exported\n")
     #}
     #if (exportdataformat == "excel")
@@ -391,14 +396,18 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  data1 <- plyr::ddply(data,.(loci,ind,k),runs = as.numeric(table(k)),elpdmean = mean(elpd,na.rm = T) ,elpdsd = sd(elpd,na.rm = T),elpdmin = min(elpd,na.rm = T),elpdmax = max(elpd,na.rm = T),here(summarise))
+  #data1 <- plyr::ddply(data,.(loci,ind,k),runs = as.numeric(table(k)),elpdmean = mean(elpd,na.rm = T) ,elpdsd = sd(elpd,na.rm = T),elpdmin = min(elpd,na.rm = T),elpdmax = max(elpd,na.rm = T),here(summarise))
+  data1 <- aggregate(elpd ~ loci + ind + k,data = data,sum)[,-4]
+  data1$runs <- as.numeric(table(data$k))
+  data2 <- aggregate(elpd ~ loci + ind + k,data = data,FUN=function(x) c(elpdmean =mean(x,na.rm = T), elpdsd=sd(x,na.rm = T),elpdmin = min(x,na.rm = T),elpdmax = max(x,na.rm = T) ) )[,-c(1:3)]
+  data1 <- cbind(data1,data2)
   
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
     #if (exportdataformat == "txt")
     #{
-      write.table(prettyNum(data1, preserve.width = "common"), "summariseRunsStructure.txt", quote = FALSE, row.names = FALSE)
+      write.table(data1, "summariseRunsStructure.txt", quote = FALSE, row.names = FALSE)
       cat("summariseRunsStructure.txt exported\n")
     #}
     #if (exportdataformat == "excel")
@@ -443,14 +452,16 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  data1 <- plyr::ddply(data,.(ind,k),runs = as.numeric(table(k)),summarise)
-  
+  #data1 <- plyr::ddply(data,.(ind,k),runs = as.numeric(table(k)),summarise)
+  data1 <- aggregate(. ~ ind + k,data = data,sum)[,-3]
+  data1$runs <- as.numeric(table(data$k))
+
   #write table if opted
   if (writetable == TRUE | writetable == "T" | writetable == "TRUE")
   {
     #if (exportdataformat == "txt")
     #{
-      write.table(prettyNum(data1, preserve.width = "common"), "summariseRunsTess.txt", quote = FALSE, row.names = FALSE)
+      write.table(data1, "summariseRunsTess.txt", quote = FALSE, row.names = FALSE)
       cat("summariseRunsTess.txt exported\n")
     #}
     #if (exportdataformat == "excel")
@@ -669,7 +680,7 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, exportplot = 
   {
     #if(exportdataformat == "txt")
     #{
-      write.table(prettyNum(data, preserve.width = "common"), "evannoMethodStructure.txt", quote = FALSE, row.names = FALSE)
+      write.table(data, "evannoMethodStructure.txt", quote = FALSE, row.names = FALSE)
       cat("evannoMethodStructure.txt exported\n")
     #}
     
@@ -1645,7 +1656,6 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
         labjust <- ppar$labjust
         pointsize <- ppar$pointsize
         linethick <- ppar$linethick
-        fmar <- ppar$fmar
         
         #add labpos to lframe df
         lframe$labpos <- as.numeric(rep(labpos,nrow(lframe)))
@@ -1764,6 +1774,10 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     
     #combine list to one dataframe 
     df2 <- plyr::rbind.fill(plist)
+    #df2 <- do.call("rbind", lapply(plist, data.frame))
+    #do.call(rbind.data.frame, plist)
+    #data.frame(Reduce(rbind, plist))
+    
     #melt
     df3 <- reshape2::melt(df2, id.var = c("Ind", "Num"))
     
@@ -2217,7 +2231,7 @@ plotMultiline <- function(files = NA, spl = NA, lpp = NA, popcol = NA, na.rm = F
           theme(legend.position = "none", panel.grid = element_blank(), panel.background = element_blank(), 
                 axis.ticks = element_line(size = 0.25), axis.text.y = element_text(size = labsize), axis.line = element_blank(), 
                 axis.title = element_blank(), axis.text.x = element_text(size = labsize, angle = labangle, 
-                                                                         vjust = labvjust, hjust = labhjust), plot.margin = unit(c(0.1, 0.1, 0.1, 0), "cm"))
+                              vjust = labvjust, hjust = labhjust), plot.margin = grid::unit(c(0.1, 0.1, 0.1, 0), "cm"))
         
         if (yaxislabs == FALSE) plist[[i]] <- plist[[i]] + theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())
         if (indlabs == FALSE) plist[[i]] <- plist[[i]] + theme(axis.ticks.x = element_blank(),axis.text.x = element_blank())
@@ -2640,7 +2654,7 @@ plotRunsInterpolate<- function(datafile = NULL, coordsfile = NULL,method = "krig
     if (showaxis == FALSE) p <- p + theme(axis.text = element_blank(),axis.ticks = element_blank(), panel.border = element_blank())
     if (addpoints == TRUE) p <- p + geom_point(data = coords,aes(x = X,y = Y),size = pointsize,shape = pointtype,fill = pointcol)
     if (legend == FALSE) p <- p + theme(legend.position = "none")
-    if (!is.na(legendsize)) p <- p + theme(legend.key.size = unit(legendsize, "cm"))
+    if (!is.na(legendsize)) p <- p + theme(legend.key.size = grid::unit(legendsize, "cm"))
     if (!is.na(legendtextsize)) p <- p + theme(legend.text = element_text(size = legendtextsize))
     
     plist[[i]] <- p
@@ -2963,7 +2977,7 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
   #hide legend if true
   if (legend == FALSE) p <- p + theme(legend.position = "none")
   #adjust legend size if not NA
-  if (!is.na(legendsize)) p <- p + theme(legend.key.size = unit(legendsize, "cm"))
+  if (!is.na(legendsize)) p <- p + theme(legend.key.size = grid::unit(legendsize, "cm"))
   #adjust legend text size if not NA
   if (!is.na(legendtextsize)) p <- p + theme(legend.text = element_text(size = legendtextsize))
   
@@ -2996,10 +3010,9 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
 # labels contiguous check
 # labels check if dataframe
 
+# removed dependency on plyr. faster code. summariseRunsX
+
 .onLoad <- function(...) {
-  packageStartupMessage
-  (
-    cat("** pophelper v1.1.1 loaded.\n** Note that in pophelper v1.1.1, output format from summariseRunsStructure() and summariseRunsTess() are different from previous version before v1.1.0. Consequently, input requirements for evannoMethodStructure are also different.\n** See NEWS for more detailed changes.\n** help(package='pophelper')")
-  )
+    packageStartupMessage("** pophelper v1.1.1 loaded.\n** Note that in pophelper v1.1.1, output format from summariseRunsStructure() and summariseRunsTess() are different from previous version before v1.1.0. Consequently, input requirements for evannoMethodStructure are also different.\n** See NEWS for more detailed changes.\n** help(package='pophelper')")
 }
 

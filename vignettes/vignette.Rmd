@@ -1,6 +1,6 @@
-# pophelper v1.1.1  
+# pophelper v1.1.2  
 
-__Roy M Francis__ | 31-Mar-2015
+__Roy M Francis__ | 17-Sep-2015
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
 options(rpubs.upload.method = "internal")
@@ -17,7 +17,7 @@ This vignette/tutorial aims to demonstrate the use of R package `pophelper`. Thi
 
 The programs STRUCTURE and TESS are two popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.
 
-This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.1.2 (2014-10-31)` on a 64-bit Windows 8.1 Platform. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
+This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.1.2 (2014-10-31)` on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
 
 ----
 
@@ -30,10 +30,10 @@ The first step is to install the `pophelper` library. The dependent R packages r
 install.packages('devtools',dep=T)
 library(devtools)
 
-# for new version v1.1.1, use
-install_github('royfrancis/pophelper',ref="v110")
+# for the current stable version v 1.1.2, use
+install_github('royfrancis/pophelper')
 
-# for version v1.0.4, use
+# for previous stable version v1.0.4, use
 install_github('royfrancis/pophelper')
 
 #load library
@@ -489,7 +489,7 @@ Here, we will use some sample files from the library.
 
 ```{r,echo=TRUE, eval=FALSE}
 #specify path for datafile and coordsfile
-flist1 <- list.files(path=system.file("/files/tess",package="pophelper"),full.names=T)
+tlist <- list.files(path=system.file("/files/tess",package="pophelper"),full.names=T)
 df1 <- tlist[2]
 cd1 <- system.file("/files/coords75.txt",package="pophelper")
 
@@ -497,10 +497,10 @@ cd1 <- system.file("/files/coords75.txt",package="pophelper")
 plotRunsInterpolate(datafile=df1,coordsfile=cd1)
 
 #adjusting legend size and legend text
-plotRunsInterpolate(datafile,coordsfile,legendsize=0.4,legendtextsize=6)
+plotRunsInterpolate(datafile=df1,coordsfile=cd1,legendsize=0.4,legendtextsize=6)
 
 #removing legend
-plotRunsInterpolate(datafile,coordsfile,legend=FALSE)
+plotRunsInterpolate(df1,cd1,legend=FALSE)
 
 # try some structure files
 s1 <- system.file("/files/Structure239_4",package="pophelper")
@@ -521,17 +521,18 @@ __Fig. 13.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6)
 We can choose only cluster 2 and try out different interpolation methods. Five methods are currently implemented: bilinear, bicubic, inverse distance weighting, nearest neighbour and kriging. Kriging is predictive while others are essentially direct spatial interpolation.
 
 ```{r,echo=TRUE, eval=FALSE}
-p1 <- plotRunsInterpolate(datafile,coordsfile,legendsize=0.3,legendtextsize=5,
+p1 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
                           clusters=2,dataout=T,method="bilinear",exportplot=F)
-p2 <- plotRunsInterpolate(datafile,coordsfile,legendsize=0.3,legendtextsize=5,
+p2 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
                           clusters=2,dataout=T,method="bicubic",exportplot=F)
-p3 <- plotRunsInterpolate(datafile,coordsfile,legendsize=0.3,legendtextsize=5,
+p3 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
                           clusters=2,dataout=T,method="idw",exportplot=F)
-p4 <- plotRunsInterpolate(datafile,coordsfile,legendsize=0.3,legendtextsize=5,
+p4 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
                           clusters=2,dataout=T,method="nn",exportplot=F)
-p5 <- plotRunsInterpolate(datafile,coordsfile,legendsize=0.3,legendtextsize=5,
+p5 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
                           clusters=2,dataout=T,method="krig",exportplot=F)
 
+library(gridExtra)
 png("MethodsComparison.png",height=16,width=22,res=200,units="cm",type="cairo")
 grid.arrange(p1[[1]],p2[[1]],p3[[1]],p4[[1]],p5[[1]],nrow=2,ncol=3)
 dev.off()
@@ -550,11 +551,11 @@ library(RColorBrewer)
 display.brewer.all()
 
 # sample plots with custom colours
-p1 <- plotRunsInterpolate(datafile,coordsfile,clusters=2:3,colours=brewer.pal(8,"RdYlBu"),
+p1 <- plotRunsInterpolate(df1,cd1,clusters=2:3,colours=brewer.pal(8,"RdYlBu"),
                           legend=F,exportplot=F,dataout=T)
-p2 <- plotRunsInterpolate(datafile,coordsfile,clusters=2,colours=brewer.pal(8,"Spectral"),
+p2 <- plotRunsInterpolate(df1,cd1,clusters=2,colours=brewer.pal(8,"Spectral"),
                           legend=F,exportplot=F,dataout=T)
-p3 <- plotRunsInterpolate(datafile,coordsfile,clusters=2,colours=rev(brewer.pal(8,"BuPu")),
+p3 <- plotRunsInterpolate(df1,cd1,clusters=2,colours=rev(brewer.pal(8,"BuPu")),
                           legend=F,exportplot=F,dataout=T)
 
 png("PlotColours.png",height=8,width=24,res=200,units="cm",type="cairo")
@@ -583,7 +584,7 @@ plotRunsSpatial(datafile=s1,coordsfile=cd2,height=12,setutm=T)
 plotRunsSpatial(datafile=s1,coordsfile=cd2,height=12,ellipse=F)
 
 # create a 2x2 montage with varying parameters
-# don't export, export data, add title
+# don't export plot, export data, add title
 p1 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottitle="Fig 1")
 # without ellipse, with square points and transparency added
 p2 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottitle="Fig 2",

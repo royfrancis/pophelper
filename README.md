@@ -1,6 +1,6 @@
-# pophelper 1.1.1
+# pophelper 1.1.2
 
-`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. For a detailed demonstration on `pophelper v1.1.1`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v111.html). Newer versions and updates are shown only on this GitHub page.
+`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. For a detailed demonstration on `pophelper v1.1.2`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Newer versions and updates are shown only on this GitHub page.
 
 Also, try the short video demo based on`pophelper v1.0.0` [here](https://www.youtube.com/watch?v=iOqxXcQReJI). This is an old video and sorry for the bad quality.
 
@@ -20,7 +20,7 @@ library(pophelper)
 
 __A note on old versions__  
 
-The new version v1.1.1 is the new master branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.1, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch.
+The new version v1.1.2 is the new master branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.2, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch.
 
 Here is the page for the old stable version [v1.0.4](https://github.com/royfrancis/pophelper/tree/v104).  
 

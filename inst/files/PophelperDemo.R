@@ -21,7 +21,7 @@ tf1
 #summarise STRUCTURE runs
 sf2 <- summariseRunsStructure(sf1)
 sf2 <- summariseRunsStructure(sf1, writetable = T)
-tf2 <- summariseRunsTess(tf1, writetable = T)
+tf2 <- summariseRunsTess(tf1, writetable = F)
 #perform evanno method
 evannoMethodStructure(sf2)
 evannoMethodStructure(sf2, writetable = T, exportplot = T)

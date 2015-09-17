@@ -1,3 +1,17 @@
+pophelper 1.1.2
+===========
+* 17-Sep-2015
+* Error fixed in evannoMethodStructure() when using writetable=T
+Error in vapply(x, format, "", ...) : values must be length 1,
+ but FUN(X[[1]]) result is length 6
+* Same error fixed in tabulateRunsStructure()
+* Same error fixed in tabulateRunsTess()
+* Same error fixed in summariseRunsStructure()
+* Same error fixed in summariseRunsTess()
+* Error fixed in plotRunsInterpolate()
+Error in theme(legend.key.size = unit(legendsize, "cm")) : 
+  could not find function "unit"
+
 pophelper 1.1.1
 ===========
 * 31-Mar-2015
