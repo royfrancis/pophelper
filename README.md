@@ -116,7 +116,7 @@ __Fig 14.__ *Interpolation plots showing some of the available colour palettes.*
 
 __Fig 15.__ *Some of the plots created using the function `plotRunsSpatial()`.*  
 
-For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v111.html).
+For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html).
 
 ### Disclaimer
 
