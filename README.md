@@ -2,7 +2,7 @@
 
 `pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. For a detailed demonstration on `pophelper v1.1.2`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Newer versions and updates are shown only on this GitHub page.
 
-Also, try the short video demo based on`pophelper v1.0.0` [here](https://www.youtube.com/watch?v=iOqxXcQReJI). This is an old video and sorry for the bad quality.
+Also, try some video tutorials based on`pophelper v1.1.2` [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_).
 
 ## Installation  
 You need to have R (> 3.1.0) statistical package installed on your system. R is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
@@ -29,7 +29,7 @@ Here is the page for the old stable version [v1.0.4](https://github.com/royfranc
 install_github('royfrancis/pophelper',ref="v104")
 ```
 __Web App__  
-An online version of pophelper is now temporarily available [here](http://www.roymfrancis.com:3838/roy/structure/). The app is currently in beta testing. Please let me know if you run into issues.
+An online version of pophelper is now available [here](http://www.pophelper.com). The app is currently in beta testing. Please let me know if you run into issues.
 
 ## List of Functions  
   
@@ -116,7 +116,7 @@ __Fig 14.__ *Interpolation plots showing some of the available colour palettes.*
 
 __Fig 15.__ *Some of the plots created using the function `plotRunsSpatial()`.*  
 
-For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v111.html).
+For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html).
 
 ### Disclaimer
 
