@@ -2,7 +2,7 @@
 
 `pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. 
 
-For a detailed demonstration on `pophelper v1.1.2`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials based on`pophelper v1.1.2`. New versions and updates are shown only on this GitHub page.
+For a detailed demonstration, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials. New versions and updates are shown only on this GitHub page.
 
 ## Installation  
 You need to have R (> 3.1.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
@@ -18,7 +18,7 @@ install_github('royfrancis/pophelper')
 library(pophelper)
 ```
 __Web App__  
-An online version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
+An online interactive version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
 
 ## List of Functions  
   
