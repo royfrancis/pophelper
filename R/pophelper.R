@@ -1,4 +1,4 @@
-#pophelper v1.1.3
+#pophelper v1.1.4
 #27-Sep-2015
 #Functions
 
@@ -1155,9 +1155,7 @@ runsToDfStructure <- function(files = NA)
     k <- as.numeric(as.character(base::gsub("\\D", "", grep("\\d populations assumed", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
     if (is.na(k)) cat(paste("Value of K is NA in file: ", name, sep = ""))
     
-    cstart <- charmatch("Inferred ancestry of individuals", file1)
-    cend <- charmatch("Estimated Allele Frequencies in each cluster", file1)
-    file1 <- file1[(cstart+2):(cend-1)]
+    file1 <- file1[grep("\\d+\\s+\\S+\\s+\\S+\\s+\\S+\\s+:\\s+\\d+.",file1)]
     file_a <- file1[file1 != ""]
     rm(file1)
     file_b <- base::gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
