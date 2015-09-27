@@ -1,11 +1,11 @@
-# pophelper 1.1.2
+# pophelper 1.1.3
 
-`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. For a detailed demonstration on `pophelper v1.1.2`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Newer versions and updates are shown only on this GitHub page.
+`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. 
 
-Also, try some video tutorials based on`pophelper v1.1.2` [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_).
+For a detailed demonstration on `pophelper v1.1.2`, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials based on`pophelper v1.1.2`. New versions and updates are shown only on this GitHub page.
 
 ## Installation  
-You need to have R (> 3.1.0) statistical package installed on your system. R is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
+You need to have R (> 3.1.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
 
 ```coffee
 install.packages('devtools',dep=T)
@@ -17,19 +17,8 @@ install_github('royfrancis/pophelper')
 #load library for use
 library(pophelper)
 ```
-
-__A note on old versions__  
-
-The new version v1.1.2 is the new master branch. It might have new bugs and issues, and there is also backward incompatibility with some functions. If you have existing scripts that do not work with the new version v1.1.2, you need to update your scripts or stick to the older version. You can always go back to older version by just reinstalling from relevant branch.
-
-Here is the page for the old stable version [v1.0.4](https://github.com/royfrancis/pophelper/tree/v104).  
-
-```coffee
-#to install the old stable version v1.0.4, use
-install_github('royfrancis/pophelper',ref="v104")
-```
 __Web App__  
-An online version of pophelper is now available [here](http://www.pophelper.com). The app is currently in beta testing. Please let me know if you run into issues.
+An online version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
 
 ## List of Functions  
   
@@ -120,11 +109,10 @@ For detailed demonstration and description, refer the [vignette](https://dl.drop
 
 ### Disclaimer
 
-The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3.
-Please make sure you verify all your results by eye atleast once per batch. Verify, verify and when you are done with that, reverify.
+The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3. Please make sure you verify all your results by eye atleast once per batch.
 
 ### Contact
 
-If you have an issues, suggestions, new useful ideas or ways to improve this, feel free to contact me, or add a comment to the issues section here on github. Preferred email is roy.m.francis@outlook.com. My spam filter sometimes goes hyper and swallows emails. If you don't receive a reply from me in 48 hours, consider sending an email to roy.francis@ebc.uu.se as well.
+If you have an issues, suggestions, corrections, ideas on ways to improve or extend this package, feel free to contact me, or add a comment to the issues section here on Github. Preferred email is roy.m.francis@outlook.com. My spam filter sometimes goes hyper and swallows emails. If you don't receive a reply from me in 48 hours, consider sending an email to roy.francis@ebc.uu.se as well.
 
 2015 Roy M Francis | roy.m.francis@outlook.com

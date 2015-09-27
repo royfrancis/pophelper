@@ -4,5 +4,5 @@ bibentry(bibtype = "Manual",
   title = "pophelper: An R package for analysis of STRUCTURE and TESS files",
   author = "Roy Mathew Francis",
   year = "2015",
-  note = "R package version 1.1.1"
+  note = "R package version 1.1.3"
 )

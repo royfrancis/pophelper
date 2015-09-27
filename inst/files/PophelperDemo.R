@@ -1,5 +1,7 @@
-#POPHELPER 1.1.1
+#POPHELPER 1.1.3
+#27-Sep-2015
 #DEMO SCRIPT
+
 library(pophelper)
 #create a new folder and set as wd
 currwd <- getwd()
@@ -60,12 +62,26 @@ labs1 <- factor(c(rep("PopA",30),rep("PopB",45)))
 #plot TESS runs with labels
 plotRuns(files=tfiles[1:2], imgoutput="sep", poplab=labs1)
 plotRuns(files=tfiles[1:2], imgoutput="join", poplab=labs1)
+#plot TABLE files
+tabs1 <- c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
+           system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
+           system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
+#plot one TABLE file
+plotRuns(files=tabs1[1],imgoutput="tab")
+#plot all TABLE files
+plotRuns(files=tabs1,imgoutput="tab")
+#plot all TABLE files with labels
+plotRuns(files=tabs1,imgoutput="tab",poplab=pops$V1)
 #plot multiline STRUCTURE
 plotMultiline(files=sfiles[1])
 #plot multiline TESS
-plotMultiline(files=tfiles[1]) 
+plotMultiline(files=tfiles[1])
 #plotmultiline with custom setting
 plotMultiline(files=sfiles[1], spl=75, lpp=10)
+#plotMultiline with one TABLE file
+plotMultiline(files=tabs1[1])
+#plotMultiline with all TABLE file
+plotMultiline(files=tabs1)
 #read coordinate file
 cd2 <- system.file("/files/coords75.txt",package="pophelper")
 #basic usage
@@ -106,6 +122,9 @@ p4 <- plotRunsSpatial(datafile=sfile239,coordsfile=cfile239,exportplot=F,dataout
 #png("PlotRunsSpatial.png",height=20,width=20,res=250,units="cm",type="cairo")
 #grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
 #dev.off()
+setwd(currwd)
+dir.create(paste(currwd,"/AnalyseDemo",sep=""))
+setwd(paste(currwd,"/AnalyseDemo",sep=""))
 
 #perform a routine analysis using a wrapper function
 analyseRuns(sfiles)

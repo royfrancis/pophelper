@@ -1,5 +1,5 @@
-#pophelper v1.1.2
-#17-Sep-2015
+#pophelper v1.1.3
+#27-Sep-2015
 #Functions
 
 #load or install required libraries
@@ -1226,7 +1226,6 @@ runsToDfTess <- function(files = NA)
   if (number>1) {return(dlist)} else{return(dframe)}
 }
 
-
 # FUNCTION collectRunsTess
 #' Collect TESS cluster run files from multiple folders
 #' @description Collect TESS cluster run files from multiple folders to one folder and rename by run
@@ -2147,15 +2146,33 @@ plotMultiline <- function(files = NA, spl = NA, lpp = NA, popcol = NA, na.rm = F
     if (chk == "TESS") df1 <- runsToDfTess(files = files[i])
     
     #read TAB files
-    if (chk == "UNIDENTIFIED") 
+    if (chk == "TAB") 
     {
-      df1 <- read.table(files[i], header = F, sep = "\t", dec = ".", quote = "")
-      if (class(df1) != "data.frame") stop("Incorrect input file type.\n")
-      nrow1 <- length(df1$V1)/length(levels(factor(as.character(df1$V1))))
-      df1$tab <- rep(1:nrow1, each = length(levels(factor(as.character(df1$V1)))))
-      df1 <- df1[, -c(1, length(df1)-1)]
-      colnames(df1)[1:length(df1)-1] <- paste("Cluster", 1:(length(df1)-1), sep = "")
-      df1 <- split(df1[, -length(df1)], df1$tab)
+#       df1 <- read.table(files[i], header = F, sep = "\t", dec = ".", quote = "")
+#       if (class(df1) != "data.frame") stop("Incorrect input file type.\n")
+#       nrow1 <- length(df1$V1)/length(levels(factor(as.character(df1$V1))))
+#       df1$tab <- rep(1:nrow1, each = length(levels(factor(as.character(df1$V1)))))
+#       df1 <- df1[, -c(1, length(df1)-1)]
+#       colnames(df1)[1:length(df1)-1] <- paste("Cluster", 1:(length(df1)-1), sep = "")
+#       df1 <- split(df1[, -length(df1)], df1$tab)
+      
+
+      df1 <- read.table(files[i],header = F, sep = "", dec = ".", quote = "",stringsAsFactors=F)
+      if (class(df1)!="data.frame") stop("Input is not a dataframe. Incorrect input file type.\n")
+      df1$V1 <- factor(df1$V1)
+      Ind <- as.numeric(as.character(length(levels(df1[, 1]))))
+      numruns <- as.numeric(as.numeric(nrow(df1))/Ind)
+      df1 <- df1[, -c(1, ncol(df1))]
+      colnames(df1)[1:length(df1)] <- paste("Cluster", 1:(length(df1)), sep = "")
+      numk <- ncol(df1)
+      df1$run <- rep(1:numruns,each=Ind)
+      df1 <- split(df1[, -length(df1)], df1$run)
+      
+    }
+    
+    if (chk == "UNIDENTIFIED")
+    {
+      stop("Input file type is unidentified.")
     }
     
     #determine if df1 is list or dataframe
@@ -2211,17 +2228,18 @@ plotMultiline <- function(files = NA, spl = NA, lpp = NA, popcol = NA, na.rm = F
       coll <- popcol
       if (is.na(popcol)) coll <- pophelper::getColours(ncol(dff))
       
-      dff$rows <- factor(c(rep(1:numrows, each = spl1), rep(nr2, each = numextra)))
       dff$ind <- as.factor(as.numeric(1:nr1))
+      dff$rows <- factor(c(rep(1:numrows, each = spl1), rep(nr2, each = numextra)))
+      
       #dff$line <- as.factor(c(rep(1:spl1, numrows), 1:numextra))
       
       #split and plot rows
-      dlist <- split(dff, dff$rows)
+      dlist <- split(dff[,-ncol(dff)], dff$rows)
       plist <- vector("list",length = nr2)
       #widthsvec <- vector(length = nr2)
       for (i in 1: nr2)
       {
-        df2 <- reshape2::melt(dlist[[i]], id.var = c("ind", "rows"))
+        df2 <- reshape2::melt(dlist[[i]], id.var = c("ind"))
         plist[[i]] <- ggplot2::ggplot(data = df2, aes(x = ind, y = value, fill = variable))+
           geom_bar(width = barwidth, space = barspace, stat = "identity", position = "stack", na.rm = na.rm)+
           scale_x_discrete(expand = c(0, 0))+
@@ -3013,6 +3031,6 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
 # removed dependency on plyr. faster code. summariseRunsX
 
 .onLoad <- function(...) {
-    packageStartupMessage("** pophelper v1.1.1 loaded.\n** Note that in pophelper v1.1.1, output format from summariseRunsStructure() and summariseRunsTess() are different from previous version before v1.1.0. Consequently, input requirements for evannoMethodStructure are also different.\n** See NEWS for more detailed changes.\n** help(package='pophelper')")
+    packageStartupMessage("pophelper v1.1.3 loaded.\n")
 }
 

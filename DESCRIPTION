@@ -1,8 +1,8 @@
 Package: pophelper
 Type: Package
 Title: Tabulate, analyse and plot STRUCTURE and TESS output files
-Version: 1.1.1
-Date: 2015-03-31
+Version: 1.1.3
+Date: 2015-09-27
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
