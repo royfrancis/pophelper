@@ -371,7 +371,6 @@ tabulateRunsTess <- function(files = NULL, writetable = FALSE, sorttable = TRUE,
 #' probability of data minus standard deviation.
 #' @seealso \code{\link{summariseRunsTess}}
 # @import xlsx
-# @import plyr
 #' @export
 #' 
 summariseRunsStructure <- function(data = NULL, writetable = FALSE)
@@ -396,7 +395,6 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  #data1 <- plyr::ddply(data,.(loci,ind,k),runs = as.numeric(table(k)),elpdmean = mean(elpd,na.rm = T) ,elpdsd = sd(elpd,na.rm = T),elpdmin = min(elpd,na.rm = T),elpdmax = max(elpd,na.rm = T),here(summarise))
   data1 <- aggregate(elpd ~ loci + ind + k,data = data,sum)[,-4]
   data1$runs <- as.numeric(table(data$k))
   data2 <- aggregate(elpd ~ loci + ind + k,data = data,FUN=function(x) c(elpdmean =mean(x,na.rm = T), elpdsd=sd(x,na.rm = T),elpdmin = min(x,na.rm = T),elpdmax = max(x,na.rm = T) ) )[,-c(1:3)]
@@ -430,7 +428,6 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
 #' @return Returns a dataframe with all values of K sorted by K. The table has 3 columns namely value of K, number of runs for each K and number of individuals.
 #' @seealso \code{\link{summariseRunsStructure}}
 # @import xlsx
-# @import plyr
 #' @export
 #' 
 summariseRunsTess <- function(data = NULL, writetable = FALSE)
@@ -452,7 +449,6 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
   #check
   if (nrow(data) < 2) stop("At least 2 runs are required for this function.\n")
   
-  #data1 <- plyr::ddply(data,.(ind,k),runs = as.numeric(table(k)),summarise)
   data1 <- aggregate(. ~ ind + k,data = data,sum)[,-3]
   data1$runs <- as.numeric(table(data$k))
 
@@ -510,7 +506,7 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
 #' the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 
 #' 2611-2620. The Evanno plot generated from this function can be recreated 
 #' from the returned dataframe if furthur customisation is required.
-# @import xlsx
+#  @import xlsx
 #' @import grid
 #' @import gridExtra
 #' @export
@@ -726,7 +722,7 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, exportplot = 
     #plot 3
     plist[[3]] <- ggplot2::ggplot(data, aes(x = k, y = lnk2))+
       geom_path(colour = plotcol1, size = base_size*0.04, na.rm = na.rm)+
-      geom_point(colour = plotcol1, fill = plotcol1,, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
+      geom_point(colour = plotcol1, fill = plotcol1, size = base_size*0.3, shape = pointsh, na.rm = na.rm)+
       geom_errorbar(aes(x = k, ymax = lnk2max, ymin = lnk2min, width = 0.2), 
                     size = base_size*0.04, colour = plotcol, na.rm = na.rm)+
       theme_bw(base_size = base_size)+

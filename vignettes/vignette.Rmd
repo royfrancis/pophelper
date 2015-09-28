@@ -1,4 +1,12 @@
-# pophelper v1.1.2  
+---
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pophelper Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# Pophelper v1.1.2
 
 __Roy M Francis__ | 17-Sep-2015
 
@@ -82,7 +90,9 @@ PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/table 
 plotRunsInterpolate()     # Spatially interpolate clusters from a STRUCTURE/TESS run file
 plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 
-analyseRuns()             # A wrapper function to quickly tabulate, summarise, perform evanno method, clumpp output and generate barplots from STRUCTURE or TESS run files.
+analyseRuns()             # A wrapper function to quickly tabulate, summarise, 
+                          # perform evanno method, clumpp output and 
+                          # generate barplots from STRUCTURE or TESS run files.
 ```
 
 ----
@@ -91,10 +101,10 @@ analyseRuns()             # A wrapper function to quickly tabulate, summarise, p
 
 In this section, we will look at how these functions are used, their syntax, usage and typical workflow. The `pophelper` library must be loaded and a working directory must be set.
 
-![Workflow Structure](smallfigs/WorkflowScheme-01.jpg)  
+![Workflow Structure](WorkflowScheme-01.jpg)  
 __Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
-![Workflow Tess](smallfigs/WorkflowScheme-02.jpg)  
+![Workflow Tess](WorkflowScheme-02.jpg)  
 __Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 __4.1 collectRunsTess__  
@@ -117,7 +127,7 @@ The function `tabulateRunsStructure()` and `tabulateRunsTess()` can be used to s
 
 A typical STRUCTURE run produces a large number of output run files as seen below.  
 
-![Structure runs view](smallfigs/Fig1.jpg)  
+![Structure runs view](Fig1.jpg)  
 __Fig. 3.__ *Typical view of Structure output run files.*
 
 For this tutorial, we will use the sample structure files accompanied with this library.
@@ -138,7 +148,7 @@ tabulateRunsStructure(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
 # Result table is sorted by loci, ind and k. To see original order, set sorttable=FALSE
 ```
 
-```{r,echo=TRUE}
+```{r,echo=TRUE, eval=FALSE}
 slist <- list.files(path=system.file("/files/structure",package="pophelper"),full.names=T)
 tr1 <- tabulateRunsStructure(files=slist)
 
@@ -176,7 +186,7 @@ head(sr1)
 head(sr2)
 ```
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE}
+```{r,echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 # basic usage
 sr1 <- summariseRunsStructure(data=tr1)
 sr2 <- summariseRunsTess(tr2)
@@ -224,7 +234,7 @@ em <- evannoMethodStructure(data=sr1,exportplot=F)
 evannoMethodStructure(data=sr1,exportplot=T,writetable=T,na.rm=T)
 ```
 
-![evannoMethod](smallfigs/Fig2.jpg)  
+![evannoMethod](Fig2.jpg)  
 __Fig. 4.__ *Plots produced from the Evanno method.*
 
 The Evanno method can be computed only if these criteria are met: At least 3 values of *K* must be available, values of *K* must be sequential (ie; there must not be missing values of *K*), number of individuals and loci must be same in all runs. If number of repeats for any *K* is less than 2, then results may not be reliable. In case the Evanno method cannot be computed, a plot of ELPD over K is produced referred to as the kPlot.
@@ -245,7 +255,7 @@ rtd1 <- runsToDfStructure(files=choose.files(multi=TRUE))
 rtd2 <- runsToDfTess(files=choose.files(multi=TRUE))
 ```
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE, eval=FALSE}
 # convert all input files
 rtd1 <- runsToDfStructure(files=slist)
 # check class of ouput
@@ -265,7 +275,7 @@ __4.6 clumppExportStructure/clumppExportTess__
 
 When multiple repeats are run for each *K* in STRUCTURE, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^3^, see references.
 
-![clumpp folder preview](smallfigs/Fig3.jpg)  
+![clumpp folder preview](Fig3.jpg)  
 __Fig. 5.__ *Folders created from clumpp export and the contents of each folder.*
 
 The functions `clumppExportStructure()` and `clumppExportTess()` takes multiple STRUCTURE and TESS files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The name for the folder can be change optionally if required using the argument `prefix="something"`.
@@ -292,7 +302,7 @@ clumppExportStructure(files=slist,prefix="Set1")
 
 The CLUMPP executable can be copied and pasted into each of these folder and run by double clicking on it. This generates three output files: aligned file, merged file and misc file. This step must be carried out manually in all folders to follow the rest of this tutorial.
 
-![clumpp folder results](smallfigs/Fig4.jpg)  
+![clumpp folder results](Fig4.jpg)  
 __Fig. 6.__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
 
 The aligned file contains all the runs in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
@@ -331,7 +341,7 @@ __4.8 plotRuns__
 
 The function `plotRuns()` is used to create barplots from STRUCTURE run files, TESS run files, combined files, aligned files or merged files. When plotting STRUCTURE or TESS run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figure. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
 
-![plotRuns Overview](smallfigs/plotRunsOverview.jpg) 
+![plotRuns Overview](plotRunsOverview.jpg) 
 __Fig 7.__ *An overview of the components of a plot from the function plotRuns() and the arguments used to modify them.*
 
 The default usage below (usage 1) creates barplots of all selected files individually/separately.
@@ -367,12 +377,12 @@ plotRuns(files=slist[3:4], imgoutput="join", popcol=c("coral","steelblue",
 +"lightblue","purple","orange"))
 ```
 
-![plotRuns sample1](smallfigs/Fig5.jpg)  
+![plotRuns sample1](Fig5.jpg)  
 __Fig. 8.__ *(A) Left: Single run plotted separately. (B) Right: Two runs joined together in one image.*
 
 Population labels can be added to this barplot by providing a vector of labels. The length must be equal to the number of individuals. In this demonstration, we will use the labels table in the `pophelper` library. In case of separate plots and joined plots, the labels are shown only once at the bottom of the plot.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval=FALSE}
 # read labels for STRUCTURE runs
 pops <- read.delim(system.file("files/structurepoplabels.txt", package="pophelper"), 
                    header=F)
@@ -417,7 +427,7 @@ lab1 <- as.factor(paste(as.character(pops$V1),c(rep("Group 1",107), rep("Group 2
 plotRuns(files=slist[1:2], imgoutput="join", poplab=lab1, labpos=0.1, labpanelheight=0.6,labsize=1.2, flabsize=3)
 ```
 
-![plotRuns with labels](smallfigs/Fig6.jpg)  
+![plotRuns with labels](Fig6.jpg)  
 __Fig. 9.__ *(A) Left: Single run plotted separately with pop labels. (B) Right: Two runs joined together in one image with pop labels.*
 
 In similar manner, the `plotsRuns` function can be used to plot from combined, aligned or merged files. For this set argument `imgoutput="tab"`.
@@ -442,7 +452,7 @@ plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1)
 plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1, height=1.4, width=6)
 ```
 
-![plotRuns with labels](smallfigs/Fig7.jpg)  
+![plotRuns with labels](Fig7.jpg)  
 __Fig. 10.__ *(A) Left: Combined files (Three STRUCTURE runs for K=4). (B) Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). (C) Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP)*
 
 `plotRuns()` function has numerous arguments to tweak the plot as required. See `?plotRuns` for more arguments and descriptions. When using `plotRuns()` with `imgoutput="join"` and using labels, the lowest plot is different in height and margins. This is a known bug and there is currently no solution. Note that this function can be a bit slow.
@@ -473,10 +483,10 @@ plotMultiline(tabs1[1],spl=75,lpp=2,indlabs=T,yaxislabs=T,ticks=T,height=5,width
 plotMultiline(tabs1[1],spl=38,height=8,width=14)
 ```
 
-![plotRuns with labels](smallfigs/Fig8.jpg)  
+![plotRuns with labels](Fig8.jpg)  
 __Fig. 11.__ *Left: Default output from `plotMultiline`. Right: Modified output.*
 
-![Multiple colours](smallfigs/Fig9.jpg)  
+![Multiple colours](Fig9.jpg)  
 __Fig. 12.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
 
 Note that this  function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
@@ -515,7 +525,7 @@ plotRunsInterpolate(datafile=s1,coordsfile=cd2,height=15,width=22,legendsize=0.4
 
 The default interpolation algorithm is Kriging (`method="krig"`). By default, `exportplot=T` exports an image to the working directory. By default `clusters=NA` which means that all clusters in the file are plotted. By default, `imgoutput="join"`, therefore all clusters are plotted in a single figure. The default `gridsize=60` produces rather pixellated grids. Increase gridsize to produce finer grid but at a higher computational cost.
 
-![Interpolation sample 1](smallfigs/Fig10.jpg)  
+![Interpolation sample 1](Fig10.jpg)  
 __Fig. 13.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
 
 We can choose only cluster 2 and try out different interpolation methods. Five methods are currently implemented: bilinear, bicubic, inverse distance weighting, nearest neighbour and kriging. Kriging is predictive while others are essentially direct spatial interpolation.
@@ -540,7 +550,7 @@ dev.off()
 
 We specify `clusters=2` which plots only cluster 2. The `dataout=T` allows to save the ggplot plot object to a variable and then modify them or combine with other plots. Due to `exportplot=F`, no plots are exported.
 
-![Interpolation sample 2](smallfigs/Fig11.jpg)  
+![Interpolation sample 2](Fig11.jpg)  
 __Fig. 14.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
 
 The colours can be easily changed by feeding in required colours to the argument `colours`. The R package `RColorBrewer` has a wide range of nice colours.
@@ -563,7 +573,7 @@ grid.arrange(p1[[1]],p1[[2]],p2[[1]],p3[[1]],ncol=4)
 dev.off()
 ```
 
-![Interpolation sample 3](smallfigs/Fig12.jpg)  
+![Interpolation sample 3](Fig12.jpg)  
 __Fig. 15.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3^rd^ plot is `brewer.pal(8,"Spectral")` and 4^th^ plot is `brewer.pal(8,"BuPu")`.*  
 
 __4.11 plotRunsSpatial__  
@@ -605,7 +615,7 @@ png("PlotRunsSpatial.png",height=20,width=20,res=250,units="cm",type="cairo")
 grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
 dev.off()
 ```
-![plotRunsSpatial sample 1](smallfigs/Fig13.jpg)  
+![plotRunsSpatial sample 1](Fig13.jpg)  
 __Fig. 16.__ *Some of the plots created using the function `plotRunsSpatial()`. Fig 1: The basic usage of the function with title added `plottitle="Fig 1"`. Fig 2: The ellipses are turned off `ellipse=F` and the point shape is changed `pointtype=15` and transparency added to points `pointtransp=0.4`. Fig 3: Convex hulls are turned on `chull=T` and coordinates are transformed to UTM `setutm=T`. The points shapes are based on clusters `pointtype=NA`. Custom colours are used `brewer.pal(5,"Dark2")` and axis are shown `showaxis=T`. Fig 4: Convex hull transparency is lowered `chulltransp=0.2`, convex hull linetype is changed `chulltype=3`, legend labels are changed `legendlabels=c("PopA","PopB","PopC","PopD","PopE")`. Custom colours are used `brewer.pal(5,"Set1")`.*  
 
 __4.12 analyseRuns__  
