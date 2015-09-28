@@ -50,6 +50,8 @@ getColours <- function(k)
     }
 }
 
+#-------------------------------------------------------------------------------
+
 # FUNCTION checkRuns
 #' Internal: Check if a selected run is STRUCTURE or TESS file.
 #' @description Check if a selected run is STRUCTURE or TESS file.
@@ -91,6 +93,8 @@ checkRuns <- function(files=NULL, warn =FALSE)
   }
   return(checkvec)
 }
+
+#-------------------------------------------------------------------------------
 
 # FUNCTION unitConverter
 #' Internal: Convert between dimension units
@@ -172,6 +176,8 @@ unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
   
   return(outvalue)
 }
+
+#-------------------------------------------------------------------------------
 
 #FUNCTION tabulateRunsStructure
 #' Tabulate STRUCTURE runs
@@ -281,6 +287,7 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
   return(main)
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION tabulateRunsTess
 #' Tabulate TESS runs
@@ -356,6 +363,7 @@ tabulateRunsTess <- function(files = NULL, writetable = FALSE, sorttable = TRUE,
   return(main)
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION summariseRunsStructure
 #' Summarise STRUCTURE runs
@@ -418,6 +426,7 @@ summariseRunsStructure <- function(data = NULL, writetable = FALSE)
   return(data1)
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION summariseRunsTess
 #' Summarise TESS runs
@@ -470,6 +479,7 @@ summariseRunsTess <- function(data = NULL, writetable = FALSE)
   return(data1)
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION evannoMethodStructure
 #' Perform the Evanno method
@@ -771,6 +781,7 @@ evannoMethodStructure <- function(data = NULL, writetable = FALSE, exportplot = 
   return(data)
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION clumppExportStructure
 #' Combine STRUCTURE runs and export files for use with software CLUMPP
@@ -944,6 +955,7 @@ clumppExportStructure <- function(files = NULL, prefix = NA, parammode = NA, par
   cat("Run completed.\n")
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION clumppExportTess
 #' Combine TESS runs and export files for use with software CLUMPP
@@ -1114,6 +1126,8 @@ clumppExportTess <- function(files = NULL, prefix = NA, parammode = NA, paramrep
   cat("Run completed.\n")
 }
 
+#-------------------------------------------------------------------------------
+
 # FUNCTION runsToDfStructure
 #' Convert STRUCTURE run files to R dataframes.
 #' @description Takes one or more STRUCTURE output files and converts each of 
@@ -1151,7 +1165,12 @@ runsToDfStructure <- function(files = NA)
     k <- as.numeric(as.character(base::gsub("\\D", "", grep("\\d populations assumed", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
     if (is.na(k)) cat(paste("Value of K is NA in file: ", name, sep = ""))
     
-    file1 <- file1[grep("\\d+\\s+\\S+\\s+\\S+\\s+\\S+\\s+:\\s+\\d+.",file1)]
+    #file1 <- file1[grep("\\d+\\s+\\S+\\s+\\S+\\s+\\S+\\s+:\\s+\\d+.",file1)]
+    
+    cstart <- charmatch("Inferred ancestry of individuals", file1)
+    cend <- charmatch("Estimated Allele Frequencies in each", file1)
+    file1 <- file1[(cstart+2):(cend-1)]
+    
     file_a <- file1[file1 != ""]
     rm(file1)
     file_b <- base::gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
@@ -1167,7 +1186,7 @@ runsToDfStructure <- function(files = NA)
   if (number>1) {return(dlist)} else{return(dframe)}
 }
 
-
+#-------------------------------------------------------------------------------
 
 # FUNCTION runsToDfTess
 #' Convert TESS cluster files to R dataframe.
@@ -1220,6 +1239,8 @@ runsToDfTess <- function(files = NA)
   if (number>1) {return(dlist)} else{return(dframe)}
 }
 
+#-------------------------------------------------------------------------------
+
 # FUNCTION collectRunsTess
 #' Collect TESS cluster run files from multiple folders
 #' @description Collect TESS cluster run files from multiple folders to one folder and rename by run
@@ -1262,6 +1283,8 @@ collectRunsTess <- function(runsdir = NA, newdir = NA, quiet = FALSE)
   if (quiet == FALSE | quiet == "F" | quiet == "FALSE") cat(paste(k, " TESS cluster files copied and renamed.\n"))
   return(c(k, l))
 }
+
+#-------------------------------------------------------------------------------
 
 # FUNCTION collectClumppOutput
 #' Collect CLUMPP output files from multiple folders
@@ -1315,6 +1338,8 @@ collectClumppOutput <- function(prefix = "STRUCTUREpop", filetype = "aligned", r
   if (quiet == FALSE | quiet == "F" | quiet == "FALSE") cat(paste("Directories processed: ", k, "\nFiles copied: ", l, "\n"))
   return(c(k, l))
 }
+
+#-------------------------------------------------------------------------------
 
 #FUNCTION getDim
 #' Internal: Get dimensions for figures.
@@ -1392,6 +1417,8 @@ getDim <- function(ind=NA, units = NA, height = NA, width = NA, res = NA, imgtyp
   return(lst)
 }
 
+#-------------------------------------------------------------------------------
+
 # FUNCTION getPlotParams
 #' Internal: Generate parameters for plots with labels
 #' @description Generates various parameters required for plotting with labels. Internal function.
@@ -1460,6 +1487,7 @@ getPlotParams <- function(poplab = NA, plotnum = 1, labsize = NA, labangle = NA,
   return(dlist)
 }
 
+#-------------------------------------------------------------------------------
 
 # FUNCTION plotRuns
 #' Plot STRUCTURE, TESS or table files as barplots.
@@ -2080,6 +2108,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
   }
 }
 
+#-------------------------------------------------------------------------------
 
 # FUNCTION plotMultiline
 #' Plot STRUCTURE/TESS/table run files in multiline
@@ -2298,6 +2327,7 @@ plotMultiline <- function(files = NA, spl = NA, lpp = NA, popcol = NA, na.rm = F
   }
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION analyseRuns
 #' Analyse STRUCTURE or TESS runs. Wrapper around several smaller functions.
@@ -2348,6 +2378,7 @@ analyseRuns <- function(files = NULL, evannoMethod = TRUE, clumppExport = TRUE, 
   }
 }
 
+#-------------------------------------------------------------------------------
 
 #FUNCTION detrmineRowsAndCols
 #' Internal: Determine rows and columns for arbitrary number of plots
@@ -2381,6 +2412,8 @@ determineRowsAndCols <- function(numplots = NA)
   if (numplots == 20) return(c(4,5))
   if (numplots>20) stop("Number of clusters > 20. Specify number of rows and columns for figures manually using the option nrow and ncol arguments.\n")
 }
+
+#-------------------------------------------------------------------------------
 
 #FUNCTION llToUtm
 #' Internal: Find UTM zone from a latitude and longitude
@@ -2418,6 +2451,8 @@ llToUtmzone <- function(lat,long)
   
   return(list(UTMZone = utm,Hemisphere = hem))
 }
+
+#-------------------------------------------------------------------------------
 
 #FUNCTION Interpolate STRUCTURE and TESS runs spatially
 #' Interpolate STRUCTURE and TESS runs spatially
@@ -2714,6 +2749,8 @@ plotRunsInterpolate<- function(datafile = NULL, coordsfile = NULL,method = "krig
   if (dataout == TRUE) return(plist)
 }
 
+#-------------------------------------------------------------------------------
+
 #FUNCTION ellipseCI
 #' Internal: ellipseCI
 #' @description Calculate ellipse for bivariate quantile
@@ -2743,6 +2780,8 @@ ellipseCI <- function(x,y,conf = 0.95,np = 100)
   colnames(t1) <- c("x","y")
   return(t1)
 }
+
+#-------------------------------------------------------------------------------
 
 #FUNCTION plotRunsSpatial
 #' plotRunsSpatial
@@ -3024,7 +3063,9 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
 
 # removed dependency on plyr. faster code. summariseRunsX
 
+#-------------------------------------------------------------------------------
+#ON LOAD
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.1.4 loaded.\n")
+    packageStartupMessage("pophelper v1.1.4 ready.\n")
 }
 

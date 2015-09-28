@@ -13,12 +13,12 @@ Description: A set of useful functions for processing output files from the
     interpolation using geographical coordinates.
 URL: https://github.com/royfrancis/pophelper
 Depends:
-    R(>= 3.1.0),
-    Cairo
+    R(>= 3.1.2),
+    Cairo,
+    ggplot2
 Imports: 
     akima,
     fields,
-    ggplot2,
     grid,
     gridExtra,
     gtable,

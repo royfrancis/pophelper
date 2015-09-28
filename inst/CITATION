@@ -1,7 +1,7 @@
 citHeader("To cite the pophelper package, please use:")
  
 bibentry(bibtype = "Manual",
-  title = "pophelper: An R package for analysis of STRUCTURE and TESS files",
+  title = "pophelper: An R package for analysis of population structure",
   author = "Roy Mathew Francis",
   year = "2015",
   note = "R package version 1.1.4"
