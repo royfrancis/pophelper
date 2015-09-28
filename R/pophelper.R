@@ -1165,11 +1165,13 @@ runsToDfStructure <- function(files = NA)
     k <- as.numeric(as.character(base::gsub("\\D", "", grep("\\d populations assumed", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
     if (is.na(k)) cat(paste("Value of K is NA in file: ", name, sep = ""))
     
-    #file1 <- file1[grep("\\d+\\s+\\S+\\s+\\S+\\s+\\S+\\s+:\\s+\\d+.",file1)]
-    
-    cstart <- charmatch("Inferred ancestry of individuals", file1)
-    cend <- charmatch("Estimated Allele Frequencies in each", file1)
-    file1 <- file1[(cstart+2):(cend-1)]
+    file1 <- file1[grep(".+\\(\\d+\\).+\\:.+",file1)]
+    if(length(file1) == 0)
+    {
+      cstart <- charmatch("Inferred ancestry of individuals", file1)
+      cend <- charmatch("Estimated Allele Frequencies in each", file1)
+      file1 <- file1[(cstart+2):(cend-1)]
+    }
     
     file_a <- file1[file1 != ""]
     rm(file1)
