@@ -3029,6 +3029,6 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,expor
 # removed dependency on plyr. faster code. summariseRunsX
 
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.1.3 loaded.\n")
+    packageStartupMessage("pophelper v1.1.4 loaded.\n")
 }
 
