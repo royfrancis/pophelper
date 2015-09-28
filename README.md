@@ -55,53 +55,53 @@ A long demo script with usage of all functions, see [here](https://github.com/ro
 
 ## Functions and workflow 
 
-![Workflow Structure](screenshots/WorkflowScheme-01.jpg)  
+![Workflow Structure](vignettes/WorkflowScheme-01.jpg)  
 __Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
-![Workflow Tess](screenshots/WorkflowScheme-02.jpg)  
+![Workflow Tess](vignettes/WorkflowScheme-02.jpg)  
 __Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
-![Evanno Method](screenshots/Fig2.jpg)  
+![Evanno Method](vignettes/Fig2.jpg)  
 __Fig 3.__ *Plots from Evanno Method.*
 
-![CLUMPP results and the contents of each folder](screenshots/Fig3.jpg) 
+![CLUMPP results and the contents of each folder](vignettes/Fig3.jpg) 
 __Fig 4.__ *Folders created from CLUMPP export and the contents of each folder.*
 
-![CLUMPP results aligned file merged file and misc file](screenshots/Fig4.jpg)  
+![CLUMPP results aligned file merged file and misc file](vignettes/Fig4.jpg)  
 __Fig 5.__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
 
-![plotRuns Overview](screenshots/plotRunsOverview.jpg) 
+![plotRuns Overview](vignettes/plotRunsOverview.jpg) 
 __Fig 6.__ *An overview of the components of a plot from the function plotRuns() and the arguments used to modify them.*
 
-![plotRuns example 1](screenshots/Fig5.jpg)  
+![plotRuns example 1](vignettes/Fig5.jpg)  
 __Fig 7.__ *Left: Single run plotted separately. Right: Two runs joined together in one image.*  
 
-![plotRuns example 2](screenshots/Fig6.jpg)  
+![plotRuns example 2](vignettes/Fig6.jpg)  
 __Fig 8.__ *Left: Single run plotted separately with pop labels. Right: Two runs joined together in one image with pop labels.*
 
-![PlotRuns example 3](screenshots/Fig7.jpg)  
+![PlotRuns example 3](vignettes/Fig7.jpg)  
 __Fig 9.__ *Left: Combined files (Three STRUCTURE runs for K=4). Middle: Aligned files (Three STRUCTURE runs for K=4 aligned using CLUMPP). Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP).*  
 
-![plotMultiline example](screenshots/Fig8.jpg)  
+![plotMultiline example](vignettes/Fig8.jpg)  
 __Fig 10.__ *Left: `plotMultiline` default output. Right: Modified output where samples per line and lines per page were defined manually.*
 
-![Multiple colours](screenshots/Fig9.jpg)  
+![Multiple colours](vignettes/Fig9.jpg)  
 
 __Fig 11.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
 
-![Interpolation sample 1](screenshots/Fig10.jpg)  
+![Interpolation sample 1](vignettes/Fig10.jpg)  
 
 __Fig 12.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
 
-![Interpolation sample 2](screenshots/Fig11.jpg)  
+![Interpolation sample 2](vignettes/Fig11.jpg)  
 
 __Fig 13.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
 
-![Interpolation sample 3](screenshots/Fig12.jpg)  
+![Interpolation sample 3](vignettes/Fig12.jpg)  
 
 __Fig 14.__ *Interpolation plots showing some of the available colour palettes.*  
 
-![plotRunsSpatial sample 1](screenshots/Fig13.jpg)  
+![plotRunsSpatial sample 1](vignettes/Fig13.jpg)  
 
 __Fig 15.__ *Some of the plots created using the function `plotRunsSpatial()`.*  
 
