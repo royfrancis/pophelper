@@ -18,6 +18,6 @@ Returns a dataframe with all values of K sorted by K. The table has 3 columns na
 Creates a summary table of several TESS runs with k, number of runs and individuals.
 }
 \seealso{
-\code{\link{summariseRunsStructure}}
+\code{\link{summariseRunsStructure}}, \code{\link{summariseRunsAdmixture}}
 }
 

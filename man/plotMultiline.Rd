@@ -4,7 +4,7 @@
 \alias{plotMultiline}
 \title{Plot STRUCTURE/TESS/table run files in multiline}
 \usage{
-plotMultiline(files = NA, spl = NA, lpp = NA, popcol = NA,
+plotMultiline(files = NULL, spl = NA, lpp = NA, popcol = NA,
   na.rm = FALSE, barwidth = 0.9, barspace = 0.1, ticks = FALSE,
   yaxislabs = FALSE, indlabs = TRUE, labsize = 5, labangle = 90,
   labvjust = 0.5, labhjust = 1, imgtype = "png", height = NA,

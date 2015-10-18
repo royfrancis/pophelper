@@ -4,7 +4,7 @@
 \alias{runsToDfStructure}
 \title{Convert STRUCTURE run files to R dataframes.}
 \usage{
-runsToDfStructure(files = NA)
+runsToDfStructure(files = NULL)
 }
 \arguments{
 \item{files}{A character or character vector of one or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)}
@@ -19,6 +19,6 @@ Takes one or more STRUCTURE output files and converts each of
 them to separate dataframes.
 }
 \seealso{
-\code{\link{runsToDfTess}}
+\code{\link{runsToDfTess}}, \code{\link{runsToDfAdmixture}}
 }
 

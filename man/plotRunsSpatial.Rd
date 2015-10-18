@@ -15,10 +15,10 @@ plotRunsSpatial(datafile = NULL, coordsfile = NULL, popcol = NA,
   plottitle = NULL, filename = NA, setutm = FALSE, dataout = FALSE)
 }
 \arguments{
-\item{datafile}{One STRUCTURE or TESS output file. Input is either a character
+\item{datafile}{One STRUCTURE, TESS or ADMIXTURE output file. Input is either a character
 or a dataframe. If character, then a path pointing to location of the datafile. Can use
-`choose.files()`. If a dataframe, then an output from `runsToDfStructure()` or `
-runsToDfTess()`.}
+\code{choose.files()}. If a dataframe, then an output from \code{runsToDfStructure()},
+\code{runsToDfTess()} or \code{runsToDfAdmixture}.}
 
 \item{coordsfile}{A character or a dataframe. If character, then a path pointing
 to location of the coordsfile. It must be a tab-delimited text file with x and y
@@ -29,17 +29,17 @@ longitude latitude (LL) decimals.}
 
 \item{popcol}{A vector of colours for the clusters. R colour names or hexadecimal
 values. If NA, colours are automatically generated. K 1 to 12 are custom unique
-colours while K>12 are coloured by function rich.color().}
+colours while K>12 are coloured by function \code{rich.color()}.}
 
 \item{exportplot}{If set to FALSE, no image is exported.}
 
 \item{imgtype}{A character indicating the export format for figures. Options are "png", "jpeg" or "pdf".
 If pdf, height and width must be in inches and res argument is ignored (set to 300).}
 
-\item{height}{A numeric indicating the height of export figure. Default in cm unless units are changed. If `imgtype`
+\item{height}{A numeric indicating the height of export figure. Default in cm unless units are changed. If \code{imgtype}
 is pdf, then height must be in inches.}
 
-\item{width}{A numeric indicating the the width of export figure. Default in cm unless units are changed. If `imgtype`
+\item{width}{A numeric indicating the the width of export figure. Default in cm unless units are changed. If \code{imgtype}
 is pdf, then height must be in inches.}
 
 \item{units}{A character indicating the units of measurement for figure dimensions. "cm", "mm" or "in".}
@@ -106,11 +106,11 @@ of the longitude within the dataset is used to determine the UTM zone.}
 This output can be modified using \code{ggplot} themes() for more figure control if required.}
 }
 \value{
-If dataout = T, a list of one or more \code{ggplot} gtable output is returned for more theme
+If \code{dataout = T}, a list of one or more \code{ggplot} gtable output is returned for more theme
 control if required.
 }
 \description{
-Plot STRUCTURE or TESS runs spatial and colour by population clusters
+Plot STRUCTURE, TESS or ADMIXTURE runs spatial and colour by population clusters
 }
 \details{
 The coordinates must always be provided as standard longitude-latitude (LL) decimal

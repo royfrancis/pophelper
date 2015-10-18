@@ -23,6 +23,6 @@ probability of data minus standard deviation.
 Creates a summary table of several STRUCTURE runs with means and std deviation. Refer to return for detailed list of columns.
 }
 \seealso{
-\code{\link{summariseRunsTess}}
+\code{\link{summariseRunsTess}}, \code{\link{summariseRunsAdmixture}}
 }
 

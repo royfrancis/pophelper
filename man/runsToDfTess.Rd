@@ -4,7 +4,7 @@
 \alias{runsToDfTess}
 \title{Convert TESS cluster files to R dataframe.}
 \usage{
-runsToDfTess(files = NA)
+runsToDfTess(files = NULL)
 }
 \arguments{
 \item{files}{A character or character vector of one or more TESS cluster run files. Use \code{choose.files(multi = TRUE)}
@@ -22,6 +22,6 @@ them to separate dataframes.
 Use collectRunsTess() to collect TESS runs into one directory.
 }
 \seealso{
-\code{\link{runsToDfStructure}}
+\code{\link{runsToDfStructure}}, \code{\link{runsToDfAdmixture}}
 }
 

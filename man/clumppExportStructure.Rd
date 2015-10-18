@@ -27,7 +27,7 @@ named by population.
 \description{
 Takes multiple STRUCTURE runs and combines several repeats for
 each K into a single file along with a parameter file. The two output files
-are organised into folders by K. The CLUMPP.exe file can simply be copied to
+are organised into folders by K. The CLUMPP executable file can simply be copied to
 this folder and run to reorder the clusters for each K.
 }
 \details{
@@ -58,6 +58,6 @@ To find out more about parammode (algorithm type) and paramrep (repeats),
 refer to CLUMPP documentation.
 }
 \seealso{
-\code{\link{clumppExportTess}}
+\code{\link{clumppExportTess}}, \code{\link{clumppExportAdmixture}}
 }
 

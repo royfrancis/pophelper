@@ -1,23 +1,24 @@
-# pophelper 1.1.4
+# pophelper 1.1.5
 
-`pophelper` is an R package to help analyse output files generated from population analysis programs such as STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. 
+`pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` can be curently used to analyse output files generated from population analysis programs such as STRUCTURE, TESS and ADMIXTURE. The `pophelper` package can be used to tabulate runs, summarise runs, estimate K using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. 
 
-For a detailed demonstration, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials. New versions and updates are shown only on this GitHub page.
+For a detailed demonstration, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v115.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials. New versions and updates are shown only on this GitHub page.
 
 ## Installation  
 You need to have R (> 3.1.2) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
 
 ```coffee
+#install devtools package from CRAN
 install.packages('devtools',dep=T)
 library(devtools)
 
-#for the current stable version, use
+#install pophelper package from GitHub
 install_github('royfrancis/pophelper')
 
 #load library for use
 library(pophelper)
 ```
-__Web App__  
+## Web App   
 An online interactive version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
 
 ## List of Functions  
@@ -105,7 +106,7 @@ __Fig 14.__ *Interpolation plots showing some of the available colour palettes.*
 
 __Fig 15.__ *Some of the plots created using the function `plotRunsSpatial()`.*  
 
-For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v112.html).
+For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v115.html).
 
 ### Disclaimer
 

@@ -8,13 +8,13 @@ tabulateRunsStructure(files = NULL, writetable = FALSE, sorttable = TRUE,
   quiet = FALSE)
 }
 \arguments{
-\item{files}{A character vector of STRUCTURE output files to be tabulated. On windows, use \code{choose.files(multi = TRUE)} for interactive selection.}
+\item{files}{A character or vector of STRUCTURE output files to be tabulated. On windows, use \code{choose.files(multi = TRUE)} for interactive selection.}
 
-\item{writetable}{A logical T or F. Set to FALSE by default. Setting to TRUE writes the output table to the working directory.}
+\item{writetable}{A logical TRUE or FALSE. Set to FALSE by default. Setting to TRUE writes the output table to the working directory.}
 
-\item{sorttable}{A logical indicating if the output table needs to be sorted. Default set to T. Sorts table by loci, ind and K.}
+\item{sorttable}{A logical indicating if the output table needs to be sorted. Default set to TRUE. Sorts table by loci, ind and K.}
 
-\item{quiet}{A logical T or F. Set to FALSE by default to print number of selected files. If set to TRUE, then number of selected files are not printed.}
+\item{quiet}{A logical TRUE or FALSE. Set to FALSE by default to print number of selected files. If set to TRUE, then number of selected files are not printed.}
 }
 \value{
 Returns a dataframe with all runs sorted by loci, ind and K (if sorttable = T). The table has 10 columns namely file name, value of K, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, mean value of alpha, number of burn-in and number of repeats. Missing values are given NA.
@@ -26,6 +26,6 @@ Creates a table from STRUCTURE output files with various STRUCTURE parameters. R
 The row numbers of the output table denotes the file number selected. This is helpful if a particular file from the table needs to be identified in the selection vector.
 }
 \seealso{
-\code{\link{tabulateRunsTess}}
+\code{\link{tabulateRunsTess}}, \code{\link{tabulateRunsAdmixture}}
 }
 

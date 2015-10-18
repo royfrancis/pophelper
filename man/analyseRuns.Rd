@@ -2,14 +2,14 @@
 % Please edit documentation in R/pophelper.R
 \name{analyseRuns}
 \alias{analyseRuns}
-\title{Analyse STRUCTURE or TESS runs. Wrapper around several smaller functions.}
+\title{Analyse STRUCTURE, TESS or ADMIXTURE runs. Wrapper around several smaller functions.}
 \usage{
 analyseRuns(files = NULL, evannoMethod = TRUE, clumppExport = TRUE,
   plotRuns = TRUE, runsToDf = TRUE, imgoutput = "sep", poplab = NA,
   popcol = NA, writetable = TRUE, sorttable = TRUE, quiet = FALSE)
 }
 \arguments{
-\item{files}{A character or character vector of one or more STRUCTURE or TESS run files}
+\item{files}{A character or character vector of one or more STRUCTURE, TESS or ADMIXTURE run files}
 
 \item{evannoMethod}{A logical indicating if evanno method should be performed. Applies only to STRUCTURE runs.}
 
@@ -36,7 +36,7 @@ If a single file is selected, a single dataframe is returned. If
 multiple files are selected, a list with multiple dataframes is returned.
 }
 \description{
-A single function to analyse STRUCTURE or TESS runs. Performs tabulate, summarise, evanno method, clumpp export, plots runs and converts runs to an R object.
+A single function to analyse STRUCTURE, TESS or ADMIXTURE runs. Performs tabulate, summarise, evanno method, clumpp export, plots runs and converts runs to an R object.
 }
 \details{
 The function \code{analyseRuns} is a wrapper around several other \code{pophelper} functions. All arguments for all these other functions are not available. If more arguments/options are required, consider running the functions separately.

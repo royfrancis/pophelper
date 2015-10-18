@@ -6,9 +6,9 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-# Pophelper v1.1.2
+# Pophelper v1.1.5
 
-__Roy M Francis__ | 17-Sep-2015
+__Roy M Francis__ | 18-Oct-2015
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
 options(rpubs.upload.method = "internal")
@@ -21,27 +21,24 @@ library(pophelper)
   
 ### 1. Introduction
 
-This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from two programs used in the analysis of population structure: STRUCTURE^4^ and TESS^2^.
+This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as STRUCTURE^5^, TESS^3^ and ADMIXTURE^1^.
 
-The programs STRUCTURE and TESS are two popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.
+The programs STRUCTURE, TESS and ADMIXTURE are popular programs used to differentiate populations, to determine population structure and to reveal population assignment at an individual level using molecular markers. These programs use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions such as tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.
 
-This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.1.2 (2014-10-31)` on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
+This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.2.0 (2015-04-16)` on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
 
 ----
 
 ### 2. Installation
 
-The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.1.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code.
+The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.2.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code.
 
 ```{r,echo=TRUE,eval=FALSE,results='hide'}
-# Installation
+# Installation devtools package
 install.packages('devtools',dep=T)
 library(devtools)
 
-# for the current stable version v 1.1.2, use
-install_github('royfrancis/pophelper')
-
-# for previous stable version v1.0.4, use
+# Install the current version of pophelper
 install_github('royfrancis/pophelper')
 
 #load library
@@ -84,6 +81,11 @@ summariseRunsTess()       # Summarise runs by repeats for each K
 runsToDfTess()            # Convert TESS run files to R dataframe
 clumppExportTess()        # Export data file and parameter file for use with CLUMPP
 
+tabulateRunsAdmixture()   # Get a tabulation of several ADMIXTURE files
+summariseRunsAdmixture()  # Summarise runs by repeats for each K
+runsToDfAdmixture()       # Convert ADMIXTURE run files to R dataframe
+clumppExportAdmixture()   # Export data file and parameter file for use with CLUMPP
+
 collectClumppOutput()     # Collect CLUMPP output into a common folder
 plotRuns()                # Plot a barplot from STRUCTURE/TESS/table files
 PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/table file
@@ -92,7 +94,7 @@ plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 
 analyseRuns()             # A wrapper function to quickly tabulate, summarise, 
                           # perform evanno method, clumpp output and 
-                          # generate barplots from STRUCTURE or TESS run files.
+                          # generate barplots from STRUCTURE, TESS or ADMIXTURE run files.
 ```
 
 ----
@@ -102,10 +104,10 @@ analyseRuns()             # A wrapper function to quickly tabulate, summarise,
 In this section, we will look at how these functions are used, their syntax, usage and typical workflow. The `pophelper` library must be loaded and a working directory must be set.
 
 ![Workflow Structure](WorkflowScheme-01.jpg)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow. The admixture runs work similarly except for the `evannoMethod`*
 
 ![Workflow Tess](WorkflowScheme-02.jpg)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The analyseRuns() function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 __4.1 collectRunsTess__  
 
@@ -121,9 +123,9 @@ collectRunsTess(runsdir = choose.dir())
 
 Within each TESS run folder, the function searches for filename ending with 'TR.txt' as the cluster file. This file is copied to the new folder and renamed as the name of the respective run directory. Therefore, do not manually rename original run files or directories.
 
-__4.2 tabulateRunsStructure/tabulateRunsTess__  
+__4.2 tabulateRunsStructure/tabulateRunsTess/tabulateRunsAdmixture__  
 
-The function `tabulateRunsStructure()` and `tabulateRunsTess()` can be used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use. `tabulateRunsStructure()` is used for STRUCTURE run files and `tabulateRunsTess()` is used for TESS run files.
+The functions `tabulateRunsStructure()`, `tabulateRunsTess()` or `tabulateRunsAdmixture` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use. `tabulateRunsStructure()` is used for STRUCTURE run files, `tabulateRunsTess()` for TESS run files and `tabulateRunsAdmixture` for ADMIXTURE run files.
 
 A typical STRUCTURE run produces a large number of output run files as seen below.  
 
@@ -137,6 +139,7 @@ For this tutorial, we will use the sample structure files accompanied with this 
 # basic usage
 df <- tabulateRunsStructure(files=choose.files(multi=TRUE))
 df <- tabulateRunsTess(files=choose.files(multi=TRUE))
+df <- tabulateRunsAdmixture(files=choose.files(multi=TRUE))
 
 # another usage
 files = choose.files(multi=TRUE)
@@ -155,56 +158,53 @@ tr1 <- tabulateRunsStructure(files=slist)
 tlist <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
 tr2 <- tabulateRunsTess(files=tlist)
 
+alist <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=T)
+tr3 <- tabulateRunsTess(files=alist)
+
 # view output
 head(tr1)
 head(tr2)
+head(tr3)
 ```
 
 This function produces a tabulated result as seen above.
 
 The `tabulateRunsStructure()` function produces a table listing all selected files showing 10 columns namely file names, value of *K*, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, mean value of alpha, number of burn-in and number of repeats. The table is sorted by loci, ind and *K*. Missing values are given NA.
 
-The `tabulateRunsTess()` function returns a table with three columns namely filename, *K* and number of individuals.
+The `tabulateRunsTess()` and `tabulateRunsAdmixture` functions return a table with three columns namely filename, *K* and number of individuals.
 
-By default, the `tabulateRunsStructure()` and `tabulateRunsTess()` functions print the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
+By default, the `tabulateRunsStructure()`, `tabulateRunsTess()` and `tabulateRunsAdmixture` functions print the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.3 summariseRunsStructure/summariseRunsTess__  
+__4.3 summariseRunsStructure/summariseRunsTess/summariseRunsAdmixture__  
 
-The table produced using `tabulateRunsStructure()` or `tabulateRunsTess()` can be further collapsed by *K* based on number of runs. The output table from `tabulateRunsStructure()` or `tabulateRunsTess()` can be passed as input to `summariseRunsStructure()` and `summariseRunsTess()` respectively. 
+The table produced using `tabulateRunsStructure()`, `tabulateRunsTess()` or `tabulateRunsAdmixture` can be further collapsed by *K* based on number of runs. The output table from `tabulateRunsStructure()`, `tabulateRunsTess()` or `tabulateRunsAdmixture` can be passed as input to `summariseRunsStructure()`, `summariseRunsTess()` and `summariseRunsAdmixture` respectively. 
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 sr1 <- summariseRunsStructure(data=tr1)
 sr2 <- summariseRunsTess(tr2)
+sr3 <- summariseRunsTess(tr3)
 
 # another usage
 sr1 <- summariseRunsStructure(data=tabulateRunsStructure(files=choose.files(multi=TRUE)))
 sr2 <- summariseRunsTess(data=tabulateRunsTess(files=choose.files(multi=TRUE)))
+sr3 <- summariseRunsAdmixture(data=tabulateRunsAdmixture(files=choose.files(multi=TRUE)))
 
 # view output
 head(sr1)
 head(sr2)
-```
-
-```{r,echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
-# basic usage
-sr1 <- summariseRunsStructure(data=tr1)
-sr2 <- summariseRunsTess(tr2)
-
-# view output
-head(sr1)
-head(sr2)
+head(sr3)
 ```
 
 The `summariseRunsStructure()` function returns 6 columns namely Mean estimated ln probability of data, standard deviation, value of *K*, number of runs for each *K*, estimated ln probability of data plus standard deviation, estimated ln probability of data minus standard deviation.
 
-The `summariseRunsTess()` function returns 3 columns namely individuals, *K* and number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
+The `summariseRunsTess()` and `summariseRunsAdmixture()` functions return 3 columns namely individuals, *K* and number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
 
 __4.4 evannoMethodStructure__  
 
 The `evannoMethodStructure()` function is only applicable to STRUCTURE runs.
 
-The Evanno method^1^ is used to estimate the number of *K*. The method is based on Evanno *et al*., (2005) listed in references. The summarised runs table output from`summariseRunsStructure()` function can be input to `evannoMethodStructure()`. The `evannoMethodStructure()` function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument `exportplot=T`. The table can be written to file using `writetable=T`.
+The Evanno method^2^ is used to estimate the number of *K*. The method is based on Evanno *et al*., (2005) listed in references. The summarised runs table output from`summariseRunsStructure()` function can be input to `evannoMethodStructure()`. The `evannoMethodStructure()` function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument `exportplot=T`. The table can be written to file using `writetable=T`.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
@@ -241,18 +241,20 @@ The Evanno method can be computed only if these criteria are met: At least 3 val
 
 From the command above, a png file and text file is exported to the working directory. The peak of deltaK in __Fig. 4.__ plot (D) is usually used to estimate the best value of K.
 
-__4.5 runsToDfStructure/runsToDfTess__  
+__4.5 runsToDfStructure/runsToDfTess/runsToDfAdmixture__  
 
-STRUCTURE files or TESS files can be converted to R dataframes using the function `runsToDfStructure()` and `runsToDfTess()` respectively. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
+STRUCTURE, TESS or ADMIXTURE run files can be converted to R dataframes using the functions `runsToDfStructure()`, `runsToDfTess()` or `runsToDfAdmixture()` respectively. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 rtd1 <- runsToDfStructure(files=slist)
 rtd2 <- runsToDfTess(files=tlist)
+rtd3 <- runsToDfAdmixture(files=alist)
 
 # select files interactively
 rtd1 <- runsToDfStructure(files=choose.files(multi=TRUE))
 rtd2 <- runsToDfTess(files=choose.files(multi=TRUE))
+rtd3 <- runsToDfAdmixture(files=choose.files(multi=TRUE))
 ```
 
 ```{r,echo=TRUE, eval=FALSE}
@@ -271,23 +273,25 @@ head(rtd1[[1]])
 
 The dataframe contains the assignment probabilities of all individuals into *K* populations denoted as Cluster1, Cluster 2 etc.
 
-__4.6 clumppExportStructure/clumppExportTess__  
+__4.6 clumppExportStructure/clumppExportTess/clumppExportAdmixture__  
 
-When multiple repeats are run for each *K* in STRUCTURE, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^3^, see references.
+When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.
 
 ![clumpp folder preview](Fig3.jpg)  
 __Fig. 5.__ *Folders created from clumpp export and the contents of each folder.*
 
-The functions `clumppExportStructure()` and `clumppExportTess()` takes multiple STRUCTURE and TESS files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The name for the folder can be change optionally if required using the argument `prefix="something"`.
+The functions `clumppExportStructure()`, `clumppExportTess()` and `clumppExportAdmixture()` takes multiple STRUCTURE, TESS or ADMIXTURE files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The name for the folder can be change optionally if required using the argument `prefix="something"`.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 clumppExportStructure(files=slist)
 clumppExportTess(files=tlist)
+clumppExportTess(files=alist)
 
 # select files interactively
 clumppExportStructure(files=choose.files(multi=TRUE))
 clumppExportTess(files=choose.files(multi=TRUE))
+clumppExportAdmixture(files=choose.files(multi=TRUE))
 
 ?clumppExportStructure 
 clumppExportStructure(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
@@ -314,12 +318,18 @@ The CLUMPP output files are now distributed in multiple folders. The aligned, me
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 setwd(choose.dir())
+# collect aligned files from STRUCTURE CLUMPP results
 collectClumppOutput()
+# collect aligned files from TESS CLUMPP results
 collectClumppOutput(prefix="TESSpop")
+# collect aligned files from ADMIXTURE CLUMPP results
+collectClumppOutput(prefix="ADMIXTUREpop")
 
 # working directory can also be set using runsdir argument
+# collect both aligned and merged files
 collectClumppOutput(prefix="STRUCTUREpop",filetype="both",runsdir=choose.dir())
 collectClumppOutput(prefix="TESSpop",filetype="both",runsdir=choose.dir())
+collectClumppOutput(prefix="ADMIXTUREpop",filetype="both",runsdir=choose.dir())
 
 ?collectClumppOutput
 collectClumppOutput(prefix = "STRUCTUREpop", filetype = "aligned", runsdir = NA, 
@@ -329,7 +339,7 @@ collectClumppOutput(prefix = "STRUCTUREpop", filetype = "aligned", runsdir = NA,
 # to change folder prefix, set prefix="STRUCTUREpop" or prefix="TESSpop" etc
 # to change which files are copied, set filetype="aligned", filetype="both" or 
 # filetype="merged"
-# to change name of new driectory, set newdir="somename"
+# to change name of new directory, set newdir="somename"
 
 collectClumppOutput()
 collectClumppOutput(prefix="TESSpop")
@@ -339,7 +349,7 @@ Collecting the aligned and merged files into a single folder can be helpful in p
 
 __4.8 plotRuns__  
 
-The function `plotRuns()` is used to create barplots from STRUCTURE run files, TESS run files, combined files, aligned files or merged files. When plotting STRUCTURE or TESS run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figure. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
+The function `plotRuns()` is used to create barplots from STRUCTURE run files, TESS run files, ADMIXTURE run files, combined files, aligned files or merged files. When plotting STRUCTURE, TESS or ADMIXTURE run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figure. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
 
 ![plotRuns Overview](plotRunsOverview.jpg) 
 __Fig 7.__ *An overview of the components of a plot from the function plotRuns() and the arguments used to modify them.*
@@ -353,10 +363,12 @@ plotRuns(files=slist[1:2])
 # same as above
 plotRuns(files=slist[1:2], imgoutput="sep")
 plotRuns(files=tlist[1:2],imgoutput="sep")
+plotRuns(files=alist[1:2],imgoutput="sep")
 
 # usage 2, join files into one figure
 plotRuns(files=slist[1:2], imgoutput="join")
 plotRuns(files=tlist[1:2],imgoutput="join")
+plotRuns(files=alist[1:2],imgoutput="join")
 
 # change height and width of figure
 plotRuns(files=slist[1], imgoutput="sep", height = 1.5, width=8)
@@ -384,8 +396,8 @@ Population labels can be added to this barplot by providing a vector of labels. 
 
 ```{r, echo=TRUE, eval=FALSE}
 # read labels for STRUCTURE runs
-pops <- read.delim(system.file("files/structurepoplabels.txt", package="pophelper"), 
-                   header=F)
+pops <- read.delim(system.file("files/structurepoplabels.txt", package="pophelper"), header=F)
+apops <- read.delim(system.file("files/admixturepoplabels.txt", package="pophelper"), header=F)
 head(pops$V1)
 length(pops$V1)
 
@@ -401,6 +413,7 @@ plotRuns(files=tlist,poplab=labs1)
 
 # plot one of the run files with labels
 plotRuns(files=slist[1], imgoutput="sep", poplab=pops$V1)
+plotRuns(files=alist[1], imgoutput="sep", poplab=apops$V1)
 plotRuns(files=tlist[1],imgoutput="sep",poplab=labs1)
 
 # plot files 1 and 2 with a common label
@@ -460,12 +473,13 @@ __Fig. 10.__ *(A) Left: Combined files (Three STRUCTURE runs for K=4). (B) Middl
 
 __4.9 plotMultiline__  
 
-The `plotMultiline` function is also used to plot STRUCTURE runs, TESS runs and table files as barplots. This function automatically identifies these three input file types. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced on A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` can be specified.
+The `plotMultiline` function is also used to plot STRUCTURE runs, TESS runs, ADMIXTURE runs and table files as barplots. This function automatically identifies these input file types. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced on A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` can be specified.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 plotMultiline(slist[1])
 plotMultiline(tlist[1])
+plotMultiline(alist[1])
 
 # manually modifying samples per line and lines per page
 plotMultiline(slist[1],spl=75,lpp=10)
@@ -627,6 +641,7 @@ This is a wrapper function for easily performing several `pophelper` functions i
 analyseRuns(choose.files())
 analyseRuns(files=slist)
 analyseRuns(files=tlist)
+analyseRuns(files=alist)
 ```
 ----
 
@@ -652,6 +667,7 @@ collectClumppOutput(prefix="STRUCTUREpop",filetype="aligned")
 #plot runs
 plotRuns(files=slist)
 plotRuns(files=slist,imgoutput="join")
+#for clumpp output
 plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
 #plot multiline
 plotMultiline(slist[1])
@@ -672,13 +688,16 @@ collectRunsTess(runsdir=choose.dir())
 tlist <- choose.files(multi=TRUE)
 #tabulate runs
 df1 <- tabulateRunsTess(tlist)
+#summarisee runs
+df2 <- tabulateRunsTess(df1)
 #clumpp export
 clumppExportTess(tlist)
 #collect clumpp output
 collectClumppOutput(prefix="TESSpop",filetype="aligned")
 #plot runs
-plotRuns(files=tlist)
-plotRuns(files=tlist,imgoutput="join")
+plotRuns(files=tlist[1])
+plotRuns(files=tlist[1:2],imgoutput="join")
+#for clumpp outputs 
 plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
 #plot multiline
 plotMultiline(tlist[1])
@@ -690,19 +709,49 @@ runsToDfTess(tlist)
 analyseRuns(tlist)
 ```
 
+__5.3 Admixture__  
+
+```{r,echo=TRUE, eval=FALSE}
+#choose files
+alist <- choose.files(multi=TRUE)
+#tabulate runs
+df1 <- tabulateRunsAdmixture(alist)
+#summarise runs
+df2 <- summariseRunsAdmixture(df1)
+#clumpp export
+clumppExportAdmixture(alist)
+#collect clumpp output
+collectClumppOutput(prefix="ADMIXTUREpop",filetype="aligned")
+#plot runs
+plotRuns(files=alist[1])
+plotRuns(files=alist[1:2],imgoutput="join")
+#for clumpp outputs
+plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
+#plot multiline
+plotMultiline(alist[1])
+plotMultiline(alist[1],spl=70,lpp=10)
+#TESS runs to data frame
+runsToDfAdmixture(alist)
+
+#or all together
+analyseRuns(alist)
+```
+
 Some of the same functionalities in this package have been implented in the online tool `StructureHarvester` by other authors. For those who prefer a graphical web interface, this may be useful. Also handy to cross-validate. See useful links.
 
 ----
 
 ### 6. References
 
-1. [Evanno, G., Regnaut, S., and Goudet, J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620](http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract)
+1. [Alexander D.H., Novembre, J. and Lange K. (2009) Fast model-based estimation of ancestry in unrelated individuals. Genome Research, 19:1655–1664](http://genome.cshlp.org/content/19/9/1655.long)  
 
-2. [François, O., and Durand, E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.](http://onlinelibrary.wiley.com/doi/10.1111/j.1755-0998.2010.02868.x/abstract)
+2. [Evanno G., Regnaut S., and Goudet J. (2005). Detecting the number of clusters of individuals using the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 2611-2620](http://onlinelibrary.wiley.com/doi/10.1111/j.1365-294X.2005.02553.x/abstract)  
 
-3. [Jakobsson, M., and Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806](http://bioinformatics.oxfordjournals.org/content/23/14/1801.short)
+3. [Francois O., and Durand E. (2010). Spatially explicit Bayesian clustering models in population genetics. Molecular Ecology Resources, 10(5), 773-784.](http://onlinelibrary.wiley.com/doi/10.1111/j.1755-0998.2010.02868.x/abstract)  
 
-4. [Pritchard, J. K., Stephens, M., & Donnelly, P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.](http://www.genetics.org/content/155/2/945.short)  
+4. [Jakobsson M., and Rosenberg N. A. (2007). CLUMPP: a cluster matching and permutation program for dealing with label switching and multimodality in analysis of population structure. Bioinformatics, 23(14), 1801-1806](http://bioinformatics.oxfordjournals.org/content/23/14/1801.short)
+
+5. [Pritchard J. K., Stephens M., & Donnelly P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959.](http://www.genetics.org/content/155/2/945.short)  
 
 ----
 
@@ -710,6 +759,7 @@ Some of the same functionalities in this package have been implented in the onli
 
 * [STRUCTURE program](http://pritchardlab.stanford.edu/structure.html)  
 * [TESS program](http://membres-timc.imag.fr/Olivier.Francois/tess.html)  
+* [ADMIXTURE program](https://www.genetics.ucla.edu/software/admixture/)  
 * [CLUMPP program](http://www.stanford.edu/group/rosenberglab/clumpp.html)  
 * [Structure Harvester](http://taylor0.biology.ucla.edu/structureHarvester)  
 * [Adegenet R package](http://adegenet.r-forge.r-project.org/) 

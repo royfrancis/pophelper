@@ -2,19 +2,19 @@
 % Please edit documentation in R/pophelper.R
 \name{checkRuns}
 \alias{checkRuns}
-\title{Internal: Check if a selected run is STRUCTURE or TESS file.}
+\title{Internal: Check if a selected run is STRUCTURE, TESS, ADMIXTURE or TAB file.}
 \usage{
 checkRuns(files = NULL, warn = FALSE)
 }
 \arguments{
-\item{files}{A character or character vector of one or more STRUCTURE or TESS run files}
+\item{files}{A character or character vector of one or more input text files}
 
-\item{warn}{A logical indicating if a warning be displayed for file those are not STRUCTURE or TESS.}
+\item{warn}{A logical indicating if a warning be displayed for file those are not STRUCTURE, TESS or ADMIXTURE file.}
 }
 \value{
-A character or character vector indicating 'STRUCTURE' or 'TESS' for all selected files.
+A character or character vector indicating 'STRUCTURE', 'TESS', 'ADMIXTURE' or 'TAB' for all selected files.
 }
 \description{
-Check if a selected run is STRUCTURE or TESS file.
+Check if a selected run is STRUCTURE, TESS, ADMIXTURE or TAB file.
 }
 

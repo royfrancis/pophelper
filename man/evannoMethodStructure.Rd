@@ -2,7 +2,7 @@
 % Please edit documentation in R/pophelper.R
 \name{evannoMethodStructure}
 \alias{evannoMethodStructure}
-\title{Perform the Evanno method}
+\title{Perform the Evanno method for STRUCTURE runs.}
 \usage{
 evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
   na.rm = TRUE, imgtype = "png", basesize = NA, height = NA,

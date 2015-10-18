@@ -2,7 +2,7 @@
 % Please edit documentation in R/pophelper.R
 \name{plotRunsInterpolate}
 \alias{plotRunsInterpolate}
-\title{Interpolate STRUCTURE and TESS runs spatially}
+\title{Interpolate STRUCTURE, TESS or ADMIXTURE runs spatially}
 \usage{
 plotRunsInterpolate(datafile = NULL, coordsfile = NULL, method = "krig",
   duplicate = "mean", idwpower = 2, clusters = NA, gridsize = 60,
@@ -14,10 +14,10 @@ plotRunsInterpolate(datafile = NULL, coordsfile = NULL, method = "krig",
   legendtextsize = NA, dataout = FALSE)
 }
 \arguments{
-\item{datafile}{One STRUCTURE or TESS output file. Input is either a character
+\item{datafile}{One STRUCTURE, TESS or ADMIXTURE output file. Input is either a character
 or a dataframe. If character, then a path pointing to location of the datafile. Can use
-`choose.files()`. If a dataframe, then an output from `runsToDfStructure()` or `
-runsToDfTess()`.}
+\code{choose.files()}. If a dataframe, then an output from \code{runsToDfStructure()},
+\code{runsToDfTess()} or \code{runsToDfAdmixture()}.}
 
 \item{coordsfile}{A character or a dataframe. If character, then a path pointing
 to location of the coordsfile. It must be a tab-delimited text file with x and y
@@ -35,7 +35,7 @@ applicable to 'bilinear' and 'bicubic' methods. Options are "error" (error messa
 if duplicate points), "strip" (remove all duplicate points), "mean" (mean of
 duplicate points), "median" (median of duplicate points).}
 
-\item{idwpower}{A character indicating the power of inverse distance weighting if method is set to "idw".}
+\item{idwpower}{A numeric indicating the power of inverse distance weighting if method is set to "idw".}
 
 \item{clusters}{A numeric or numeric vector indicating the clusters to plot. If NA, all clusters are plotted. For ex.
 If set to 2, cluster 2 is plotted. If set to 2:4, clusters 2, 3 and 4 are plotted.
@@ -53,10 +53,10 @@ than 2, then automatically set to "sep".}
 9 value 'Blues' palette from RColorBrewer by default.}
 
 \item{nrow}{A numeric indicating the number of rows of plots in a joined plot. Determined automatically
-if number of plots <20 and nrow = NA.}
+if number of plots <20 and \code{nrow = NA}.}
 
 \item{ncol}{A numeric indicating the number of columns of plots in a joined plot. Determined automatically
-if number of plots <20 and ncol = NA.}
+if number of plots <20 and \code{ncol = NA}.}
 
 \item{exportplot}{A logical. If set to FALSE, no image is exported.}
 
@@ -99,21 +99,21 @@ The legendsize does not control the text in the legend.}
 This output can be modified using \code{ggplot} themes() for more figure control if required.}
 }
 \value{
-If dataout = T, a list of one or more \code{ggplot} gtable output is returned for more theme
+If \code{dataout = TRUE}, a list of one or more \code{ggplot} gtable output is returned for more theme
 control if required.
 }
 \description{
-Interpolate clusters from STRUCTURE and TESS runs spatially using coordinates.
+Interpolate clusters from STRUCTURE, TESS or ADMIXTURE runs spatially using coordinates.
 }
 \details{
 The "bilinear", "bicubic", "idw" and "nn" are essentially direct interpolation
 between spatial points. The "krig" option is predictive rather than direct interpolation.
 The kriging function is same function provided by the TESS authors in their R script.
-The function uses great circle distances (`rdist.earth()`) from `fields` package to
+The function uses great circle distances \code{rdist.earth()} from \code{fields} package to
 determine theta. Therefore coordinates must be in LL and not UTM.
-For more details of methods, see R package 'akima' function 'interp' for "bilinear"
-and "bicubic" methods, see R package 'fields' function 'Krig' for "krig" method, see
-R package 'spatstat' function 'idw' for "idw" and function 'nnmark' for "nn" method.
+For more details of methods, see R package \code{akima} function \code{interp} for "bilinear"
+and "bicubic" methods, see R package \code{fields} function \code{Krig} for "krig" method, see
+R package \code{spatstat} function \code{idw} for "idw" and function \code{nnmark} for "nn" method.
 The model for "krig" is automatically determined and may produce warning messages if
 the GCV algorithm does not converge optimally. This shouldn't be an issue for exploratory
 analyses. All methods require full coordinate data. No missing data allowed in coordsfile.

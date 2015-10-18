@@ -1,3 +1,13 @@
+pophelper 1.1.5
+===========
+* 18-Oct-2015
+* Handling of Admixture files
+* checkRuns modified to use grepl instead of grep and checks for Admixture files too.
+* plotRuns() handles ADMIXTURE files
+* plotMultiline() handles ADMIXTURE files
+* plotRunsInterpolate() handles ADMIXTURE files
+* Code optimisation
+
 pophelper 1.1.4
 ===========
 * 27-Sep-2015
