@@ -1,5 +1,5 @@
-#POPHELPER 1.1.4
-#27-Sep-2015
+#POPHELPER 1.1.6
+#02-JAN-2016
 #DEMO SCRIPT
 
 library(pophelper)

@@ -1,3 +1,13 @@
+pophelper 1.1.6
+===========
+* 02-Jan-2016
+* Sort individuals by one or all clusters in plotRuns() or plotMultiline()
+* Subset/reorder populations when using pop labels in plotRuns()
+* runsToDfMatrix(), tabulateRunsMatrix(), summariseRunsMatrix(), clumppExportMatrix() implemented for tabular data
+* runsToDfAdmixture(), tabulateRunsAdmixture(), summariseRunsAdmixture(), clumppExportAdmixture() deprecated
+* Argument 'barwidth' deprecated from plotMultiline()
+* Fixed space, labeller for compatibility with ggplot2 2.0.0
+
 pophelper 1.1.5
 ===========
 * 18-Oct-2015
