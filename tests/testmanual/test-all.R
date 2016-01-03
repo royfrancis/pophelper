@@ -448,6 +448,16 @@ test_that("check output joined with labels",{
 })
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+test_that("check less colours",{
+  expect_error(plotRuns(sfiles[4],popcol=c("red","green")))
+})
+
+plotRuns(sfiles[4],popcol=c("red","green","blue"))
+test_that("check custom colours",{
+  expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[4]),".png"))
+
 #-------------------------------------------------------------------------------
 
 context("plotRuns Tess")
@@ -1230,6 +1240,8 @@ if(deleteoutput) file.remove(list.files()[grep("Interpolation-nn",list.files())]
 #-------------------------------------------------------------------------------
 
 context("plotRunsSpatial")
+cfile239 <- read.delim(system.file("files/coords239.txt",package="pophelper"),header=FALSE)
+sfile239 <- system.file("files/Structure239_4",package="pophelper")
 plotRunsSpatial(datafile=sfile239,coordsfile=cfile239)
 test_that("check output",{
   expect_equal(any(grepl("Spatial.png",list.files())),TRUE)

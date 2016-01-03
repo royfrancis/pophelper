@@ -110,7 +110,7 @@ If \code{dataout = T}, a list of one or more \code{ggplot} gtable output is retu
 control if required.
 }
 \description{
-Plot STRUCTURE, TESS or MATRIX runs spatial and colour by population clusters
+Plot STRUCTURE, TESS or MATRIX runs spatially and colour individuals by max assignment cluster.
 }
 \details{
 The coordinates must always be provided as standard longitude-latitude (LL) decimal

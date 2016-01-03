@@ -17,7 +17,7 @@ plotMultiline(files = NULL, spl = NA, lpp = NA, popcol = NA,
 
 \item{lpp}{An integer indicating lines per page. Defaults to 11.}
 
-\item{popcol}{A character vector of colours for populations.}
+\item{popcol}{A character vector of colours for clusters.}
 
 \item{sortind}{A character indicating how individuals are sorted. Default is NA. Other options are 'all' or any one cluster (eg. 'Cluster1').}
 

@@ -117,7 +117,7 @@ plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 
 analyseRuns()             # A wrapper function to quickly tabulate, summarise, 
                           # perform evanno method, clumpp output and 
-                          # generate barplots from STRUCTURE, TESS or ADMIXTURE run files.
+                          # generate barplots from STRUCTURE, TESS or MATRIX run files.
 ```
 
 An overview of the standard workflow using STRUCTURE files, TESS files and other tabular input files is shown below.  
@@ -909,7 +909,7 @@ Note that this  function can be slow and takes several minutes to run depending 
 
 __4.7 plotRunsInterpolate__  
 
-The `plotRunsInterpolate()` function allows to spatially interpolate STRUCTURE and TESS clusters. Files needed are STRUCTURE or TESS run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232). Note that this is generally a slow function and can take several minutes.
+The `plotRunsInterpolate()` function allows to spatially interpolate STRUCTURE, TESS or MATRIX runs. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232). Note that this is generally a slow function and can take several minutes.
 
 Here, we will use some sample files from the library.
 
@@ -1008,10 +1008,12 @@ Note that when using `plotRunsInterpolate()`, all methods may not work with all 
 
 __4.8 plotRunsSpatial__  
 
-Estimate clusters using the highest probability of assignment for each individual and plot these clusters to spatial coordinates. The clusters are denoted by colour or point shape. The clusters can also be marked by confidence ellipses or convex hulls. Files needed are STRUCTURE or TESS run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232).
+Estimate clusters using the highest probability of assignment for each individual and plot these clusters to spatial coordinates. The clusters are denoted by colour or point shape. The clusters can also be marked by confidence ellipses or convex hulls. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232).
 
 ```{r,echo=TRUE, eval=FALSE}
 library(RColorBrewer)
+s1 <- system.file("files/Structure239_4",package="pophelper")
+cd2 <- system.file("files/coords239.txt",package="pophelper")
 
 # basic usage
 plotRunsSpatial(datafile=s1,coordsfile=cd2)
@@ -1042,7 +1044,7 @@ p4 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottit
                       popcol=brewer.pal(5,"Set1"),showaxis=T)
 
 png("PlotRunsSpatial.png",height=20,width=20,res=250,units="cm",type="cairo")
-grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
+gridExtra::grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
 dev.off()
 ```
 ![plotruns-spatial](plotruns-spatial.png)  
@@ -1057,7 +1059,7 @@ plotRunsSpatial(datafile=s1,coordsfile=cd2)
 
 __4.9 analyseRuns__  
 
-This is a wrapper function for easily performing several `pophelper` functions in one function. The `analyseRuns()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
+This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or MATRIX run files. The `analyseRuns()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage

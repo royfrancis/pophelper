@@ -2498,8 +2498,8 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
 
       #get Colours
       coll <- popcol
-      if (all(is.na(popcol))) coll <- getColours(k)
-      if (length(coll) != k) stop("plotRuns: Number of colours not equal to number of populations.\n")
+      if (any(is.na(popcol))) coll <- getColours(k)
+      if (length(coll) < k) stop(paste0("plotRuns: Number of colours (",length(coll),") less than number of clusters (",k,").\n"))
       
       #getDim
       dimtemp <- pophelper:::getDim(ind = Ind, height = height, width = width, res = dpi, units = units, imgtype=imgtype, labpanelheight=labpanelheight, plotnum = 1)
@@ -2763,7 +2763,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
     #Get Col
     coll <- popcol
     if (any(is.na(popcol))) coll <- getColours(max(kvec))
-    if (length(coll) < max(kvec)) stop(paste0("Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),").\n"))
+    if (length(coll) < max(kvec)) stop(paste0("plotRuns: Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),").\n"))
     
     #save plot
     dt <- as.character(format(Sys.time(), "%Y%m%d%H%M%S"))
@@ -3039,7 +3039,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
       
       #Get col
       coll <- popcol
-      if (all(is.na(popcol))) coll <- pophelper:::getColours(numk)
+      if (any(is.na(popcol))) coll <- pophelper:::getColours(numk)
       if (length(coll) < max(numk)) stop(paste0("Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),").\n"))
       
       #save plot
@@ -3186,7 +3186,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
 #' @param files A character vector of filenames or paths. One or more STRUCTURE, TESS, combined, aligned or merged files. Use \code{choose.files(multi = TRUE)} for interactive selection.
 #' @param spl An integer indicating samples per line. Defaults to 60.
 #' @param lpp An integer indicating lines per page. Defaults to 11.
-#' @param popcol A character vector of colours for populations.
+#' @param popcol A character vector of colours for clusters.
 #' @param sortind A character indicating how individuals are sorted. Default is NA. Other options are 'all' or any one cluster (eg. 'Cluster1').
 #' @param na.rm Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
 #' @param barwidth A numeric indicating the width of the bars.
@@ -3264,7 +3264,6 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
 #       df1 <- df1[, -c(1, length(df1)-1)]
 #       colnames(df1)[1:length(df1)-1] <- paste("Cluster", 1:(length(df1)-1), sep = "")
 #       df1 <- split(df1[, -length(df1)], df1$tab)
-      
 
       df1 <- read.table(files[i],header = F, sep = "", dec = ".", quote = "",stringsAsFactors=F)
       if (class(df1) != "data.frame") stop("plotMultiline: Input is not a dataframe. Incorrect input file type.\n")
@@ -3353,8 +3352,9 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
       
       #get colours
       coll <- popcol
-      if (is.na(popcol)) coll <- pophelper:::getColours(ncol(dff))
-      
+      if (any(is.na(popcol))) coll <- pophelper:::getColours(ncol(dff))
+      if(length(coll) < ncol(dff)) stop(paste0("plotMultiline: Number of colours (",length(coll),") is less than the number of clusters (",ncol(dff),").\n"))
+
       dff$ind <- as.factor(as.numeric(1:nr1))
       dff$rows <- factor(c(rep(1:numrows, each = spl1), rep(nr2, each = numextra)))
       
@@ -3367,9 +3367,9 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
       for (i in 1: nr2)
       {
         df2 <- reshape2::melt(dlist[[i]], id.var = c("ind"))
-        df2 <- df2[rev(1:nrow(df2)),] 
+        df2 <- df2[rev(1:nrow(df2)),]
         plist[[i]] <- ggplot2::ggplot(data = df2, aes(x = ind, y = value, fill = variable))+
-          geom_bar(width = barwidth, stat = "identity", position = "stack", na.rm = na.rm)+
+          geom_bar(width = barwidth, stat = "identity", position = "fill", na.rm = na.rm)+
           scale_x_discrete(expand = c(0, 0))+
           scale_y_continuous(expand = c(0, 0),limits=c(0,1))+
           scale_fill_manual(values = coll)+
@@ -3504,7 +3504,7 @@ analyseRuns <- function(files = NULL, evannoMethod = TRUE, clumppExport = TRUE, 
 
 #-------------------------------------------------------------------------------
 
-#FUNCTION detrmineRowsAndCols
+#FUNCTION determineRowsAndCols
 #' Internal: Determine rows and columns for arbitrary number of plots
 #' @description Internal: Determine rows and columns for figures from arbitrary number of plots
 #' @param numplots A numeric indicating the number of plots available for plot
@@ -3930,7 +3930,7 @@ ellipseCI <- function(x,y,conf = 0.95,np = 100)
 
 #FUNCTION plotRunsSpatial
 #' plotRunsSpatial
-#' @description Plot STRUCTURE, TESS or MATRIX runs spatial and colour by population clusters
+#' @description Plot STRUCTURE, TESS or MATRIX runs spatially and colour individuals by max assignment cluster.
 #' @param datafile One STRUCTURE, TESS or MATRIX output file. Input is either a character 
 #' or a dataframe. If character, then a path pointing to location of the datafile. Can use 
 #' \code{choose.files()}. If a dataframe, then an output from \code{runsToDfStructure()}, 
@@ -4145,6 +4145,7 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,
   #get colours
   popcol1 <- popcol
   if (all(is.na(popcol))) popcol1 <- pophelper:::getColours(len)
+  if(length(popcol1) < length(levels(factor(as.character(df2$Clusters))))) stop("plotRunsSpatial: Number of colours less than number of clusters.\n")
   #chull colours
   if (chull) popcol2 <- popcol1[match(llev,clev)]
   if (ellipse) popcol3 <- popcol1[match(elev,clev)]
