@@ -1,11 +1,11 @@
 # pophelper 1.1.6
 
-`pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output files generated from population analysis programs such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate *K* using the Evanno method, export files for CLUMPP, generate barplot figures, spatial plots and interpolation using geographical coordinates. 
+`pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output files generated from population analysis programs such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate *K* using the Evanno method, export files for CLUMPP and generate barplot figures. As a bonus, experimental features include spatial plots and interpolation using geographical coordinates, which may be removed or moved elsewhere in future.  
 
-For a detailed demonstration, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v116.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials based on version 1.1.5. New versions and updates are shown only on this GitHub page.
+For a detailed demonstration, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v116.html). Click [here](https://www.youtube.com/playlist?list=PLcQHvdPK8df1p_ZtpHOs9hUj6aNR670j_) to watch video tutorials based on version 1.1.5. New versions and updates are shown only on this GitHub page.  
 
 ## Installation  
-You need to have R (> 3.1.2) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.
+You need to have R (> 3.1.2) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the 'devtools' package. Then, you can install `pophelper` from `github` using the `devtools` package.  
 
 ```coffee
 #install devtools package from CRAN
@@ -19,7 +19,7 @@ install_github('royfrancis/pophelper')
 library(pophelper)
 ```
 ## Web App   
-An online interactive version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
+An online interactive version of pophelper is now available at [pophelper.com](http://www.pophelper.com).  
 
 ## List of Functions  
   
@@ -31,23 +31,27 @@ For functions where one or more files need to be selected, the selection can be 
 
 
 ```coffee
+#structure functions
 tabulateRunsStructure()   # Get a tabulation of several STRUCTURE files
 summariseRunsStructure()  # Summarise runs by repeats for each K
 evannoMethodStructure()   # Perform the Evanno method on summarised data
 runsToDfStructure()       # Convert STRUCTURE run files to R dataframe
 clumppExportStructure()   # Export data file and parameter file for use with CLUMPP
 
+#tess functions
 collectRunsTess()         # Collect TESS output from multiple directories into one
 tabulateRunsTess()        # Get a tabulation of several TESS files
 summariseRunsTess()       # Summarise runs by repeats for each K
 runsToDfTess()            # Convert TESS run files to R dataframe
 clumppExportTess()        # Export data file and parameter file for use with CLUMPP
 
+#matrix functions
 tabulateRunsMatrix()      # Get a tabulation of several MATRIX files
 summariseRunsMatrix()     # Summarise runs by repeats for each K
 runsToDfMatrix()          # Convert MATRIX run files to R dataframe
 clumppExportMatrix()      # Export data file and parameter file for use with CLUMPP
 
+#common functions
 collectClumppOutput()     # Collect CLUMPP output into a common directory
 plotRuns()                # Plot a barplot from STRUCTURE/TESS/table files
 PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/table file
@@ -114,6 +118,9 @@ __Fig 15.__ *Interpolation plots showing some of the available colour palettes.*
 __Fig 16.__ *Some of the plots created using the function `plotRunsSpatial()`.*  
 
 For detailed demonstration and description, refer the [vignette](https://dl.dropboxusercontent.com/u/78814791/sites/pophelpervignette/vignette_v116.html).
+
+### Citation  
+Francis, R. M. (2016). "POPHELPER: An R package and web app to analyse and visualise population structure." Molecular Ecology Resources. DOI: 10.1111/1755-0998.12509  
 
 ### Disclaimer
 
