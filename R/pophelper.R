@@ -1,5 +1,5 @@
-#pophelper v1.1.6
-#02-Jan-2016
+#pophelper v1.1.7
+#18-May-2016
 
 #check packages
 pkgs <- c("akima","fields","grid","gridExtra","ggplot2","gtable","PBSmapping","plyr","reshape2","spatstat")
@@ -1769,16 +1769,18 @@ runsToDfStructure <- function(files = NULL)
     file1 <- file1[grep(".+\\(\\d+\\).+\\:.+",file1)]
     if(length(file1) == 0)
     {
-      cstart <- charmatch("Inferred ancestry of individuals", file1)
-      cend <- charmatch("Estimated Allele Frequencies in each", file1)
+      cstart <- base::charmatch("Inferred ancestry of individuals", file1)
+      cend <- base::charmatch("Estimated Allele Frequencies in each", file1)
       file1 <- file1[(cstart+2):(cend-1)]
     }
     
     file_a <- file1[file1 != ""]
     rm(file1)
-    file_b <- base::gsub(":  ", "", substr(file_a, regexpr(":\\W+\\d\\.\\d+", file_a), nchar(file_a)-1))
+    file_a <- base::gsub("\\([0-9.,]+\\)","",file_a)
+    file_b <- base::gsub(":  ", "", substr(file_a, base::regexpr(":\\W+\\d\\.\\d+", file_a), base::nchar(file_a)-1))
+    file_b <- base::sub("\\s+$","",base::sub("^\\s+","",file_b))
     rm(file_a)
-    file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b, " ")))))
+    file_c <- as.vector(as.numeric(as.character(unlist(base::strsplit(file_b, " ")))))
     rm(file_b)
     dframe <- as.data.frame(matrix(file_c, nrow = ind, byrow = TRUE),stringsAsFactors = FALSE)
     dframe <- as.data.frame(sapply(dframe, as.numeric),stringsAsFactors = FALSE)
@@ -3188,6 +3190,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
 #' @param lpp An integer indicating lines per page. Defaults to 11.
 #' @param popcol A character vector of colours for clusters.
 #' @param sortind A character indicating how individuals are sorted. Default is NA. Other options are 'all' or any one cluster (eg. 'Cluster1').
+#' @param sortlabels A logical indicating if the labels must show the original sort order. Set to FALSE by default. After sorting the labels will be 1, 2, 3 etc. If set to TRUE, then labels reflect original order: 90, 65 etc. This argument is not used when \code{sortind=NA}.
 #' @param na.rm Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
 #' @param barwidth A numeric indicating the width of the bars.
 #' @param barspace This argument is deprecated. A numeric indicating the space between the bars.
@@ -3208,7 +3211,7 @@ plotRuns <- function(files = NULL, imgoutput = "sep", poplab = NA, popcol = NA, 
 #' @import gridExtra
 #' @export
 #'
-plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind=NA, na.rm = FALSE, 
+plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind=NA, sortlabels=FALSE, na.rm = FALSE, 
                           barwidth = 0.9, barspace = NA, ticks = FALSE, yaxislabs = FALSE, indlabs = TRUE, 
                           labsize = 5, labangle = 90, labvjust = 0.5,labhjust = 1, imgtype = "png", height = NA, 
                           width = NA, res = NA, units = NA)
@@ -3225,6 +3228,7 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
     if(length(sortind) > 1) stop("plotMultiline: Argument 'sortind' must be of length 1. Use 'all' or a cluster like 'Cluster1'.\n")
     if(sortind != "all" && !grepl("Cluster[0-9+]",sortind)) stop("plotMultiline: Argument 'sortind' must be set to 'all' or a cluster like 'Cluster1'.\n")
   }
+  if(!is.logical(sortlabels)) stop("plotMultiline: Argument 'sortlabels' set incorrectly. Set as TRUE or FALSE.")
   if (imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg" ) stop("plotMultiline: Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.\n")
   
   #set NA values
@@ -3300,7 +3304,7 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
         {
           maxval <- apply(dff,1,max)
           matchval <- vector(length=nrow(dff))
-          for(j in 1:nrow(dff)) matchval[j] <- match(maxval[j],dff[j,])
+          for(k in 1:nrow(dff)) matchval[k] <- match(maxval[k],dff[k,])
           dftemp <- dff
           dftemp$maxval <- maxval
           dftemp$matchval <- matchval
@@ -3355,7 +3359,14 @@ plotMultiline <- function(files = NULL, spl = NA, lpp = NA, popcol = NA, sortind
       if (any(is.na(popcol))) coll <- pophelper:::getColours(ncol(dff))
       if(length(coll) < ncol(dff)) stop(paste0("plotMultiline: Number of colours (",length(coll),") is less than the number of clusters (",ncol(dff),").\n"))
 
-      dff$ind <- as.factor(as.numeric(1:nr1))
+      #sorting labels
+      if(is.na(sortind)){
+        dff$ind <- as.factor(as.numeric(1:nr1))
+      }else{
+        if(!sortlabels) dff$ind <- as.factor(as.numeric(1:nr1))
+        if(sortlabels) dff$ind <- factor(as.numeric(rownames(dff)),levels=rownames(dff))
+      }
+
       dff$rows <- factor(c(rep(1:numrows, each = spl1), rep(nr2, each = numextra)))
       
       #dff$line <- as.factor(c(rep(1:spl1, numrows), 1:numextra))
@@ -4231,6 +4242,6 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,
 #-------------------------------------------------------------------------------
 #ON LOAD
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.1.6 ready.")
+    packageStartupMessage("pophelper v1.1.7 ready.")
 }
 

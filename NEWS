@@ -1,22 +1,29 @@
+pophelper 1.1.7
+===========
+* 18-May-2016
+* runsToDfStructure() produced NA columns when STRUCTURE file contains probability intervals. Fixed. Thanks to J A Blanco Aguiar for pointing out this issue.  
+* plotMultiline() has a new argument sortlabels to show x-axis labels in the original sort order.
+* A critical loop variable issue fixed in plotMultiline().  
+
 pophelper 1.1.6
 ===========
 * 02-Jan-2016
-* Sort individuals by one or all clusters in plotRuns() or plotMultiline()
-* Subset/reorder populations when using pop labels in plotRuns()
-* runsToDfMatrix(), tabulateRunsMatrix(), summariseRunsMatrix(), clumppExportMatrix() implemented for tabular data
-* runsToDfAdmixture(), tabulateRunsAdmixture(), summariseRunsAdmixture(), clumppExportAdmixture() deprecated
-* Argument 'barwidth' deprecated from plotMultiline()
-* Fixed space, labeller for compatibility with ggplot2 2.0.0
+* Sort individuals by one or all clusters in plotRuns() or plotMultiline().  
+* Subset/reorder populations when using pop labels in plotRuns().  
+* runsToDfMatrix(), tabulateRunsMatrix(), summariseRunsMatrix(), clumppExportMatrix() implemented for tabular data.  
+* runsToDfAdmixture(), tabulateRunsAdmixture(), summariseRunsAdmixture(), clumppExportAdmixture() deprecated.  
+* Argument 'barwidth' deprecated from plotMultiline().  
+* Fixed space, labeller for compatibility with ggplot2 2.0.0.  
 
 pophelper 1.1.5
 ===========
 * 18-Oct-2015
-* Handling of Admixture files
+* Handling of Admixture files.  
 * checkRuns modified to use grepl instead of grep and checks for Admixture files too.
-* plotRuns() handles ADMIXTURE files
-* plotMultiline() handles ADMIXTURE files
-* plotRunsInterpolate() handles ADMIXTURE files
-* Code optimisation
+* plotRuns() handles ADMIXTURE files.  
+* plotMultiline() handles ADMIXTURE files.  
+* plotRunsInterpolate() handles ADMIXTURE files.  
+* Code optimisation.  
 
 pophelper 1.1.4
 ===========
@@ -31,14 +38,14 @@ pophelper 1.1.3
 pophelper 1.1.2
 ===========
 * 17-Sep-2015
-* Error fixed in evannoMethodStructure() when using writetable=T
+* Error fixed in evannoMethodStructure() when using writetable=T.  
 Error in vapply(x, format, "", ...) : values must be length 1,
  but FUN(X[[1]]) result is length 6
-* Same error fixed in tabulateRunsStructure()
-* Same error fixed in tabulateRunsTess()
-* Same error fixed in summariseRunsStructure()
-* Same error fixed in summariseRunsTess()
-* Error fixed in plotRunsInterpolate()
+* Same error fixed in tabulateRunsStructure().  
+* Same error fixed in tabulateRunsTess().  
+* Same error fixed in summariseRunsStructure().  
+* Same error fixed in summariseRunsTess().  
+* Error fixed in plotRunsInterpolate().  
 Error in theme(legend.key.size = unit(legendsize, "cm")) : 
   could not find function "unit"
 

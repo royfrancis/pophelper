@@ -91,14 +91,14 @@ test_that("quiet=FALSE",{
 })
 
 test_that("quiet=TRUE",{
-  expect_output(tabulateRunsStructure(files=sfiles, quiet=TRUE),"")
-  expect_output(tabulateRunsTess(files=tfiles, quiet=TRUE),"")
-  expect_output(suppressWarnings(tabulateRunsAdmixture(files=afiles, quiet=TRUE)),"")
-  expect_output(tabulateRunsMatrix(files=afiles, quiet=TRUE),"")
-  expect_output(tabulateRunsMatrix(files=ffiles, quiet=TRUE),"")
-  expect_output(tabulateRunsMatrix(files=mcfiles, quiet=TRUE),"")
-  expect_output(tabulateRunsMatrix(files=mtfiles, quiet=TRUE),"")
-  expect_output(tabulateRunsMatrix(files=msfiles, quiet=TRUE),"")
+  expect_silent(tabulateRunsStructure(files=sfiles, quiet=TRUE))
+  expect_silent(tabulateRunsTess(files=tfiles, quiet=TRUE))
+  expect_silent(suppressWarnings(tabulateRunsAdmixture(files=afiles, quiet=TRUE)))
+  expect_silent(tabulateRunsMatrix(files=afiles, quiet=TRUE))
+  expect_silent(tabulateRunsMatrix(files=ffiles, quiet=TRUE))
+  expect_silent(tabulateRunsMatrix(files=mcfiles, quiet=TRUE))
+  expect_silent(tabulateRunsMatrix(files=mtfiles, quiet=TRUE))
+  expect_silent(tabulateRunsMatrix(files=msfiles, quiet=TRUE))
 })
 
 test_that("sorttable=FALSE",{
@@ -317,57 +317,57 @@ test_that("Error: no input",{
 })
 
 #-------------------------------------------------------------------------------
-
+if(FALSE) {
 #clumppExport
 context("Clumpp Output")
 clumppExportStructure(sfiles)
-test_that("clumpp export check",{
+test_that("structure clumpp export check",{
   expect_equal(all(grepl("STRUCTUREpop",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("STRUCTUREpop*", recursive = TRUE, force = TRUE)
 
 clumppExportStructure(sfiles,prefix="Boom")
-test_that("clumpp export check prefix",{
+test_that("structure clumpp export check prefix",{
   expect_equal(all(grepl("Boom",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("Boom*", recursive = TRUE, force = TRUE)
 
 clumppExportTess(tfiles)
-test_that("clumpp export check",{
+test_that("tess clumpp export check",{
   expect_equal(all(grepl("TESSpop",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("TESSpop*", recursive = TRUE, force = TRUE)
 
 clumppExportTess(tfiles,prefix="Hahaha")
-test_that("clumpp export check prefix",{
+test_that("tess clumpp export check prefix",{
   expect_equal(all(grepl("Hahaha",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("Hahaha*", recursive = TRUE, force = TRUE)
 
 suppressWarnings(clumppExportAdmixture(afiles))
-test_that("clumpp export check",{
+test_that("admixture clumpp export check",{
   expect_equal(all(grepl("ADMIXTUREpop",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("ADMIXTUREpop*", recursive = TRUE, force = TRUE)
 
 clumppExportStructure(sfiles,prefix="Nanana")
-test_that("clumpp export check prefix",{
+test_that("structure clumpp export check prefix",{
   expect_equal(all(grepl("Nanana",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("Nanana*", recursive = TRUE, force = TRUE)
 
 clumppExportMatrix(afiles)
-test_that("clumpp export check",{
+test_that("matrix clumpp export check",{
   expect_equal(all(grepl("MATRIXpop",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("MATRIXpop*", recursive = TRUE, force = TRUE)
 
 clumppExportMatrix(ffiles)
-test_that("clumpp export check",{
+test_that("matrix clumpp export check",{
   expect_equal(all(grepl("MATRIXpop",list.dirs()[-1])),TRUE)
 })
 if(deleteoutput) unlink("MATRIXpop*", recursive = TRUE, force = TRUE)
-
+}
 #-------------------------------------------------------------------------------
 
 #collectClumppOutput
@@ -911,6 +911,30 @@ if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
 plotMultiline(sfiles[1:2],sortind="all")
 test_that("sfiles >1 check output sort all",{
+  expect_equal(any(grepl("structure",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+plotMultiline(sfiles[1:2],sortind=NA,sortlabels=F)
+test_that("sfiles 1 check output sort NA sortlabels F",{
+  expect_equal(any(grepl("structure",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+plotMultiline(sfiles[1:2],sortind="all",sortlabels=F)
+test_that("sfiles 1 check output sort all sortlabels F",{
+  expect_equal(any(grepl("structure",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+plotMultiline(sfiles[1:2],sortind="all",sortlabels=T)
+test_that("sfiles 1 check output sort all sortlabels F",{
+  expect_equal(any(grepl("structure",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+plotMultiline(sfiles[1:2],sortind="Cluster1",sortlabels=T)
+test_that("sfiles 1 check output sort all sortlabels F",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
