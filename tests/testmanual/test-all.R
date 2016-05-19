@@ -11,6 +11,7 @@ dir.create(paste(currwd,"/pophelper-demo",sep=""))
 setwd(paste(currwd,"/pophelper-demo",sep=""))
 #read sample STRUCTURE files from R package
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+sfiles1 <- list.files(path=system.file("files/structure-ci",package="pophelper"),full.names=TRUE)
 #read sample TESS files from R package
 tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
 #read sample ADMIXTURE files from R package
@@ -37,6 +38,7 @@ cr5 <- pophelper:::checkRuns(mcfiles)
 cr6 <- pophelper:::checkRuns(mtfiles)
 cr7 <- pophelper:::checkRuns(msfiles)
 cr8 <- pophelper:::checkRuns(tabs1)
+cr9 <- pophelper:::checkRuns(sfiles1)
 
 test_that("check runs output",{
   expect_equal(unique(cr1$type),"STRUCTURE")
@@ -55,6 +57,7 @@ test_that("check runs output",{
   expect_equal(unique(cr7$subtype),"SPACE")
   expect_equal(unique(cr8$type),"TAB")
   expect_equal(unique(cr8$subtype),NA)
+  expect_equal(unique(cr9$type),"STRUCTURE")
 })
 
 #tabulateRuns
@@ -67,6 +70,7 @@ tr5 <- tabulateRunsMatrix(files=ffiles)
 tr6 <- tabulateRunsMatrix(files=mcfiles)
 tr7 <- tabulateRunsMatrix(files=mtfiles)
 tr8 <- tabulateRunsMatrix(files=msfiles)
+tr9 <- tabulateRunsStructure(files=sfiles1)
 
 test_that("Is output dataframe?",{
   expect_equal(class(tr1),"data.frame")
@@ -77,6 +81,7 @@ test_that("Is output dataframe?",{
   expect_equal(class(tr6),"data.frame")
   expect_equal(class(tr7),"data.frame")
   expect_equal(class(tr8),"data.frame")
+  expect_equal(class(tr9),"data.frame")
 })
 
 test_that("quiet=FALSE",{
@@ -307,6 +312,8 @@ test_that("Is output dataframe or list?",{
   expect_equal(class(runsToDfMatrix(mtfiles[1])),"data.frame")
   expect_equal(class(runsToDfMatrix(msfiles)),"list")
   expect_equal(class(runsToDfMatrix(msfiles[1])),"data.frame")
+  expect_equal(class(runsToDfStructure(sfiles1)),"list")
+  expect_equal(class(runsToDfStructure(sfiles1[1])),"data.frame")
 })
 
 test_that("Error: no input",{
@@ -878,7 +885,7 @@ if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 #-------------------------------------------------------------------------------
 
 #plotMultiline
-context("plotMultiline")
+context("plotMultiline STRUCTURE")
 plotMultiline(sfiles[1])
 test_that("sfiles 1 check output",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
@@ -939,6 +946,7 @@ test_that("sfiles 1 check output sort all sortlabels F",{
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+context("plotMultiline TESS")
 plotMultiline(tfiles[1])
 test_that("tfiles 1 check output",{
   expect_equal(any(grepl("tess",list.files())),TRUE)
@@ -963,6 +971,7 @@ test_that("tfiles >1 check output",{
 })
 if(deleteoutput) file.remove(list.files()[grep("tess",list.files())])
 
+context("plotMultiline ADMIXTURE")
 plotMultiline(afiles[1])
 test_that("afiles 1 check output",{
   expect_equal(any(grepl("adm",list.files())),TRUE)
@@ -987,6 +996,7 @@ test_that("afiles >1 check output join sort all",{
 })
 if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
 
+context("plotMultiline FF")
 plotMultiline(ffiles[1])
 test_that("ffiles 1 check output",{
   expect_equal(any(grepl("fast",list.files())),TRUE)
@@ -1011,6 +1021,7 @@ test_that("ffiles >1 check output sort all",{
 })
 if(deleteoutput) file.remove(list.files()[grep("fast",list.files())])
 
+context("plotMultiline MC")
 plotMultiline(mcfiles[1])
 test_that("mcfiles 1 check output",{
   expect_equal(any(grepl("mat",list.files())),TRUE)
@@ -1035,6 +1046,7 @@ test_that("mcfiles >1 check output sort all",{
 })
 if(deleteoutput) file.remove(list.files()[grep("mat",list.files())])
 
+context("plotMultiline MT")
 plotMultiline(mtfiles[1])
 test_that("mtfiles 1 check output",{
   expect_equal(any(grepl("mat",list.files())),TRUE)
@@ -1059,6 +1071,7 @@ test_that("mtfiles >1 check output sort all",{
 })
 if(deleteoutput) file.remove(list.files()[grep("mat",list.files())])
 
+context("plotMultiline MS")
 plotMultiline(msfiles[1])
 test_that("msfiles 1 check output",{
   expect_equal(any(grepl("mat",list.files())),TRUE)

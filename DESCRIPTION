@@ -2,8 +2,8 @@ Package: pophelper
 Type: Package
 Title: Tabulate, analyse and visualise STRUCTURE, TESS and ADMIXTURE output
     files
-Version: 1.1.7
-Date: 2016-05-18
+Version: 1.1.8
+Date: 2016-05-19
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>

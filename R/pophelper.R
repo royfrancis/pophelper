@@ -1,5 +1,5 @@
-#pophelper v1.1.7
-#18-May-2016
+#pophelper v1.1.8
+#19-May-2016
 
 #check packages
 pkgs <- c("akima","fields","grid","gridExtra","ggplot2","gtable","PBSmapping","plyr","reshape2","spatstat")
@@ -264,10 +264,10 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
     
     #find individuals and get number of individuals
     ind[i] <- as.numeric(base::gsub("\\D", "", grep("\\d individuals", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1]))
-    if (is.na(ind[i])) cat(paste0("Number of individuals is NA in file: ", filenames[i]))
+    if (is.na(ind[i])) cat(paste0("Number of individuals is NA in file: ", filenames[i],"\n"))
     #get value of k & error check
     k[i] <- as.numeric(base::gsub("\\D", "", grep("\\d populations assumed", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1]))
-    if (is.na(k[i])) cat(paste0("Value of K is NA in file: ", filenames[i]))
+    if (is.na(k[i])) cat(paste0("Value of K is NA in file: ", filenames[i],"\n"))
     #get number of loci & error check
     loci[i] <- as.numeric(base::gsub("\\D", "", grep("\\d loci", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1]))
     if (is.na(loci[i])) cat(paste0("Number of Loci is NA in file: ", filenames[i], "\n"))
@@ -279,15 +279,24 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
     if (is.na(reps[i])) cat(paste0("Reps value is NA in file: ", filenames[i], "\n"))
     #get est ln prob of data & error check
     elpd[i] <- as.numeric(base::gsub("=", "", base::gsub("Estimated Ln Prob of Data", "", grep("Estimated Ln Prob of Data", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
-    if (is.na(elpd[i])) cat(paste0("Estimated Ln Prob of Data is NA in file: ", filenames[i]))
+    if (is.na(elpd[i])) cat(paste0("Estimated Ln Prob of Data is NA in file: ", filenames[i], "\n"))
     #get mn value of ln likelihood & error check
     mvll[i] <- as.numeric(base::gsub("=", "", base::gsub("Mean value of ln likelihood", "", grep("Mean value of ln likelihood", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
-    if (is.na(mvll[i])) cat(paste0("Mean value of ln likelihood is NA in file: ", filenames[i]))
+    if (is.na(mvll[i])) cat(paste0("Mean value of ln likelihood is NA in file: ", filenames[i], "\n"))
     #get Variance of ln likelihood else NA
     vll[i] <- as.numeric(base::gsub("=", "", base::gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
+    if (is.na(vll[i])) cat(paste0("Variance of ln likelihood is NA in file: ", filenames[i], "\n"))
     #get Mean value of alpha
-    mva[i] <- as.numeric(base::gsub("=", "", base::gsub("Mean value of alpha", "", grep("Mean value of alpha", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
-    #add values to rows in main table
+    mvat <- grep("Mean value of alpha", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)
+    if (length(mvat) == 0) {cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n")); mva[i] <- NA}
+    if (length(mvat) > 1)
+    {
+      mva[i] <- mean(as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat)))))
+      if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
+    }else{
+      mva[i] <- as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat))))
+      if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
+    }
   }
   
   #make dataframe container
@@ -4242,6 +4251,6 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,
 #-------------------------------------------------------------------------------
 #ON LOAD
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.1.7 ready.")
+    packageStartupMessage("pophelper v1.1.8 ready.")
 }
 
