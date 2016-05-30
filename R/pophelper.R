@@ -1,5 +1,5 @@
-#pophelper v1.1.8
-#19-May-2016
+#pophelper v1.1.9
+#31-May-2016
 
 #check packages
 pkgs <- c("akima","fields","grid","gridExtra","ggplot2","gtable","PBSmapping","plyr","reshape2","spatstat")
@@ -250,7 +250,7 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
   elpd <- vector(length = number, mode = "numeric")
   mvll <- vector(length = number, mode = "numeric")
   vll <- vector(length = number, mode = "numeric")
-  mva <- vector(length = number, mode = "numeric")
+  #mva <- vector(length = number, mode = "numeric")
   
   i <- 1
   for (i in i:number)
@@ -287,25 +287,25 @@ tabulateRunsStructure <- function(files = NULL, writetable = FALSE, sorttable = 
     vll[i] <- as.numeric(base::gsub("=", "", base::gsub("Variance of ln likelihood", "", grep("Variance of ln likelihood", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)[1])))
     if (is.na(vll[i])) cat(paste0("Variance of ln likelihood is NA in file: ", filenames[i], "\n"))
     #get Mean value of alpha
-    mvat <- grep("Mean value of alpha", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)
-    if (length(mvat) == 0) {cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n")); mva[i] <- NA}
-    if (length(mvat) > 1)
-    {
-      mva[i] <- mean(as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat)))))
-      if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
-    }else{
-      mva[i] <- as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat))))
-      if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
-    }
+    # mvat <- grep("Mean value of alpha", file1, perl = TRUE, ignore.case = TRUE, value = TRUE)
+    # if (length(mvat) == 0) {cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n")); mva[i] <- NA}
+    # if (length(mvat) > 1)
+    # {
+    #   mva[i] <- mean(as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat)))))
+    #   if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
+    # }else{
+    #   mva[i] <- as.numeric(sub("= ","",substr(mvat,regexpr("=",mvat),regexpr("$",mvat))))
+    #   if (is.na(mva[i])) cat(paste0("Mean value of alpha is NA in file: ", filenames[i], "\n"))
+    # }
   }
   
   #make dataframe container
   main <- data.frame(file = filenames, k = as.numeric(k), ind = as.numeric(ind),
                      loci = as.numeric(loci), elpd = as.numeric(elpd), 
                      mvll = as.numeric(mvll), vll = as.numeric(vll),
-                     mva = as.numeric(mva), burnin = as.numeric(burnin), 
+                     burnin = as.numeric(burnin), 
                      reps = as.numeric(reps),stringsAsFactors = FALSE)
-  
+  #mva = as.numeric(mva), 
   #sort table on loci, ind, K
   if(sorttable) main <- main[with(main, order(loci, ind, k)), ]
   
@@ -4251,6 +4251,6 @@ plotRunsSpatial <- function(datafile = NULL, coordsfile = NULL,popcol = NA,
 #-------------------------------------------------------------------------------
 #ON LOAD
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.1.8 ready.")
+    packageStartupMessage("pophelper v1.1.9 ready.")
 }
 
