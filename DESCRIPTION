@@ -1,16 +1,16 @@
 Package: pophelper
 Type: Package
-Title: Tabulate, analyse and visualise STRUCTURE, TESS and ADMIXTURE output
+Title: Tabulate, analyse and visualise STRUCTURE, TESS, ADMIXTURE and fastSTRUCTURE run
     files
-Version: 1.1.9
-Date: 2016-05-31
+Version: 1.2.0
+Date: 2016-07-25
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
 Description: A set of useful functions for processing output files from the
-    population structure analysis softwares STRUCTURE, TESS and ADMIXTURE. The
+    population structure analysis softwares STRUCTURE, TESS, ADMIXTURE, fastSTRUCTURE etc. The
     package contains functions to tabulate runs, summarise runs, plot runs, estimate
-    K using Evanno method, export to clumpp format and generate barplots.
+    K using Evanno method, export clumpp files, export distruct files and generate barplots.
 URL: https://github.com/royfrancis/pophelper
 Depends:
     R(>= 3.1.2),
@@ -23,8 +23,7 @@ Imports:
     gridExtra,
     gtable,
     PBSmapping,
-    plyr,
-    reshape2,
+    tidyr,
     spatstat
 Suggests:
     knitr,

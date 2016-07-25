@@ -1,3 +1,6 @@
+# Test Script
+# 25-Jul-2016
+
 library(testthat)
 library(pophelper)
 
@@ -25,7 +28,7 @@ msfiles <- list.files(path=system.file("files/matrix/space",package="pophelper")
 tabs1 <- c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
-
+pops <- read.delim(system.file("files/structurepoplabels.txt",package="pophelper"),header=FALSE)
 #-------------------------------------------------------------------------------
 
 #checkRuns
@@ -298,6 +301,8 @@ context("runsToDf")
 test_that("Is output dataframe or list?",{
   expect_equal(class(runsToDfStructure(sfiles)),"list")
   expect_equal(class(runsToDfStructure(sfiles[1])),"data.frame")
+  expect_equal(any(is.na(as.numeric(row.names(runsToDfStructure(sfiles[1],indlabfromfile = F))))),FALSE)
+  expect_equal(any(is.na(as.numeric(row.names(runsToDfStructure(sfiles[1],indlabfromfile = T))))),TRUE)
   expect_equal(class(runsToDfTess(tfiles)),"list")
   expect_equal(class(runsToDfTess(tfiles[1])),"data.frame")
   expect_equal(class(suppressWarnings(runsToDfAdmixture(afiles))),"list")
@@ -339,6 +344,12 @@ test_that("structure clumpp export check prefix",{
 })
 if(deleteoutput) unlink("Boom*", recursive = TRUE, force = TRUE)
 
+clumppExportStructure(sfiles,useexe=T)
+test_that("structure clumpp export useexe",{
+  expect_equal(all(grepl("STRUCTUREpop",list.dirs()[-1])),TRUE)
+})
+if(deleteoutput) unlink("STRUCTUREpop*", recursive = TRUE, force = TRUE)
+
 clumppExportTess(tfiles)
 test_that("tess clumpp export check",{
   expect_equal(all(grepl("TESSpop",list.dirs()[-1])),TRUE)
@@ -351,11 +362,23 @@ test_that("tess clumpp export check prefix",{
 })
 if(deleteoutput) unlink("Hahaha*", recursive = TRUE, force = TRUE)
 
-suppressWarnings(clumppExportAdmixture(afiles))
-test_that("admixture clumpp export check",{
-  expect_equal(all(grepl("ADMIXTUREpop",list.dirs()[-1])),TRUE)
+clumppExportTess(tfiles,useexe=TRUE)
+test_that("tess clumpp export check",{
+  expect_equal(all(grepl("TESSpop",list.dirs()[-1])),TRUE)
 })
-if(deleteoutput) unlink("ADMIXTUREpop*", recursive = TRUE, force = TRUE)
+if(deleteoutput) unlink("TESSpop*", recursive = TRUE, force = TRUE)
+
+suppressWarnings(clumppExportMatrix(afiles))
+test_that("matrix clumpp export check",{
+  expect_equal(all(grepl("MATRIXpop",list.dirs()[-1])),TRUE)
+})
+if(deleteoutput) unlink("MATRIXpop*", recursive = TRUE, force = TRUE)
+
+clumppExportMatrix(afiles,useexe=TRUE)
+test_that("matrix clumpp export check",{
+  expect_equal(all(grepl("MATRIXpop",list.dirs()[-1])),TRUE)
+})
+if(deleteoutput) unlink("MATRIXpop*", recursive = TRUE, force = TRUE)
 
 clumppExportStructure(sfiles,prefix="Nanana")
 test_that("structure clumpp export check prefix",{
@@ -375,6 +398,8 @@ test_that("matrix clumpp export check",{
 })
 if(deleteoutput) unlink("MATRIXpop*", recursive = TRUE, force = TRUE)
 }
+
+
 #-------------------------------------------------------------------------------
 
 #collectClumppOutput
@@ -437,6 +462,18 @@ test_that("check output sep with labels",{
 })
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+plotRuns(sfiles[1],poplab=pops$V1,popmean=T)
+test_that("check popmean",{
+  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+plotRuns(sfiles[1:4],poplab=pops$V1,popmean=T)
+test_that("check popmean",{
+  expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1:4]),".png"))
+
 plotRuns(sfiles[1],poplab=pops$V1,sortind="Cluster1")
 test_that("check output sep with labels sort cluster",{
   expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
@@ -449,11 +486,52 @@ test_that("check output sep with labels sort all",{
 })
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+plotRuns(sfiles[1:4],poplab=pops$V1,popmean=T,sortind="all")
+test_that("check popmean with sortind",{
+  expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1:4]),".png"))
+
 plotRuns(sfiles[1:2],imgoutput="join",poplab=pops$V1)
 test_that("check output joined with labels",{
   expect_equal(length(grep("Joined.+",list.files())),1)
 })
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+plotRuns(sfiles[1:4],poplab=pops$V1,popmean=T,imgoutput="join")
+test_that("check popmean with join",{
+  expect_equal(length(grep("Joined.+",list.files())),1)
+})
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+popsrep <- read.delim(system.file("files/structurepoplabels-rep.txt",package="pophelper"),header=FALSE)
+
+plotRuns(sfiles[1],poplab=popsrep$V1)
+test_that("check output sep with rep labels",{
+  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+plotRuns(sfiles[1],poplab=popsrep$V1,popmean=T)
+test_that("check popmean with rep labels",{
+  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+plotRuns(sfiles[1],poplab=popsrep$V1,sort="all")
+test_that("check output sep with rep labels sort all",{
+  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+plotRuns(sfiles[1],poplab=popsrep$V1,sort="Cluster2")
+test_that("check output sep with rep labels sort cluster",{
+  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+})
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+expect_error(plotRuns(sfiles[1],poplab=popsrep$V1,subsetpops="Pop A"))
+expect_error(plotRuns(sfiles[1],poplab=popsrep$V1,subsetpops=c("Pop B","Pop A")))
 
 test_that("check less colours",{
   expect_error(plotRuns(sfiles[4],popcol=c("red","green")))
@@ -512,6 +590,12 @@ test_that("check output sep with labels",{
 })
 if(deleteoutput) file.remove(list.files()[grep("tess",list.files())])
 
+plotRuns(tfiles[1],poplab=labs1,popmean = T)
+test_that("check output sep with labels and popmean",{
+  expect_equal(any(grepl("tess",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("tess",list.files())])
+
 plotRuns(tfiles[1],poplab=labs1,sortind="Cluster1")
 test_that("check output sep with labels sortind cluster1",{
   expect_equal(any(grepl("tess",list.files())),TRUE)
@@ -526,6 +610,12 @@ if(deleteoutput) file.remove(list.files()[grep("tess",list.files())])
 
 plotRuns(tfiles[1:2],imgoutput="join",poplab=labs1)
 test_that("check output joined with labels",{
+  expect_equal(length(grep("Joined.+",list.files())),1)
+})
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+plotRuns(tfiles[1:4],imgoutput="join",poplab=labs1, popmean=T)
+test_that("check output joined with labels and popmean",{
   expect_equal(length(grep("Joined.+",list.files())),1)
 })
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
@@ -565,6 +655,12 @@ test_that("check output sep with labels",{
 })
 if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
 
+plotRuns(afiles[1],poplab=admpops$V1, popmean=T)
+test_that("check output sep with labels and popmean",{
+  expect_equal(any(grepl("adm",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
+
 plotRuns(afiles[1],poplab=admpops$V1,sortind="Cluster1")
 test_that("check orderind cluster",{
   expect_equal(any(grepl("admixture",list.files())),TRUE)
@@ -579,6 +675,12 @@ if(deleteoutput) file.remove(list.files()[grep("admixture",list.files())])
 
 plotRuns(afiles[1:2],imgoutput="join",poplab=admpops$V1)
 test_that("check output joined with labels",{
+  expect_equal(length(grep("Joined.+",list.files())),1)
+})
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+plotRuns(afiles[1:3],imgoutput="join",poplab=admpops$V1,popmean=T)
+test_that("check output joined with labels and popmean",{
   expect_equal(length(grep("Joined.+",list.files())),1)
 })
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
@@ -624,13 +726,25 @@ if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 fastpops <- read.delim(system.file("files/faststructurepoplabels.txt",package="pophelper"),header=FALSE)
 
-plotRuns(ffiles[1],poplab=fastpops$V1)
+plotRuns(ffiles[2],poplab=fastpops$V1)
 test_that("check output sep with labels",{
   expect_equal(any(grepl("fast",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
 
-plotRuns(ffiles[1:2],imgoutput="join",poplab=fastpops$V1)
+plotRuns(ffiles[2],poplab=fastpops$V1,popmean=T)
+test_that("check output sep with labels and pop mean",{
+  expect_equal(any(grepl("fast",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
+
+plotRuns(ffiles[2:3],imgoutput="join",poplab=fastpops$V1)
+test_that("check output joined with labels",{
+  expect_equal(length(grep("Joined.+",list.files())),1)
+})
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+plotRuns(ffiles[2:4],imgoutput="join",poplab=fastpops$V1,popmean=T)
 test_that("check output joined with labels",{
   expect_equal(length(grep("Joined.+",list.files())),1)
 })
@@ -683,6 +797,12 @@ test_that("check output sep with labels",{
 })
 if(deleteoutput) file.remove(list.files()[grep("matrix",list.files())])
 
+plotRuns(mcfiles[1],poplab=matpops$V1,popmean=T)
+test_that("check output sep with labels",{
+  expect_equal(any(grepl("matrix",list.files())),TRUE)
+})
+if(deleteoutput) file.remove(list.files()[grep("matrix",list.files())])
+
 plotRuns(mcfiles[1],poplab=matpops$V1,sortind="Cluster1")
 test_that("check output sep with labels",{
   expect_equal(any(grepl("matrix",list.files())),TRUE)
@@ -708,6 +828,12 @@ test_that("check output joined with labels sort cluster1",{
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 plotRuns(mcfiles[1:2],imgoutput="join",poplab=matpops$V1,sortind="all")
+test_that("check output joined with labels sort cluster1",{
+  expect_equal(length(grep("Joined.+",list.files())),1)
+})
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+plotRuns(mcfiles[1:3],imgoutput="join",poplab=matpops$V1,sortind="all",popmean=T)
 test_that("check output joined with labels sort cluster1",{
   expect_equal(length(grep("Joined.+",list.files())),1)
 })
@@ -870,18 +996,61 @@ test_that("check output table",{
 })
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+plotRuns(files=tabs1,imgoutput="tab",popmean=T)
+test_that("check output table",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
 plotRuns(files=tabs1,imgoutput="tab",sortind="Cluster1")
 test_that("check output table sort cluster",{
   expect_equal(length(grep("STRUCTUREpop",list.files())),3)
 })
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
-plotRuns(files=tabs1,imgoutput="tab",sortind="all")
-test_that("check output table sort all",{
+plotRuns(files=tabs1,imgoutput="tab",poplab=pops$V1)
+test_that("check output table pop lab",{
   expect_equal(length(grep("STRUCTUREpop",list.files())),3)
 })
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+plotRuns(files=tabs1,imgoutput="tab",poplab=pops$V1,sortind="all")
+test_that("check output table pop lab sort all",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+plotRuns(files=tabs1,imgoutput="tab",poplab=pops$V1,sortind="Cluster1")
+test_that("check output table pop lab sort cluster",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+plotRuns(files=tabs1,imgoutput="tab",poplab=pops$V1,popmean=T)
+test_that("check output table pop lab pop mean",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+plotRuns(files=tabs1,imgoutput="tab",poplab=popsrep$V1)
+test_that("check output table pop lab rep",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+plotRuns(files=tabs1,imgoutput="tab",poplab=popsrep$V1,sortind="all")
+test_that("check output table pop lab rep sort",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+plotRuns(files=tabs1,imgoutput="tab",poplab=popsrep$V1,sortind="all",popmean=T)
+test_that("check output table pop lab rep sort pop mean",{
+  expect_equal(length(grep("STRUCTUREpop",list.files())),3)
+})
+if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
+
+expect_error(plotRuns(files=tabs1,imgoutput="tab",poplab=popsrep$V1,subsetpops="Pop B"))
 #-------------------------------------------------------------------------------
 
 #plotMultiline
@@ -911,37 +1080,39 @@ test_that("sfiles >1 check output",{
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
 plotMultiline(sfiles[1:2],sortind="Cluster1")
-test_that("sfiles >1 check output sort cluster",{
+test_that("sfiles >1 sort cluster",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
 plotMultiline(sfiles[1:2],sortind="all")
-test_that("sfiles >1 check output sort all",{
+test_that("sfiles >1 sort all",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
-plotMultiline(sfiles[1:2],sortind=NA,sortlabels=F)
-test_that("sfiles 1 check output sort NA sortlabels F",{
+plotMultiline(sfiles[1:2],sortind=NA,indlabfromfile=T)
+test_that("sfiles 1 sort NA indlabfromfile",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
-plotMultiline(sfiles[1:2],sortind="all",sortlabels=F)
-test_that("sfiles 1 check output sort all sortlabels F",{
+plotMultiline(sfiles[1:2],sortind="all",indlabfromfile=T)
+test_that("sfiles 1 sort all indlabfromfile=T",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
-plotMultiline(sfiles[1:2],sortind="all",sortlabels=T)
-test_that("sfiles 1 check output sort all sortlabels F",{
+inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE)
+
+plotMultiline(sfiles[1:2],indlab=inds$V1)
+test_that("sfiles 1 indlab",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
-plotMultiline(sfiles[1:2],sortind="Cluster1",sortlabels=T)
-test_that("sfiles 1 check output sort all sortlabels F",{
+plotMultiline(sfiles[1:2],sortind="Cluster1",indlab=inds$V1)
+test_that("sfiles 1 check output sort cluster1 indlab",{
   expect_equal(any(grepl("structure",list.files())),TRUE)
 })
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
@@ -1306,6 +1477,7 @@ test_that("check output",{
 })
 if(deleteoutput) file.remove(list.files()[grep("Spatial.png",list.files())])
 
+
 #-------------------------------------------------------------------------------
 
 context("analyseRuns Structure")
@@ -1351,6 +1523,206 @@ test_that("check output",{
 })
 if(deleteoutput) unlink(list.dirs()[-1],recursive = T,force = T)
 if(deleteoutput) file.remove(list.files())
+
+#-------------------------------------------------------------------------------
+
+context("distructExport Structure")
+
+pops <- read.delim(system.file("files/structurepoplabels.txt",package="pophelper"),header=FALSE)
+
+#ind one file
+distructExport(files = sfiles[1])
+test_that("destructExport structure one file",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#both top and bottom labels
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),poplabtop=as.character(pops$V1),popmean=T)
+test_that("destructExport structure top and bottom labels",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#both top and bottom labels quiet
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),poplabtop=as.character(pops$V1),quiet=T)
+test_that("destructExport structure top and botoom labels quiet",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#no bottom labels
+distructExport(sfiles[1],poplabbottom=NA,poplabtop=as.character(pops$V1))
+test_that("destructExport structure no bottom labels",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#no top labels
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),poplabtop=NA)
+test_that("destructExport structure no top labels",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#no both labels
+distructExport(sfiles[1],poplabbottom=NA,poplabtop=NA)
+test_that("destructExport structure both labels",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files
+distructExport(sfiles[2:5],poplabbottom=as.character(pops$V1))
+test_that("destructExport structure multiple files",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#pop mean true
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),popmean=T)
+test_that("destructExport structure popmean true",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files with popmean
+distructExport(sfiles[2:5],poplabbottom=as.character(pops$V1),popmean=T)
+test_that("destructExport structure multiple files",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#other colours
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),popcol=pophelper:::distructColours()[43:44])
+test_that("destructExport structure other colours",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files use exe
+distructExport(sfiles[2:5],poplabbottom=as.character(pops$V1),useexe=T)
+test_that("destructExport structure use exe",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files popmean use exe
+distructExport(sfiles[2:5],poplabbottom=as.character(pops$V1),popmean=T,useexe=T)
+test_that("destructExport structure popmean use exe",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#other colours use exe
+distructExport(sfiles[1],poplabbottom=as.character(pops$V1),popcol=pophelper:::distructColours()[43:44],useexe=T)
+test_that("destructExport structure other colours use exe",{
+  expect_equal(any(grepl("drawparams",list.files("./structure_01-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+context("exportDistruct Tess")
+pops <- read.delim(system.file("files/tesspoplabels.txt",package="pophelper"),header=FALSE)
+
+#both top and bottom labels
+distructExport(tfiles[3],poplabbottom=as.character(pops$V1),poplabtop=as.character(pops$V1))
+test_that("exportDistruct Tess top and bottom labels",{
+  expect_equal(any(grepl("drawparams",list.files("./tess_03-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#both top and bottom labels quiet
+distructExport(tfiles[3],poplabbottom=as.character(pops$V1),poplabtop=as.character(pops$V1),quiet=T)
+test_that("exportDistruct Tess top and bottom labels quiet",{
+  expect_equal(any(grepl("drawparams",list.files("./tess_03-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#no bottom labels
+distructExport(tfiles[3],poplabbottom=NA,poplabtop=as.character(pops$V1))
+test_that("exportDistruct Tess no bottom labels",{
+  expect_equal(any(grepl("drawparams",list.files("./tess_03-distruct"))),TRUE)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files
+distructExport(tfiles[2:5],poplabbottom=as.character(pops$V1))
+test_that("exportDistruct Tess multiple files",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#multiple files with popmean
+distructExport(tfiles[2:5],poplabbottom=as.character(pops$V1),popmean=T)
+test_that("exportDistruct Tess pop mean",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+context("distructExport Other formats")
+
+#admixture multiple
+distructExport(files = afiles[1:4],popmean=F)
+test_that("exportDistruct Admixture",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#admixture multiple popmean
+distructExport(files = afiles[1:4],popmean=T)
+test_that("exportDistruct Admixture pop mean",{
+  expect_equal(length(list.files()),4)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#faststructure
+distructExport(files = ffiles[2:3],popmean=F)
+test_that("exportDistruct faststructure",{
+  expect_equal(length(list.files()),2)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#matrix files comma
+distructExport(files = mcfiles[2:3],popmean=F)
+test_that("exportDistruct Matrix Comma",{
+  expect_equal(length(list.files()),2)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#matrix files tab
+distructExport(files = mtfiles[2:3],popmean=F)
+test_that("exportDistruct Matrix tab",{
+  expect_equal(length(list.files()),2)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#matrix files space
+distructExport(files = msfiles[2:3],popmean=F)
+test_that("exportDistruct Matrix space",{
+  expect_equal(length(list.files()),2)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#tab no popmean
+distructExport(files = tabs1,popmean=F)
+test_that("exportDistruct Admixture",{
+  expect_equal(length(list.files()),7)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#tab popmean
+distructExport(files = tabs1,popmean=T)
+test_that("exportDistruct Admixture",{
+  expect_equal(length(list.files()),7)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
+
+#tab no popmean use exe
+distructExport(files = tabs1,useexe=T)
+test_that("exportDistruct Admixture",{
+  expect_equal(length(list.files()),7)
+})
+if(deleteoutput) unlink(list.files(),recursive=T,force=T)
 
 #-------------------------------------------------------------------------------
 

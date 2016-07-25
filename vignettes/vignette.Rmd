@@ -1,14 +1,23 @@
 ---
-output: rmarkdown::html_vignette
+title: "Pophelper 1.2.0"
+output: 
+  html_document: 
+    code_folding: "none"
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+  highlight: tango 
+  theme: flatly
 vignette: >
   %\VignetteIndexEntry{Pophelper Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-# Pophelper 1.1.6
-
-__Roy M Francis__ | 02-Jan-2016
+__Roy M Francis__ | 25-July-2016
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
 options(rpubs.upload.method = "internal")
@@ -17,44 +26,23 @@ knitr::opts_chunk$set(collapse = TRUE)
 pkgname <- "pophelper"
 library(pophelper)
 ```
-  
-## Contents
 
-#### 1. Introduction  
-#### 2. Installation  
-#### 3. Functions & Overview  
-#### 4. Workflow  
-#### 4.1. Structure workflow  
-#### 4.2 Tess workflow  
-#### 4.3 Matrix workflow (Admixture, fastStructure)  
-#### 4.4 collectClumppOutput
-#### 4.5 plotRuns
-#### 4.6 plotMultiline
-#### 4.7 plotRunsInterpolate
-#### 4.8 plotRunsSpatial
-#### 4.9 analyseRuns
-#### 5. Working code  
-#### 6. Useful links  
-#### 7. References  
-#### 8. Disclaimer  
-#### 9. Contact  
+# Introduction  
 
-## 1. Introduction  
+This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, fastSTRUCTURE^6^, STRUCTURE^5^, TESS^3^ and any output in a tabular delimited file.
 
-This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, fastSTRUCTURE^6^, STRUCTURE^5^ and TESS^3^.
+Softwares such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions that include tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. 
 
-Softwares such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions that include tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. Several other programs exist for determining population structures such as BAPS, INSTRUCT, GENELAND etc which will not be covered for now.
-
-This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.2.0 (2015-04-16)` on a 64-bit Windows 8.1 Platform. The package has been briefly tested on 64-bit Windows 7 and 64-bit Mac OS X 10.9.5. This vignette has been compiled using R Markdown in RStudio. Input and output codes are printed in a font different from body text like `this`.  
+This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.3.0 (2016-05-03)` on a 64-bit Windows 7 Platform. Input and output codes are printed in a font different from body text like `this`.  
 
 ----
 
-## 2. Installation  
+# Installation  
 
 The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.2.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code.
 
 ```{r,echo=TRUE,eval=FALSE,results='hide'}
-# Installation devtools package
+# Install devtools package
 install.packages('devtools',dep=T)
 library(devtools)
 
@@ -68,9 +56,12 @@ library(pophelper)
 packageDescription("pophelper", fields = "Version")
 ```
 
-The next step is to set the working directory. The working directory is a folder that usually contains the run files of interest so as to allow R to access it. Functions may produce outputs such as text files or images which will be exported to the working directory. The working directory can be set by running the command below and then selecting the folder interactively in the popup window.
+The next step is to set the working directory. The working directory is a folder that usually contains the run files of interest so as to allow R to access it. The working directory must have read-write-execute permissions. Functions may produce outputs such as text files or images which will be exported to the working directory. The working directory can be set by running the command below using a path or by selecting the folder interactively in the popup window.
 
-`setwd(choose.dir())`
+```{r,echo=TRUE,eval=FALSE,results='hide'}
+setwd("path")
+setwd(choose.dir())
+```
 
 For this demonstration, the sample run files will be loaded from the `pophelper` library. Therefore, the working directory will be used for output generated from various `r print(pkgname)` functions.
 
@@ -88,7 +79,7 @@ For functions where one or more files need to be selected, the selection can be 
 
 ----
 
-## 3. Functions & Overview  
+# Functions & Overview  
 All functions in the `pophelper` package are lsited below.  
  
 ```{r, eval=FALSE,echo=TRUE}
@@ -96,54 +87,45 @@ tabulateRunsStructure()   # Get a tabulation of several STRUCTURE files
 summariseRunsStructure()  # Summarise runs by repeats for each K
 evannoMethodStructure()   # Perform the Evanno method on summarised data
 runsToDfStructure()       # Convert STRUCTURE run files to R dataframe
-clumppExportStructure()   # Export data file and parameter file for use with CLUMPP
+clumppExportStructure()   # Export files for use with CLUMPP
 
-collectRunsTess()         # Collect TESS output from multiple folders into one
+collectRunsTess()         # Collect TESS output from multiple directories into one
 tabulateRunsTess()        # Get a tabulation of several TESS files
 summariseRunsTess()       # Summarise runs by repeats for each K
 runsToDfTess()            # Convert TESS run files to R dataframe
-clumppExportTess()        # Export data file and parameter file for use with CLUMPP
+clumppExportTess()        # Export files for use with CLUMPP
 
 tabulateRunsMatrix()      # Get a tabulation of several MATRIX files
 summariseRunsMatrix()     # Summarise runs by repeats for each K
 runsToDfMatrix()          # Convert MATRIX run files to R dataframe
-clumppExportMatrix()      # Export data file and parameter file for use with CLUMPP
+clumppExportMatrix()      # Export files for use with CLUMPP
 
-collectClumppOutput()     # Collect CLUMPP output into a common folder
-plotRuns()                # Plot a barplot from STRUCTURE/TESS/table files
-PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/table file
+collectClumppOutput()     # Collect CLUMPP output into a common directory
+plotRuns()                # Plot a barplot from STRUCTURE/TESS/Matrix/table files
+PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/Matrix/table file
+distructExport()          # Export files for DISTRUCT from STRUCTURE/TESS/Matrix/table file
+
 plotRunsInterpolate()     # Spatially interpolate clusters from a STRUCTURE/TESS run file
 plotRunsSpatial()         # Cluster by max assignment and plot points spatially
 
 analyseRuns()             # A wrapper function to quickly tabulate, summarise, 
-                          # perform evanno method, clumpp output and 
-                          # generate barplots from STRUCTURE, TESS or MATRIX run files.
+                          # perform evanno method, clumpp output and generate barplots 
+                          # from STRUCTURE, TESS or MATRIX run files.
 ```
 
-An overview of the standard workflow using STRUCTURE files, TESS files and other tabular input files is shown below.  
-
-![Workflow Structure](workflow-structure.png)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
-
-![Workflow Tess](workflow-tess.png)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
-
-![Workflow Tess](workflow-matrix.png)  
-__Fig 3.__ *Workflow for MATRIX files (fastSTRUCTURE, ADMIXTURE etc). Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
-
-### 3.1 Input files  
-The input run files expected by the package are STRUCTURE run files, TESS run files (-TR files in folders), ADMIXTURE run files and fastSTRUCTURE meanQ files. Inputs can also be a numeric tabular tab, space or comma-delimited files without headers.  
+# Input files  
+The input run files expected by the package are STRUCTURE run files, TESS run files (-TR files in folders), or MATRIX run files. MATRIX files are numeric delimited tabular file like ADMIXTURE run files and fastSTRUCTURE meanQ files. Inputs can also be a generic numeric tabular tab, space or comma-delimited files without headers.  
 
 ![input-preview](input-preview.png)  
-*__Fig 4__: A preview of the input files. `STRUCTURE` file (Left), `TESS` file (centre) and `ADMIXTURE` file (right).*  
+*__Fig 4__: A preview of the input files. `STRUCTURE` file (Left), `TESS` file (centre) and `MATRIX` file (right).*  
 
-Input files for population labels and spatial coordinates must be a tab-delimited header-free text files.  
+Combined, aligned and merged file used with CLUMPP are referred to as TAB files (table). They can be used for plotting. Input files for population labels and spatial coordinates must be tab-delimited header-free text files.  
 
 ----
 
-## 4. Workflow  
+# Workflow  
 
-In this section, we will look at how these functions are used, their syntax and typical workflow. The workflow differs depending on the run files that are used. Specific functions are available for STRUCTURE, TESS or MATRIX input files. Specific functions are covered in sections 4.1, 4.2 and 4.3. Functions that are common and shared for all run types are covered in sections 4.4 to 4.9.  
+In this section, we will look at how these functions are used, their syntax and typical workflow. The workflow differs depending on the run files that are used. Specific functions are available for STRUCTURE, TESS or MATRIX input files. Specific functions are covered in workflow section. Functions that are common and shared for all run types are covered later.  
 
 The `pophelper` library must be loaded and a working directory must be set.
 
@@ -152,9 +134,12 @@ library(pophelper)
 setwd(choose.dir())
 ```
 
-### 4.1 STRUCTURE runs Workflow  
+## STRUCTURE runs Workflow  
 
-__4.1.1 tabulateRunsStructure__  
+![Workflow Structure](workflow-structure.png)  
+__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+
+### tabulateRunsStructure  
 The functions `tabulateRunsStructure()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
 
 A typical STRUCTURE run produces a large number of output run files as seen below.  
@@ -186,11 +171,11 @@ head(tr1)
 
 ```
 
-The `tabulateRunsStructure()` function produces a table listing all selected files showing 10 columns namely file names, value of *K*, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, mean value of alpha, number of burn-in and number of repeats. The table is sorted by loci, ind and *K*. Missing values are given NA.
+The `tabulateRunsStructure()` function produces a table listing all selected files showing 10 columns namely file names, value of *K*, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, number of burn-in and number of repeats. The table is sorted by loci, ind and *K*. Missing values are given NA.
 
 By default, the `tabulateRunsStructure()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.1.2 summariseRunsStructure__  
+### summariseRunsStructure  
 
 The table produced using `tabulateRunsStructure()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateRunsStructure()` can be passed as input to `summariseRunsStructure()`. 
 
@@ -208,7 +193,7 @@ head(sr1)
 
 The `summariseRunsStructure()` function returns 6 columns namely Mean estimated ln probability of data, standard deviation, value of *K*, number of runs for each *K*, estimated ln probability of data plus standard deviation, estimated ln probability of data minus standard deviation.
 
-__4.1.3 evannoMethodStructure__  
+### evannoMethodStructure  
 
 The `evannoMethodStructure()` function is only applicable to STRUCTURE runs.
 
@@ -247,7 +232,7 @@ The Evanno method can be computed only if these criteria are met: At least 3 val
 
 From the command above, a png file and text file is exported to the working directory. The peak of deltaK in Fig. 6D. is usually used to estimate the best value of *K*.
 
-__4.1.4 runsToDfStructure__  
+### runsToDfStructure  
 
 STRUCTURE run files can be converted to R dataframes using the functions `runsToDfStructure()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
 
@@ -259,23 +244,31 @@ rtd1 <- runsToDfStructure(files=slist)
 rtd1 <- runsToDfStructure(files=choose.files(multi=TRUE))
 ```
 
+If individual labels are present in the STRUCTURE file, they can be imported as rownames by setting `indlabfromfile=T`. Space in labels may be replaced by underscore. Incorrect parsing with internal population flags may introduce underscores. If duplicate labels are found, the labels are not imported.
+
 ```{r,echo=TRUE, eval=FALSE}
 # convert all input files
 rtd1 <- runsToDfStructure(files=slist)
 # check class of ouput
 class(rtd1)
+# view head of first converted file
+head(rtd1)
+
 # convert only one input file
 rtd1.1 <- runsToDfStructure(files=slist[1])
 # check class of output
 class(rtd1.1)
-
 # view head of first converted file
 head(rtd1[[1]])
+
+#include individual names from structure file as row names
+runsToDfStructure(files=slist[1],indlabfromfile = T)
+
 ```
 
 The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
 
-__4.1.5 clumppExportStructure__  
+### clumppExportStructure  
 
 When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.
 
@@ -302,22 +295,34 @@ clumppExportStructure(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 clumppExportStructure(files=slist,prefix="Set1")
 ```
 
-The CLUMPP executable needs to be copied and pasted into each of these folder and run by double clicking on it.  This step must be carried out manually in all folders to follow the rest of this tutorial. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
+The CLUMPP executable needs to be copied and pasted into each of these folder and executed by running it. Alternatively, the CLUMPP executable can now be run automatically by specifying `useexe=T`. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
+
+```{r,echo=TRUE, eval=FALSE}
+#auto execute CLUMPP
+clumppExportStructure(files=slist, useexe=T)
+```
+
+Remember to cite CLUMPP^4^ if this option is used.
 
 ![clumpp-folder-results](clumpp-output.png)  
 __Fig. 8.__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
 
 The aligned file contains all the runs as in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
 
-### 4.2 TESS runs Workflow  
+The remaining workflow is common for all input filetypes. Head over to section 'Common functions'.
 
-__4.2.1 collectRunsTess__  
+## TESS runs Workflow  
+
+![Workflow Tess](workflow-tess.png)  
+__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+
+### collectRunsTess  
 
 This function is applicable only to TESS runs. Unlike STRUCTURE runs which are exported into a single directory, TESS output files are exported into separate directories by run. This means that one needs to go into individual folders to obtain the run file. The function `collectRunsTess()` collects TESS cluster files from individual run folders into one new folder and rename each runfile by the folder name. Set working directory first and run basic usage.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
-collectRunsTess()
+collectRunsTess(runsdir="D:\\RoyDocs\\Dropbox\\Rwork\\pophelperRpackage\\tessoriginal")
 
 # another usage
 collectRunsTess(runsdir = choose.dir())
@@ -325,7 +330,7 @@ collectRunsTess(runsdir = choose.dir())
 
 Within each TESS run folder, the function searches for filename ending with 'TR.txt' as the cluster file. This file is copied to the new folder and renamed with the name of the respective run directory. Therefore, DO NOT manually rename original TESS run files or directories.
 
-__4.2.2 tabulateRunsTess__  
+### tabulateRunsTess  
 
 The function `tabulateRunsTess()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
 
@@ -358,7 +363,7 @@ The `tabulateRunsTess()` function returns a table with three columns namely file
 
 By default, the `tabulateRunsTess()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.2.3 summariseRunsTess__  
+### summariseRunsTess  
 
 The table produced using `tabulateRunsTess()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateRunsTess()` can be passed as input to `summariseRunsTess()`. 
 
@@ -375,7 +380,7 @@ head(sr2)
 
 The `summariseRunsTess()` function returns 3 columns namely individuals, *K* and the number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.2.4 runsToDfTess__  
+### runsToDfTess  
 
 TESS run files can be converted to R dataframes using the functions `runsToDfTess()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
 
@@ -403,7 +408,7 @@ head(rtd2[[1]])
 
 The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
 
-__4.2.5 clumppExportTess__  
+### clumppExportTess  
 
 When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.
 
@@ -427,15 +432,23 @@ clumppExportTess(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 clumppExportTess(files=slist,prefix="Set1")
 ```
 
-The CLUMPP executable needs to be copied and pasted into each of these folder and run by double clicking on it.  This step must be carried out manually in all folders to follow the rest of this tutorial. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
+The CLUMPP executable needs to be copied and pasted into each of these folder and executed.  Alternatively, setting `useexe=T` will automatically run CLUMPP. Remember to cite CLUMPP^4^ if this option is used. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
+
+```{r,echo=TRUE, eval=FALSE}
+#auto execute CLUMPP
+clumppExportTess(files=tlist, useexe=T)
+```
 
 The aligned file contains all the runs in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
 
-### 4.3 MATRIX runs Workflow  
+## MATRIX runs Workflow  
+
+![Workflow Tess](workflow-matrix.png)  
+__Fig 3.__ *Workflow for MATRIX files (fastSTRUCTURE, ADMIXTURE etc). Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 Any run files from any software or manually created which are numeric, tabular, header-free and delimited by space, tab or comma are referred to as MATRIX files. The ADMIXTURE run files and fastSTRUCTURE meanQ files are such files that can be used this this workflow.  
 
-__4.3.1 tabulateRunsMatrix__  
+### tabulateRunsMatrix  
 
 The function `tabulateRunsMatrix()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
 
@@ -489,7 +502,7 @@ The `tabulateRunsMatrix()` function returns a table with three columns namely fi
 
 By default, the `tabulateRunsMatrix()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.3.2 summariseRunsMatrix__
+### summariseRunsMatrix
 
 The table produced using `tabulateRunsMatrix()` can be further collapsed by *K* based on number of runs. The output table from `tabulateRunsMatrix()` can be passed as input to `summariseRunsMatrix()` respectively. 
 
@@ -514,7 +527,7 @@ head(sr7)
 
 The `summariseRunsMatrix()` function returns 3 columns namely individuals, *K* and number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-__4.3.3 runsToDfMatrix__  
+### runsToDfMatrix  
 
 MATRIX run files (ADMIXTURE, fastSTRUCTURE etc) or any numeric, tabular, header-free space/tab/comma delimited files can be converted to R dataframes using the function `runsToDfMatrix()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
 
@@ -546,7 +559,7 @@ head(rtd3[[1]])
 
 The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
 
-__4.3.4 clumppExportMatrix__  
+### clumppExportMatrix  
 
 When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.  
 
@@ -571,14 +584,19 @@ clumppExportMatrix(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
 clumppExportMatrix(files=slist,prefix="Set1")
 ```
 
-The CLUMPP executable needs to be copied and pasted into each of these folder and run by double clicking on it.  This step must be carried out manually in all folders to follow the rest of this tutorial. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file.  
+The CLUMPP executable needs to be copied and pasted into each of these folder and executed. Alternatively, the CLUMPP executable can now be run automatically by specifying `useexe=T`. Remember to cite CLUMPP^4^ if this option is used. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file.  
+
+```{r,echo=TRUE, eval=FALSE}
+#auto execute CLUMPP
+clumppExportMatrix(files=alist, useexe=T)
+```
 
 The aligned file contains all the runs in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
 
-### Common functions  
+## Common functions  
 These are functions common to all types of input run files.  
 
-__4.4 collectClumppOutput__  
+### collectClumppOutput  
 
 The CLUMPP output files are now distributed in multiple folders. The aligned, merged or both files can be copied from multiple folders into a single folder for further analyses using the function `collectClumppOutput()`. The working directory is set suitably before running this function. This function need a `prefix` argument which denotes the prefix used in the previous function or the text before the underscore. For ex. a directory named `STRUCTUREpop_K2` has the prefix `STRUCTUREpop`.
 
@@ -587,7 +605,7 @@ The CLUMPP output files are now distributed in multiple folders. The aligned, me
 setwd(choose.dir())
 # collect aligned files from STRUCTURE CLUMPP results. Default prefix is STRUCTUREpop
 collectClumppOutput()
-# collect aligned files from TESS CLUMPP results
+# by default, collect aligned files from TESS CLUMPP results
 collectClumppOutput(prefix="TESSpop")
 # collect aligned files from MATRIX CLUMPP results
 collectClumppOutput(prefix="MATRIXpop")
@@ -614,9 +632,9 @@ collectClumppOutput(prefix="TESSpop")
 
 Collecting the aligned and merged files into a single folder can be helpful in plotting these files. From the command above, both aligned and merged files are copied into a new directory `STRUCTUREpop-aligned` within the working directory.
 
-__4.5 plotRuns__  
+### plotRuns  
 
-The function `plotRuns()` is used to create barplots from STRUCTURE, TESS, MATRIX run files, combined files, aligned files or merged files. When plotting STRUCTURE, TESS or MATRIX run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figures. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
+The function `plotRuns()` is used to create barplots from STRUCTURE, TESS, MATRIX run files, combined files, aligned files or merged files. The combined, aligned or merged files are referred to as TAB files. When plotting STRUCTURE, TESS or MATRIX run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figures. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
 
 ![plotruns-overview](plotruns-overview.png) 
 __Fig 9.__ *An overview of the components of a plot from the function plotRuns() and the arguments used to modify them.*
@@ -855,11 +873,22 @@ plotRuns(files=tabs1[2],imgoutput="tab",poplab=pops$V1,subsetpops=c("Pop B","Pop
 ![plotruns-tab-lab-subsetreorder](structure-tab-lab-subsetreorder.png)  
 __Fig. 18.__ *(A) Left: Combined file with subsetted pop labels. (B) Right: Combined file with reordered pop labels.*
 
+Some additional features include ability to plot mean values by population when population labels are in use.
+
+![plotruns-structure-lab-popmean](structure-lab-popmean.png)  
+__Fig. 19.__ *(A) Left: STRUCTURE file showing population mean values. (B) Right: Aligned TAB file showing population mean.*
+
+```{r,echo=TRUE, eval=FALSE}
+#pop mean
+plotRuns(sfiles[4],poplab=pops$V1,popmean=T)
+plotRuns(files=tabs1[2],imgoutput="tab",poplab=pops$V1,popmean=T)
+```
+
 `plotRuns()` function has numerous arguments to tweak the plot as required. See `?plotRuns` for more arguments and descriptions.
 
-__4.6 plotMultiline__  
+### plotMultiline  
 
-The `plotMultiline` function is also used to plot STRUCTURE runs, TESS runs, ADMIXTURE runs and table files as barplots. This function automatically identifies these input file types. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced on A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` can be specified.
+The `plotMultiline` function is also used to plot STRUCTURE runs, TESS runs, ADMIXTURE runs and TAB files as barplots. This function automatically identifies these input file types. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced on A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` can be specified.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
@@ -900,14 +929,77 @@ plotMultiline(slist[1],spl=75,lpp=10,sortind="all")
 ```
 
 ![plotruns-plotmultiline](plotmultiline.png)  
-__Fig. 19.__ *Left: Default output from `plotMultiline`. Middle Left: Modified output with custom `spl` and `lpp`. Middle Right: Sorted by Cluster1. Right: Sorted by 'all'.*
+__Fig. 20.__ *Left: Default output from `plotMultiline`. Middle Left: Modified output with custom `spl` and `lpp`. Middle Right: Sorted by Cluster1. Right: Sorted by 'all'.*
+
+Individual labels can be added as a character vector.
+```{r,echo=TRUE, eval=FALSE}
+inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE)
+#add ind labels.
+plotMultiline(slist[1],indlab=inds$V1)
+plotMultiline(slist[1],indlab=inds$V1,sortind="all")
+plotMultiline(slist[1],indlab=inds$V1,sortind="Cluster1")
+
+#long ind name
+inds <- read.delim(system.file("files/structureindlabelslong.txt",package="pophelper"),header=FALSE)
+plotMultiline(slist[1],indlab=inds$V1)
+plotMultiline(slist[1],indlab=inds$V1,spl=75,lpp=4)
+plotMultiline(slist[1:3],indlab=inds$V1,spl=75,lpp=4)
+```
+
+For STRUCTURE files, the individual labels if available within the file, can be imported and plotted using `indlabfromfile=T`. `sortlabels` has no effect when `indlabfromfile=T`
+
+```{r,echo=TRUE, eval=FALSE}
+#use ind labels from STRUCTURE file.
+plotMultiline(slist[1],indlabfromfile=T)
+plotMultiline(slist[1],indlabfromfile=T,sortind="all")
+```
 
 ![plotmultiline-colours](plotmultiline-colours.png)  
-__Fig. 20.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
+__Fig. 21.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
 
 Note that this  function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
 
-__4.7 plotRunsInterpolate__  
+### distructExport
+
+DISTRUCT^7^ is one of the original programs written to generate assignment barplots tabular output. This function generates all output files necessary to run DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files. A directory labelled 'filename-distruct' is created for each input file. Each directory contains the 'filename-indq.txt', 'filename-popq.txt', 'filename-colours.txt' and 'drawparams'. If poplab is in use, then 'filename-poplabbottom.txt' and/or 'filename-poplabtop.txt' are also created. The DISTRUCT executable can be run in this directory to create a 'filename.ps' postcript vector file. Using `useexe=T` will run the DISTRUCT executable automatically. Remember to cite DISTRUCT^7^ if this option is used. The 'filename.ps' file can be imported into a vector image editing software or seen using a viewer.
+
+```{r,echo=TRUE, eval=FALSE}
+#basic usage
+distructExport(files = sfiles[1])
+#with bottom labels
+distructExport(files = sfiles[1],poplabbottom=pops$V1)
+#with population means
+distructExport(files = sfiles[1],popmean=T)
+#grayscale colours
+distructExport(files = sfiles[1],grayscale=T)
+#run distruct executable
+distructExport(files = sfiles[1],useexe=T)
+
+#tess files
+distructExport(files = tfiles[2])
+#admixture files, adjust if plot does not fit on canvas
+distructExport(files = afiles[3],indwidth=0.36,xorigin=15)
+#TAB files
+distructExport(files = tabs1[1])
+distructExport(files = tabs1)
+```
+
+![distructexport](destruct-structure.png)  
+__Fig. 26.__ *Left: DISTRUCT plot with `popmean=F`. Middle: DISTRUCT plot with `popmean=T`. Right: DISTRUCT plot with `grayscale=T`.*  
+
+### analyseRuns  
+
+This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or MATRIX run files. The `analyseRuns()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
+
+```{r,echo=TRUE, eval=FALSE}
+# basic usage
+analyseRuns(choose.files())
+analyseRuns(files=slist)
+analyseRuns(files=tlist)
+analyseRuns(files=alist)
+```
+
+### plotRunsInterpolate  
 
 The `plotRunsInterpolate()` function allows to spatially interpolate STRUCTURE, TESS or MATRIX runs. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232). Note that this is generally a slow function and can take several minutes.
 
@@ -951,7 +1043,7 @@ plotRunsInterpolate(datafile=s1,coordsfile=cd2,method = "bilinear",height=10,wid
 The default interpolation algorithm is Kriging (`method="krig"`). By default, `exportplot=T` exports an image to the working directory. By default `clusters=NA` which means that all clusters in the file are plotted. By default, `imgoutput="join"`, therefore all clusters are plotted in a single figure. The default `gridsize=60` produces rather pixellated grids. Increase gridsize to produce finer grid but at a higher computational cost.
 
 ![plotruns-interpolate-join](plotruns-interpolate-join.png)  
-__Fig. 21.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
+__Fig. 22.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
 
 We can choose only cluster 2 and try out different interpolation methods. Five methods are currently implemented: bilinear, bicubic, inverse distance weighting, nearest neighbour and kriging. Kriging is predictive while others are essentially direct spatial interpolation.
 
@@ -979,7 +1071,7 @@ dev.off()
 We specify `clusters=2` which plots only cluster 2. The `dataout=T` allows to save the ggplot plot object to a variable and then modify them or combine with other plots. Due to `exportplot=F`, no plots are exported.
 
 ![plotruns-interpolate-methods](plotruns-interpolate-methods.png)  
-__Fig. 22.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
+__Fig. 23.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
 
 The colours can be easily changed by feeding in required colours to the argument `colours`. The R package `RColorBrewer` has a wide range of nice colours.
 
@@ -1002,11 +1094,11 @@ dev.off()
 ```
 
 ![plotruns-interpolate-customcolours](plotruns-interpolate-customcolours.png)  
-__Fig. 23.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3^rd^ plot is `brewer.pal(8,"Spectral")` and 4^th^ plot is `brewer.pal(8,"BuPu")`.*  
+__Fig. 24.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3^rd^ plot is `brewer.pal(8,"Spectral")` and 4^th^ plot is `brewer.pal(8,"BuPu")`.*  
 
 Note that when using `plotRunsInterpolate()`, all methods may not work with all sorts of coordinate inputs.  
 
-__4.8 plotRunsSpatial__  
+### plotRunsSpatial  
 
 Estimate clusters using the highest probability of assignment for each individual and plot these clusters to spatial coordinates. The clusters are denoted by colour or point shape. The clusters can also be marked by confidence ellipses or convex hulls. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232).
 
@@ -1048,7 +1140,7 @@ gridExtra::grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
 dev.off()
 ```
 ![plotruns-spatial](plotruns-spatial.png)  
-__Fig. 24.__ *Some of the plots created using the function `plotRunsSpatial()`. Fig 1: The basic usage of the function with title added `plottitle="Fig 1"`. Fig 2: The ellipses are turned off `ellipse=F` and the point shape is changed `pointtype=15` and transparency added to points `pointtransp=0.4`. Fig 3: Convex hulls are turned on `chull=T` and coordinates are transformed to UTM `setutm=T`. The points shapes are based on clusters `pointtype=NA`. Custom colours are used `brewer.pal(5,"Dark2")` and axis are shown `showaxis=T`. Fig 4: Convex hull transparency is lowered `chulltransp=0.2`, convex hull linetype is changed `chulltype=3`, legend labels are changed `legendlabels=c("PopA","PopB","PopC","PopD","PopE")`. Custom colours are used `brewer.pal(5,"Set1")`.*  
+__Fig. 25.__ *Some of the plots created using the function `plotRunsSpatial()`. Fig 1: The basic usage of the function with title added `plottitle="Fig 1"`. Fig 2: The ellipses are turned off `ellipse=F` and the point shape is changed `pointtype=15` and transparency added to points `pointtransp=0.4`. Fig 3: Convex hulls are turned on `chull=T` and coordinates are transformed to UTM `setutm=T`. The points shapes are based on clusters `pointtype=NA`. Custom colours are used `brewer.pal(5,"Dark2")` and axis are shown `showaxis=T`. Fig 4: Convex hull transparency is lowered `chulltransp=0.2`, convex hull linetype is changed `chulltype=3`, legend labels are changed `legendlabels=c("PopA","PopB","PopC","PopD","PopE")`. Custom colours are used `brewer.pal(5,"Set1")`.*  
 
 ```{r,echo=TRUE, eval=FALSE}
 # try some fast-structure files
@@ -1057,24 +1149,11 @@ cd2 <- system.file("files/coords22.txt",package="pophelper")
 plotRunsSpatial(datafile=s1,coordsfile=cd2)
 ```
 
-__4.9 analyseRuns__  
-
-This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or MATRIX run files. The `analyseRuns()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-analyseRuns(choose.files())
-analyseRuns(files=slist)
-analyseRuns(files=tlist)
-analyseRuns(files=alist)
-```
-----
-
-## 5. Working code
+# Working code
 
 Here is a list of all functions in a order typical of workflow.
 
-__5.1 Structure__  
+## Structure  
 
 ```{r,echo=TRUE, eval=FALSE}
 #choose files
@@ -1104,7 +1183,7 @@ runsToDfStructure(slist)
 analyseRuns(slist)
 ```
 
-__5.2 Tess__  
+## Tess  
 
 ```{r,echo=TRUE, eval=FALSE}
 #collect TESS output
@@ -1134,7 +1213,7 @@ runsToDfTess(tlist)
 analyseRuns(tlist)
 ```
 
-__5.3 Admixture/fastStructure/Other__  
+## Admixture/fastStructure/Other  
 
 ```{r,echo=TRUE, eval=FALSE}
 #choose files
@@ -1166,7 +1245,7 @@ Most of the functionalities in this package have been implented in the online to
 
 ----
 
-## 6. References
+# References
 
 1. [Alexander D.H., Novembre, J. and Lange K. (2009). Fast model-based estimation of ancestry in unrelated individuals. Genome Research, 19:1655-1664](http://genome.cshlp.org/content/19/9/1655.long)  
 
@@ -1178,11 +1257,12 @@ Most of the functionalities in this package have been implented in the online to
 
 5. [Pritchard J. K., Stephens M., & Donnelly P. (2000). Inference of population structure using multilocus genotype data. Genetics, 155(2), 945-959](http://www.genetics.org/content/155/2/945.short)  
 
-6. [Raj A., Stephens M., Pritchard J.K. (2014). fastSTRUCTURE: variational inference of population structure in large SNP data sets. Genetics 197, 573-589](http://www.genetics.org/content/early/2014/04/14/genetics.114.164350)
+6. [Raj A., Stephens M., Pritchard J.K. (2014). fastSTRUCTURE: variational inference of population structure in large SNP data sets. Genetics 197, 573-589](http://www.genetics.org/content/early/2014/04/14/genetics.114.164350)  
 
+7. [Rosenberg, Noah A. "DISTRUCT: a program for the graphical display of population structure." Molecular Ecology Notes 4.1 (2004): 137-138.](http://onlinelibrary.wiley.com/doi/10.1046/j.1471-8286.2003.00566.x/abstract)  
 ----
 
-## 7. Useful Links
+# Useful Links
 
 * [STRUCTURE program](http://pritchardlab.stanford.edu/structure.html)  
 * [TESS program](http://membres-timc.imag.fr/Olivier.Francois/tess.html)  
@@ -1191,18 +1271,19 @@ Most of the functionalities in this package have been implented in the online to
 * [CLUMPP program](http://www.stanford.edu/group/rosenberglab/clumpp.html)  
 * [Structure Harvester](http://taylor0.biology.ucla.edu/structureHarvester)  
 * [Adegenet R package](http://adegenet.r-forge.r-project.org/)  
+* [Distruct program](https://web.stanford.edu/group/rosenberglab/distruct.html)
 
 ----
 
-## 8. Disclaimer
+# Disclaimer
 
 The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3. Please make sure you verify all your results by eye atleast once per batch.  
 
 ----
 
-## 9. Contact
+# Contact
 
-Feel free to email me if you have any comments, suggestions or issues. Preferred email is roy.m.francis@outlook.com.  
+Feel free to email me if you have any comments, suggestions or issues. Preferred email is roy[dot]m[dot]francis[at]outlook[dot]com.  
   
   
-__2016 Roy M Francis__ | roy.m.francis@outlook.com
+__2016 Roy M Francis__  

@@ -1,3 +1,18 @@
+pophelper 1.2.0
+===========
+* 25-July-2016
+* Function exportDistruct() added to generate input files for software DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files.
+* Argument 'indlabfromfile' added to runsToDfStructure() to read individual labels from structure file if available and adds as row names.
+* Argument 'indlabfromfile' added to plotMultiline() to read individual labels from structure file if available and use as labels.
+* Argument 'indlab' added to plotMultiline() to provide individual labels externally.
+* Argument 'popmean' added to plotRuns() to plot population mean values rather than individual values. Applicable only when pop labels are in use.
+* plotRuns() is able to handle duplicated contiguous block of pop labels except when using argument 'subsetpops'.
+* clumppExportStructure(), clumppExportTess() and clumppExportMatrix() now checks for directory write permission before creating directory.
+* Argument 'useexe' added to clumppExportStructure(), clumppExportTess() and clumppExportMatrix() to automatically run CLUMPP.
+* Incorrect error messages were reported when some logical arguments were incorrectly set. This has been corrected for tabulateRunsStructure(), tabulateRunsTess(),tabulateRunsMatrix().
+* Dependency on plyr and reshape removed. 
+* New dependency on tidyr.
+
 pophelper 1.1.9
 ===========
 * 31-May-2016

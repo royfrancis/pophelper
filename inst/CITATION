@@ -8,5 +8,5 @@ bibentry(bibtype = "Article",
   issn = "1755-0998",
   doi = "10.1111/1755-0998.12509",
   url = "https://github.com/royfrancis/pophelper",
-  note = "R package version 1.1.9"
+  note = "R package version 1.2.0"
 )
