@@ -66,13 +66,13 @@ analyseRuns()             # A wrapper function to quickly tabulate, summarise, p
 ## Functions and workflow 
 
 ![workflow-structure](vignettes/workflow-structure.png)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
 
 ![workflow-tess](vignettes/workflow-tess.png)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
 
 ![workflow-matrix](vignettes/workflow-matrix.png)  
-__Fig 3.__ *Workflow for MATRIX files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 3.__ *Workflow for MATRIX files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
 
 ![evanno-method](vignettes/evanno-plot.png)  
 __Fig 4.__ *Plots from Evanno Method.*
