@@ -39,7 +39,7 @@ This vignette covers the use of all important functions in the `pophelper` packa
 
 # Installation  
 
-The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.2.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code.
+The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.2.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code. The source code is available from [GitHub](https://github.com/royfrancis/pophelper).  
 
 ```{r,echo=TRUE,eval=FALSE,results='hide'}
 # Install devtools package
@@ -113,6 +113,8 @@ analyseRuns()             # A wrapper function to quickly tabulate, summarise,
                           # from STRUCTURE, TESS or MATRIX run files.
 ```
 
+----
+
 # Input files  
 The input run files expected by the package are STRUCTURE run files, TESS run files (-TR files in folders), or MATRIX run files. MATRIX files are numeric delimited tabular file like ADMIXTURE run files and fastSTRUCTURE meanQ files. Inputs can also be a generic numeric tabular tab, space or comma-delimited files without headers.  
 
@@ -137,7 +139,7 @@ setwd(choose.dir())
 ## STRUCTURE runs Workflow  
 
 ![Workflow Structure](workflow-structure.png)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
 
 ### tabulateRunsStructure  
 The functions `tabulateRunsStructure()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
@@ -314,7 +316,7 @@ The remaining workflow is common for all input filetypes. Head over to section '
 ## TESS runs Workflow  
 
 ![Workflow Tess](workflow-tess.png)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
 
 ### collectRunsTess  
 
@@ -444,7 +446,7 @@ The aligned file contains all the runs in the combined file after realignment of
 ## MATRIX runs Workflow  
 
 ![Workflow Tess](workflow-matrix.png)  
-__Fig 3.__ *Workflow for MATRIX files (fastSTRUCTURE, ADMIXTURE etc). Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
+__Fig 3.__ *Workflow for MATRIX files (fastSTRUCTURE, ADMIXTURE etc). Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
 
 Any run files from any software or manually created which are numeric, tabular, header-free and delimited by space, tab or comma are referred to as MATRIX files. The ADMIXTURE run files and fastSTRUCTURE meanQ files are such files that can be used this this workflow.  
 
@@ -1149,6 +1151,8 @@ cd2 <- system.file("files/coords22.txt",package="pophelper")
 plotRunsSpatial(datafile=s1,coordsfile=cd2)
 ```
 
+----
+
 # Working code
 
 Here is a list of all functions in a order typical of workflow.
@@ -1260,6 +1264,7 @@ Most of the functionalities in this package have been implented in the online to
 6. [Raj A., Stephens M., Pritchard J.K. (2014). fastSTRUCTURE: variational inference of population structure in large SNP data sets. Genetics 197, 573-589](http://www.genetics.org/content/early/2014/04/14/genetics.114.164350)  
 
 7. [Rosenberg, Noah A. "DISTRUCT: a program for the graphical display of population structure." Molecular Ecology Notes 4.1 (2004): 137-138.](http://onlinelibrary.wiley.com/doi/10.1046/j.1471-8286.2003.00566.x/abstract)  
+
 ----
 
 # Useful Links

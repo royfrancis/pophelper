@@ -1,4 +1,4 @@
-# pophelper 1.2.0
+# pophelper 1.2.1
 
 `pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output files generated from population analysis programs such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS. The `pophelper` package can be used to tabulate runs, summarise runs, estimate *K* using the Evanno method, export files for CLUMPP, export files for DISTRUCT and generate barplot figures. Additionally, there are functions to create spatial plots and interpolation using geographical coordinates. 
 
@@ -19,7 +19,7 @@ install_github('royfrancis/pophelper')
 library(pophelper)
 ```
 
-`pophelper 1.2.0` has been tested using R version 3.3.1 on Windows 7 64bit, Mac OS X 10.10.1 (Yosemite) 64bit, Linux Ubuntu 16.04.1 and Scientific Linux 6.7 (R 3.3.0). Note that `pophelper 1.2.0` includes binary executables for CLUMPP and DISTRUCT.
+`pophelper 1.2.0` has been tested using R version 3.3.1 on Windows 7 64bit, Mac OS X 10.10.1 (Yosemite) 64bit, Linux Ubuntu 16.04.1 and Scientific Linux 6.7 (R 3.3.0). Note that `pophelper 1.2.0` and later includes binary executables for CLUMPP and DISTRUCT.
 
 ## Web App   
 An online interactive version of pophelper is now available at [pophelper.com](http://www.pophelper.com).
@@ -66,13 +66,13 @@ analyseRuns()             # A wrapper function to quickly tabulate, summarise, p
 ## Functions and workflow 
 
 ![workflow-structure](vignettes/workflow-structure.png)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
+__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 ![workflow-tess](vignettes/workflow-tess.png)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
+__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 ![workflow-matrix](vignettes/workflow-matrix.png)  
-__Fig 3.__ *Workflow for MATRIX files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path.*
+__Fig 3.__ *Workflow for MATRIX files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For clumpp results, the clumpp executable must be run to continue with the workflow.*
 
 ![evanno-method](vignettes/evanno-plot.png)  
 __Fig 4.__ *Plots from Evanno Method.*

@@ -1,5 +1,5 @@
-#pophelper v1.2.0
-#25-Jul-2016
+#pophelper v1.2.1
+#05-Sep-2016
 
 #check packages
 pkgs <- c("akima","fields","grid","gridExtra","ggplot2","gtable","PBSmapping","spatstat","tidyr")
@@ -2034,19 +2034,32 @@ runsToDfStructure <- function(files = NULL, indlabfromfile=FALSE)
     
     file_a <- file1[file1 != ""]
     rm(file1)
-    #using textconnection
+    
+    #error check
     file_b <- read.delim(textConnection(file_a),header=F,sep="",stringsAsFactors = F)
-    dframe <- file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9][.][0-9]+$",file_b[1,])))]
+    suppressWarnings(
+      errorcheck <- try(
+        file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=F],
+        silent=T)
+    )
+    rm(file_b)
     
-    #using manual substring
-    #file_a <- base::gsub("\\([0-9.,]+\\)","",file_a)
-    #file_b <- base::gsub(":  ", "", substr(file_a, base::regexpr(":\\W+\\d\\.\\d+", file_a), base::nchar(file_a)-1))
-    #file_b <- base::sub("\\s+$","",base::sub("^\\s+","",file_b))
-    #rm(file_a)
-    #file_c <- as.vector(as.numeric(as.character(unlist(base::strsplit(file_b, " ")))))
-    #rm(file_b)
-    #dframe <- as.data.frame(matrix(file_c, nrow = ind, byrow = TRUE),stringsAsFactors = FALSE)
-    
+    if(class(errorcheck) == "try-error")
+    {
+      #using manual substring
+      file_a <- base::gsub("\\([0-9.,]+\\)","",file_a)
+      file_b <- base::gsub(":  ", "", substr(file_a, base::regexpr(":\\W+\\d\\.\\d+", file_a), base::nchar(file_a)-1))
+      file_b <- base::sub("\\s+$","",base::sub("^\\s+","",file_b))
+      rm(file_a)
+      file_c <- as.vector(as.numeric(as.character(unlist(base::strsplit(file_b, " ")))))
+      rm(file_b)
+      dframe <- as.data.frame(matrix(file_c, nrow = ind, byrow = TRUE),stringsAsFactors = FALSE)
+    }else{
+      #using textconnection
+      file_b <- read.delim(textConnection(file_a),header=F,sep="",stringsAsFactors = F)
+      dframe <- file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=F]
+    }
+
     dframe <- as.data.frame(sapply(dframe, as.numeric),stringsAsFactors = FALSE)
     colnames(dframe) <- paste0("Cluster", 1:k)
     row.names(dframe) <- 1:nrow(dframe)

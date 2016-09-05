@@ -1,3 +1,8 @@
+pophelper 1.2.1
+===========
+* 05-Sep-2016
+* Fixed a critical bug during parsing in runsToDfStructure() when K=1. Thanks to Emily Humble for reporting this.
+
 pophelper 1.2.0
 ===========
 * 25-July-2016
