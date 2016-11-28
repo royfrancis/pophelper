@@ -5279,7 +5279,7 @@ getOS <- function() {
 
 #ON LOAD
 .onLoad <- function(...) {
-    packageStartupMessage("pophelper v1.2.0 ready.")
+    packageStartupMessage("pophelper v1.2.1 ready.")
 }
 
 #-------------------------------------------------------------------------------
