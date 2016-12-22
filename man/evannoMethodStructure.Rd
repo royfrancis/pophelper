@@ -9,7 +9,7 @@ evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
   width = NA, res = NA, units = NA)
 }
 \arguments{
-\item{data}{A dataframe with summarised runs. An output from \code{summariseRunsStructure()}. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.}
+\item{data}{A dataframe with summarised runs. An output from \code{summariseQ()} derived from STRUCTURE runs. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.}
 
 \item{writetable}{A logical indicating if the output table is to be exported as a file in the working directory.}
 
@@ -19,8 +19,8 @@ evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
 generates warnings from \code{ggplot}. If set to TRUE, NAs are removed before 
 plotting and warning messages from \code{ggplot} are avoided.}
 
-\item{imgtype}{A character indicating the type of exported image. Default set to png. Other possible 
-options are jpeg or pdf.}
+\item{imgtype}{A character indicating the type of exported image. Default set to 'png'. Other possible 
+options are 'jpeg' or 'pdf'.}
 
 \item{basesize}{A numeric indicating the base size of various plot elements such as point size, line thickness etc. Increase basesize with larger figure dimensions. Defaults to 5.}
 
@@ -56,14 +56,18 @@ and Goudet, J. (2005). Detecting the number of clusters of individuals using
 the software STRUCTURE: a simulation study. Molecular ecology, 14(8), 
 2611-2620. The Evanno plot generated from this function can be recreated 
 from the returned dataframe if furthur customisation is required.
+
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 }
 \examples{
+
 \dontrun{
-slist <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
-tr1 <- tabulateRunsStructure(files=slist)
-sr1 <- summariseRunsStructure(tr1)
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+tr1 <- tabulateQ(readQ(sfiles))
+sr1 <- summariseQ(tr1)
 evannoMethodStructure(sr1)
 evannoMethodStructure(data=sr1,exportplot=T)
 }
+
 }
 

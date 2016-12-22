@@ -1,3 +1,64 @@
+pophelper 2.0.0
+===========
+* 19-Dec-2016
+* checkRuns modified
+* clumppExport.. 'usexe' path issue corrected
+* Erroneous warning messages in clumppExport.. fixed
+* File name matching issue in clumppExport.. fixed
+* tabulateRunsStructure() deprecated
+* tabulateRunsTess() deprecated
+* tabulateRunsMatrix() deprecated
+* summariseRunsStructure() deprecated
+* summariseRunsTess() deprecated
+* summariseRunsMatrix() deprecated
+* clumppExportStructure() deprecated
+* clumppExportTess() deprecated
+* clumppExportMatrix() deprecated
+* runsToDfStructure() deprecated
+* runsToDfTess() deprecated
+* runsToDfMatrix() deprecated
+* readQ() added
+  + Input files are converted to a qlist.
+  + Structure specific values such as elpd, mvll etc are preserved as dataframe attributes
+  + For CLUMPP, multiple runs within a file are suffixed with -1, -2 etc.
+* tabulateQ() added
+  + Argument 'qlist' added to accept a qlist input
+  + Argument 'quiet' removed
+* summariseQ() added
+* clumppExport() added
+  + Argument 'qlist' added to accept a qlist input
+* plotRuns() error when using subsetpops 'length of poplabels not equal to number of individuals' fixed.
+* plotRuns() renamed to plotQ().
+  + Argument 'qlist' added to accept a qlist input
+  + plotRuns() 'imgoutput' argument has two options 'sep' or 'join'
+  + Argument 'popcol' changed to clustercol
+  + Argument 'popmean' changed to grpmean
+  + Argument 'poplab' changed to grplab
+  + Argument 'grplab' must now be a named list to allow more than one label sets
+  + Argument 'flab' changed to 'sp'
+  + Argument 'splab' added to provide custom labels to strip panels
+  + Argument 'flabsize' changed to 'splabsize'
+  + Argument 'flabcol' changed to 'splabcol'
+  + Argument 'flabbackcol' changed to 'spbgcol'
+  + Argument 'divgrp' added to define which label set(s) must be divider lines based on
+  + Argument 'labalpha' added to adjust transparency of labels
+  + Argument 'linealpha' added to adjust transparency of line
+  + Argument 'pointalpha' added to adjust transparency of points
+  + Argument 'divalpha' added to adjust transparency of divider line
+  + Argument 'legend' added to display legend for cluster colours
+  + Argument 'legendlab' added to provide custom cluster labels
+  + Argument 'legendpos' added for legend justification
+  + Argument 'legendkeysize' added to adjust legend key size
+  + Argument 'legendtextsize' added to adjust legend text size
+* plotMultiline() renamed to plotQMultiline()
+* plotQMultiline() modified to accept qlist input
+* distructExport() modified to accept qlist input
+* Deprecated functions show error messages
+* analyseRuns() renamed to analyseQ()
+* checkRuns() renamed to checkQ()
+* Functions related to spatial, plotRunsInterpolate() and plotRunsSpatial() renamed to plotQInterpolate() and plotQSpatial() and moved to a different package pophelperSpatial
+
+
 pophelper 1.2.1
 ===========
 * 05-Sep-2016
@@ -142,5 +203,5 @@ pophelper 1.0.1
 
 pophelper 1.0.0
 ===========  
-* completed 16-Feb-2014
+* 16-Feb-2014
 * the first version of the `pophelper` package

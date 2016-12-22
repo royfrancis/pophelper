@@ -4,11 +4,11 @@
 \alias{collectClumppOutput}
 \title{Collect CLUMPP output files from multiple folders}
 \usage{
-collectClumppOutput(prefix = "STRUCTUREpop", filetype = "aligned",
-  runsdir = NA, newdir = NA, quiet = FALSE)
+collectClumppOutput(prefix = "pop", filetype = "aligned", runsdir = NA,
+  newdir = NA, quiet = FALSE)
 }
 \arguments{
-\item{prefix}{A character indicating the prefix of the CLUMPP directories before the underscore. For ex. if the directories are STRUCTUREpop_K2, then prefix is STRUCTUREpop.}
+\item{prefix}{A character indicating the prefix of the CLUMPP directories before the underscore. For ex. if the directories are pop_K2, then prefix is pop.}
 
 \item{filetype}{A character indicating the type of file to be copied. Options are 'aligned' to copy aligned files only, 'merged' to copy merged files only and 'both' to copy both files.}
 
@@ -26,12 +26,13 @@ Collect CLUMPP output files from multiple folders to one folder
 }
 \details{
 Within each CLUMPP output folder, the function searches for filenames containing combination of prefix and filetype. This file is copied to the new folder. Therefore, do not manually rename CLUMPP output files or output directories.
+
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 }
 \examples{
 \dontrun{
 collectClumppOutput(runsdir="path")
-collectClumppOutput(prefix="TESSpop",runsdir="path")
-collectClumppOutput(prefix="MATRIXpop",runsdir="path")
+collectClumppOutput(prefix="pop",runsdir="path")
 }
 }
 

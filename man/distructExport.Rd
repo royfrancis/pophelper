@@ -2,38 +2,39 @@
 % Please edit documentation in R/pophelper.R
 \name{distructExport}
 \alias{distructExport}
-\title{Generate input files for DISTRUCT.}
+\title{Generate files for DISTRUCT.}
 \usage{
-distructExport(files = NULL, poplabbottom = NA, poplabtop = NA,
-  popmean = FALSE, overwritedirs = FALSE, printtitle = FALSE,
-  popcol = NA, grayscale = FALSE, printcolorbrewer = FALSE, sepline = T,
-  seplinewidth = 0.2, borderlinewidth = 1.2, indlinewidth = 0.2,
-  fontsize = 6, topdist = 5, bottomdist = -7, figheight = 36,
-  indwidth = 1, orientation = 0, xorigin = NA, yorigin = NA,
-  xscale = 1, yscale = 1, toplabangle = 60, bottomlabangle = 60,
-  echodata = TRUE, printdata = FALSE, quiet = FALSE, useexe = FALSE)
+distructExport(qlist = NULL, grplabbottom = NA, grplabtop = NA,
+  grpmean = FALSE, overwritedirs = FALSE, printtitle = FALSE,
+  clustercol = NA, grayscale = FALSE, printcolorbrewer = FALSE,
+  sepline = T, seplinewidth = 0.2, borderlinewidth = 1.2,
+  indlinewidth = 0.2, fontsize = 6, topdist = 5, bottomdist = -7,
+  figheight = 36, indwidth = 1, orientation = 0, xorigin = NA,
+  yorigin = NA, xscale = 1, yscale = 1, toplabangle = 60,
+  bottomlabangle = 60, echodata = TRUE, printdata = FALSE,
+  quiet = FALSE, useexe = FALSE)
 }
 \arguments{
-\item{files}{A character/path or vector of files. Input can be STRUCTURE, TESS, MATRIX run files or TAB files. On windows, use \code{choose.files(multi = TRUE)} for interactive selection.}
+\item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
 
-\item{poplabbottom}{A character vector of population labels to be plotted below the plot. The vector must be the same length as number of individuals. See details.}
+\item{grplabbottom}{A character vector of group labels to be plotted below the plot. The vector must be the same length as number of individuals. See details.}
 
-\item{poplabtop}{An optional character vector of population labels to be plotted above the plot. The vector must be the same length as number of individuals. See details.}
+\item{grplabtop}{An optional character vector of group labels to be plotted above the plot. The vector must be the same length as number of individuals. See details.}
 
-\item{popmean}{A logical indicating if individual values are to be plotted (F) or population means are to be plotted (T).}
+\item{grpmean}{A logical indicating if individual values are to be plotted (F) or group means are to be plotted (T).}
 
 \item{overwritedirs}{A logical indicating if existing directories must be overwritten (T) automatically or not (F).}
 
 \item{printtitle}{A logical indicating if the filename must be printed as the title on the plot.}
 
-\item{popcol}{A character vector of colours equal to the number of clusters. Note these are not R colours. Use \code{distructColours()} or refer to DISTRUCT manual for colours.
+\item{clustercol}{A character vector of colours equal to the number of clusters. Note these are not R colours. Use \code{distructColours()} or refer to DISTRUCT manual for colours.
 With multiple files, number of colours must equal input file with highest number of clusters.}
 
 \item{grayscale}{A logical indicating if clusters must be shown in grayscale.}
 
-\item{printcolorbrewer}{A logical indicating if the colours provided in \code{popcol} are ColorBrewer colours. See details.}
+\item{printcolorbrewer}{A logical indicating if the colours provided in \code{clustercol} are ColorBrewer colours. See details.}
 
-\item{sepline}{A logical indicating if divider lines must be drawn between populations (T).}
+\item{sepline}{A logical indicating if divider lines must be drawn between groups (T).}
 
 \item{seplinewidth}{A numeric indicating width of sepline.}
 
@@ -41,7 +42,7 @@ With multiple files, number of colours must equal input file with highest number
 
 \item{indlinewidth}{A numeric indicating width of border around individual bars and ticks.}
 
-\item{fontsize}{A numeric indicating font size of population labels.}
+\item{fontsize}{A numeric indicating font size of group labels.}
 
 \item{topdist}{A numeric indicating distance of top labels from the top edge of the plot.}
 
@@ -71,17 +72,17 @@ With multiple files, number of colours must equal input file with highest number
 
 \item{quiet}{A logical TRUE or FALSE. Set to TRUE by default to print verbose statements to screen.}
 
-\item{useexe}{A logical indicating if DISTRUCT executable is automatically run based on system OS (experimental).}
+\item{useexe}{A logical indicating if DISTRUCT executable is automatically run based on system OS (experimental). Does not work on UNIX systems.}
 }
 \value{
 The function does not return anything. The function creates directories for each input file and 
 populates it with files necessary to run DISTRUCT. The files are individual q-matrix file (xx-indq.txt),
 population q-matrix file (xx-popq.txt), a cluster colour file (xx-colours.txt) and drawparams file. If 
-population labels were defined, then (xx-poplab-bottom.txt) or (xx-poplab-top.txt) are also exported. The
+group labels were defined, then (xx-poplab-bottom.txt) or (xx-poplab-top.txt) are also exported. The
 DISTRUCT executable is run in this directory to generate an xx.ps file.
 }
 \description{
-Create DISTRUCT input files from STRUCTURE/TESS/MATRIX runs or TAB files.
+Create DISTRUCT input files from a qlist.
 }
 \details{
 \strong{Orientation} \cr
@@ -107,24 +108,30 @@ Replace the colour names in xx-colours.txt output file with selected colorbrewer
 This option automatically runs the DISTRUCT executable that is provided with this package. 
 Note that the executable is 64bit LSB requiring a 64bit system. The DISTRUCT executable was obtained from 
 here \url{https://web.stanford.edu/group/rosenberglab/distruct.html}. Remember to cite DISTRUCT if this option is used.\cr
+
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 }
 \examples{
 \dontrun{
 #read some data
-sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
-pops <- read.delim(system.file("files/structurepoplabels.txt",package="pophelper"),header=FALSE)
+slist <- readQ(list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE))
+grps1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE, stringsAsFactor=F)
+grps2 <- read.delim(system.file("files/structuregrplabels2.txt",package="pophelper"),header=FALSE, stringsAsFactor=F)
 
 #plot without labels
-distructExport(sfiles)
+distructExport(slist[1])
 
-#plot with bottom label
-distructExport(files,poplabbottom=pops$V1)
+#plot with bottom group label
+distructExport(slist[1],grplabbottom=grps1$V1)
 
-#plot with top label
-distructExport(files,poplabtop=pops$V1)
+#plot with top group label
+distructExport(slist[1],grplabtop=grps2$V1)
 
-#plot population mean values
-distructExport(files,poplabbottom=pops$V1,popmean=T)
+#plot group mean values
+distructExport(slist[1],grplabbottom=grps1$V1,grpmean=T)
+
+#automatically run DESTRUCT
+distructExport(slist[1],useexe=T)
 }
 }
 

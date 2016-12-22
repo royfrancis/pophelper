@@ -2,7 +2,7 @@
 % Please edit documentation in R/pophelper.R
 \name{unitConverter}
 \alias{unitConverter}
-\title{Internal: Convert between dimension units}
+\title{Internal: Convert value between dimension units}
 \usage{
 unitConverter(value = NA, fromunit = NA, tounit = NA, res = NA)
 }

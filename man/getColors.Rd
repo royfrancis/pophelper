@@ -2,7 +2,7 @@
 % Please edit documentation in R/pophelper.R
 \name{getColors}
 \alias{getColors}
-\title{Internal: Get Colours}
+\title{Internal: Generate colours based on number of K}
 \usage{
 getColors(k)
 }

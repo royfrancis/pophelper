@@ -4,11 +4,11 @@
 \alias{getPlotParams}
 \title{Internal: Generate parameters for plots with labels}
 \usage{
-getPlotParams(poplab = NA, plotnum = 1, labsize = NA, labangle = NA,
+getPlotParams(grplab = NA, plotnum = 1, labsize = NA, labangle = NA,
   labjust = NA, pointsize = NA, linethick = NA)
 }
 \arguments{
-\item{poplab}{A character vector of labels same length as number of individuals.}
+\item{grplab}{A character vector of labels same length as number of individuals.}
 
 \item{plotnum}{A numeric indicating the number of plots on the figure.}
 
@@ -16,7 +16,7 @@ getPlotParams(poplab = NA, plotnum = 1, labsize = NA, labangle = NA,
 
 \item{labangle}{A numeric indicating the angle/rotation of labels. 0 is horizontal while 90 is vertical.}
 
-\item{labjust}{A numeric indicating the justification of labels. Defaults to 0.5 if labangle = 0  or 1 if 
+\item{labjust}{A numeric indicating the justification of labels. Defaults to 0.5 if labangle=0  or 1 if 
 labangle between 20 and 135.}
 
 \item{pointsize}{A numeric indicating the size of points on label marker line.}
@@ -24,7 +24,7 @@ labangle between 20 and 135.}
 \item{linethick}{A numeric indicating the thickness of the label marker line.}
 }
 \value{
-A list with following plot parameters: poplab, plotnum, labsize, 
+A list with following plot parameters: grplab, plotnum, labsize, 
 labangle, labjust, pointsize, linethick.
 }
 \description{

@@ -1,8 +1,8 @@
 ---
-title: "Pophelper 1.2.0"
+title: "Pophelper 2.0.0"
 output: 
   html_document: 
-    code_folding: "none"
+    code_folding: "hide"
     toc: true
     toc_depth: 3
     toc_float:
@@ -12,48 +12,61 @@ output:
   highlight: tango 
   theme: flatly
 vignette: >
-  %\VignetteIndexEntry{Pophelper Tutorial}
+  %\VignetteIndexEntry{Pophelper tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-__Roy M Francis__ | 25-July-2016
+__Roy M Francis__ | 22-Dec-2016
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
-options(rpubs.upload.method = "internal")
-knitr::opts_chunk$set(collapse = TRUE)
+options(rpubs.upload.method="internal")
+knitr::opts_chunk$set(collapse=TRUE)
 #source("D:/Data/Dropbox/Rwork/pophelperRpackage/pophelper/R/pophelper.R")
-pkgname <- "pophelper"
 library(pophelper)
 ```
 
 # Introduction  
 
-This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, fastSTRUCTURE^6^, STRUCTURE^5^, TESS^3^ and any output in a tabular delimited file.
+This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, FASTSTRUCTURE^6^, STRUCTURE^5^, TESS^3^ and any q-matrix output as a numeric tabular delimited file.
 
-Softwares such as ADMIXTURE, fastSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a predefined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file or cluster file. `pophelper` has a set of functions that include tabulating runs, summarising runs, plotting runs etc that can be applied to these run files. 
+Softwares such as ADMIXTURE, FASTSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal the genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a pre-defined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file, cluster file or q-matrix file. `pophelper` has a set of functions that include tabulating, summarising and plotting that can be applied to these run files. 
 
-This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. This demonstration has been performed using `R version 3.3.0 (2016-05-03)` on a 64-bit Windows 7 Platform. Input and output codes are printed in a font different from body text like `this`.  
+This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. Input and output codes are printed in a font different from body text like `this`.  
 
 ----
 
 # Installation  
 
-The first step is to install the `pophelper` library. The dependent R packages required for the `pophelper` library as also automatically installed. You need to have R (>= 3.2.0) installed on your system. Then, install the `devtools` package. Then, install `pophelper` package from `github` using the `devtools` package. See below for code. The source code is available from [GitHub](https://github.com/royfrancis/pophelper).  
+The first step is to install the `pophelper` library. The source code is available from [GitHub](https://github.com/royfrancis/pophelper). You need to have R (>= 3.3.0) installed on your system. Then, install the `devtools` package. 
 
 ```{r,echo=TRUE,eval=FALSE,results='hide'}
 # Install devtools package
-install.packages('devtools',dep=T)
+install.packages('devtools',dependencies=T)
 library(devtools)
+```
 
+It is best to first install the dependency packages.  
+
+```{r,echo=TRUE,eval=FALSE,results='hide'}
+install.packages(c("Cairo","ggplot2","gridExtra","gtable","tidyr"),dependencies=T)
+```
+
+Then, install `pophelper` package from `github` using the function `install_github()` from `devtools` package.  
+
+```{r,echo=TRUE,eval=FALSE,results='hide'}
 # Install the current version of pophelper
 install_github('royfrancis/pophelper')
+```
 
-#load library
+Note that `ggplot2` version must be 2.2.0 or higher. And the `pophelper` package can be installed as previously mentioned. Once the package is installed, the package is loaded as shown below.
+
+```{r,echo=TRUE,eval=FALSE,results='hide'}
+# load library
 library(pophelper)
 
 # check version
-packageDescription("pophelper", fields = "Version")
+packageDescription("pophelper", fields="Version")
 ```
 
 The next step is to set the working directory. The working directory is a folder that usually contains the run files of interest so as to allow R to access it. The working directory must have read-write-execute permissions. Functions may produce outputs such as text files or images which will be exported to the working directory. The working directory can be set by running the command below using a path or by selecting the folder interactively in the popup window.
@@ -63,16 +76,14 @@ setwd("path")
 setwd(choose.dir())
 ```
 
-For this demonstration, the sample run files will be loaded from the `pophelper` library. Therefore, the working directory will be used for output generated from various `r print(pkgname)` functions.
-
 Standard help and documentation for all functions are obtained using `?`.
 
 ```{r,echo=TRUE,eval=FALSE,results='hide'}
-?tabulateRunsStructure
-?summariseRunsStructure
+?tabulateQ
+?summariseQ
 ?collectRunsTess
 #If using RStudio, press tab inside function to see arguments.
-#tabulateRunsStructure(<press tab>)
+#readQ(<press tab>)
 ```
 
 For functions where one or more files need to be selected, the selection can be performed interactively. Windows users can use `choose.files(multi=T)` for multi-selection or `file.choose()` for single selection. Mac users can use `file.choose()` for single selection and `tk_choose.files()` from `tcltk` package for multiple selection.
@@ -80,142 +91,324 @@ For functions where one or more files need to be selected, the selection can be 
 ----
 
 # Functions & Overview  
-All functions in the `pophelper` package are lsited below.  
+All user functions in the `pophelper` package are listed below.  
  
 ```{r, eval=FALSE,echo=TRUE}
-tabulateRunsStructure()   # Get a tabulation of several STRUCTURE files
-summariseRunsStructure()  # Summarise runs by repeats for each K
-evannoMethodStructure()   # Perform the Evanno method on summarised data
-runsToDfStructure()       # Convert STRUCTURE run files to R dataframe
-clumppExportStructure()   # Export files for use with CLUMPP
+readQ()                   # convert q-matrix run files to qlist
+tabulateQ()               # tabulate a qlist
+summariseQ()              # summarise an output from tabulateQ()
+clumppExport()            # generate CLUMPP input/output files
+collectClumppOutput()     # collect CLUMPP output into a common directory
+plotQ()                   # create barplots from qlist
+PlotQMultiline()          # create multi-line barplots from qlist
+distructExport()          # export files for DISTRUCT from qlist
 
-collectRunsTess()         # Collect TESS output from multiple directories into one
-tabulateRunsTess()        # Get a tabulation of several TESS files
-summariseRunsTess()       # Summarise runs by repeats for each K
-runsToDfTess()            # Convert TESS run files to R dataframe
-clumppExportTess()        # Export files for use with CLUMPP
+evannoMethodStructure()   # perform the Evanno method for STRUCTURE data
+collectRunsTess()         # collect TESS output from multiple directories into one
 
-tabulateRunsMatrix()      # Get a tabulation of several MATRIX files
-summariseRunsMatrix()     # Summarise runs by repeats for each K
-runsToDfMatrix()          # Convert MATRIX run files to R dataframe
-clumppExportMatrix()      # Export files for use with CLUMPP
+analyseQ()                # wrapper function to quickly tabulate, summarise, 
+                          # perform evanno method, clumpp output and generate
+                          # barplots from filenames/paths.
 
-collectClumppOutput()     # Collect CLUMPP output into a common directory
-plotRuns()                # Plot a barplot from STRUCTURE/TESS/Matrix/table files
-PlotMultiline()           # Plot a multi-line barplot from STRUCTURE/TESS/Matrix/table file
-distructExport()          # Export files for DISTRUCT from STRUCTURE/TESS/Matrix/table file
+# Deprecated Functions
+# functions from previous version of pophelper absent in current version
+tabulateRunsStructure()   # renamed to tabulateQ
+tabulateRunsTess()        # renamed to tabulateQ
+tabulateRunsMatrix()      # renamed to tabulateQ
 
-plotRunsInterpolate()     # Spatially interpolate clusters from a STRUCTURE/TESS run file
-plotRunsSpatial()         # Cluster by max assignment and plot points spatially
+summariseRunsStructure()  # renamed to summariseQ
+summariseRunsTess()       # renamed to summariseQ
+summariseRunsMatrix()     # renamed to summariseQ
 
-analyseRuns()             # A wrapper function to quickly tabulate, summarise, 
-                          # perform evanno method, clumpp output and generate barplots 
-                          # from STRUCTURE, TESS or MATRIX run files.
+runsToDfStructure()       # renamed to readQ
+runsToDfTess()            # renamed to readQ
+runsToDfMatrix()          # renamed to readQ
+
+clumppExportStructure()   # renamed to clumppExport
+clumppExportTess()        # renamed to clumppExport
+clumppExportMatrix()      # renamed to clumppExport
+
+plotRuns()                # renamed to plotQ
+plotMultiline()           # renamed to plotQMultiline
+analyseRuns()             # renamed to analyseQ
+
+plotRunsInterpolate()     # renamed to plotQInterpolate
+                          # moved to package pophelperSpatial
+plotRunsSpatial()         # renamed to plotQSpatial
+                          # moved to package pophelperSpatial
 ```
 
 ----
 
 # Input files  
-The input run files expected by the package are STRUCTURE run files, TESS run files (-TR files in folders), or MATRIX run files. MATRIX files are numeric delimited tabular file like ADMIXTURE run files and fastSTRUCTURE meanQ files. Inputs can also be a generic numeric tabular tab, space or comma-delimited files without headers.  
+Generally speaking, there are four input file formats that can be defined. All are text formats. These are STRUCTURE run files, TESS run files (-TR files in folders), BASIC (simple delimited files) or a CLUMPP associated file. 
+
+STRUCTURE and TESS run files have specific format as shown below in __Fig. 1__. BASIC files are numeric delimited tabular file like ADMIXTURE run files and FASTSTRUCTURE meanQ files. They can also be a generic numeric tabular tab, space or comma-delimited files without headers. CLUMPP associated files are COMBINED, ALIGNED or MERGED files for use with CLUMPP. The COMBINED file is generated using the function `clumppExport()`. The ALIGNED and MERGED files are generated by CLUMPP. A sample CLUMPP format is shown in __Fig. 2__.
+
+The `readQ()` function in `pophelper` is used to read in these different input file types and convert them into an R list object. This list is referred to as a `qlist`. For those familiar with R, a `qlist` is just a regular list datatype in R. Each table/file is converted to a data.frame object which is stored in a list. Multiple runs would be a list of lists.
+
+A schematic data structure of a two run qlist would look like below:
+
+```{r, eval=FALSE}
+$list
++--$list
++  +--$data.frame
++--$list
+   +--$data.frame
+```
+
+An example is shown below
+
+```{r, eval=FALSE,echo=TRUE}
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
+sf <- readQ(files=sfiles[1:2])
+str(sf)
+```
+
+`qlist`s can also be create manually or generated in R just like any other list without using the `readQ` function in `pophelper`. But, note that `evannoMethodStructure()` needs the attributes associated with the data.frame. Other functions currently do not use the attributes.
+
+Here is a toy qlist object
+
+```{r, eval=FALSE,echo=TRUE}
+# create two data frames
+df1 <- data.frame(Cluster1=c(0.2,0.4,0.6,0.2),Cluster2=c(0.8,0.6,0.4,0.8))
+df2 <- data.frame(Cluster1=c(0.3,0.1,0.5,0.6),Cluster2=c(0.7,0.9,0.5,0.4))
+
+# one-element qlist
+q1 <- list("sample1"=df1)
+str(q1)
+
+# two-element qlist
+q2 <- list("sample1"=df1,"sample2"=df2)
+str(q2)
+```
 
 ![input-preview](input-preview.png)  
-*__Fig 4__: A preview of the input files. `STRUCTURE` file (Left), `TESS` file (centre) and `MATRIX` file (right).*  
+__Fig. 1:__ *A preview of the input files. STRUCTURE file (Left), TESS file (centre) and BASIC file (right).*  
 
-Combined, aligned and merged file used with CLUMPP are referred to as TAB files (table). They can be used for plotting. Input files for population labels and spatial coordinates must be tab-delimited header-free text files.  
+COMBINED, ALIGNED and MERGED files used with CLUMPP are referred to as CLUMPP files. They can also be used for plotting.
+
+![clumpp-format](clumpp-format.png)  
+__Fig. 2:__ *A preview of the CLUMPP format file.* 
 
 ----
 
 # Workflow  
 
-In this section, we will look at how these functions are used, their syntax and typical workflow. The workflow differs depending on the run files that are used. Specific functions are available for STRUCTURE, TESS or MATRIX input files. Specific functions are covered in workflow section. Functions that are common and shared for all run types are covered later.  
+In this section, we will look at how these functions are used, their syntax and typical order of workflow. The workflow is similar for all input filetypes. A few specific functions are specific to certain filetypes.
 
 The `pophelper` library must be loaded and a working directory must be set.
 
 ```{r, eval=FALSE,echo=TRUE}
 library(pophelper)
-setwd(choose.dir())
+setwd("path-to-wd")
 ```
 
-## STRUCTURE runs Workflow  
+![Workflow](workflow.png)  
+__Fig. 3:__ *Workflow for all filetypes. Files/objects are indicated in black text and functions are indicated in blue. External executables are indicated in green. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T` for automatic execution. The `analyseQ()` function is a wrapper function which can be used to run several functions together. This is indicated by the orange path. Functions indicated with superscripts 1 and 2 are only applicable to specific filetypes. `collectRunsTess()` is used to consolidate and rename TESS runs. evannoMethodStructure() is used to perform the Evanno method for STRUCTURE runs.*
 
-![Workflow Structure](workflow-structure.png)  
-__Fig 1.__ *Workflow for STRUCTURE files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
+## collectRunsTess  
 
-### tabulateRunsStructure  
-The functions `tabulateRunsStructure()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
+This function is applicable only to TESS runs. Unlike STRUCTURE runs which are exported into a single directory, TESS output files are exported into separate directories by run. This means that one needs to go into individual folders to obtain the run file. The function `collectRunsTess()` collects TESS cluster files from individual run folders into one new folder and rename each runfile by the folder name. Set working directory first and run basic usage.
 
-A typical STRUCTURE run produces a large number of output run files as seen below.  
-
-![structure-files-view](structure-files.png)  
-__Fig. 5.__ *Typical view of Structure output run files.*
+```{r,echo=FALSE, eval=FALSE, results='hide'}
+# basic usage
+collectRunsTess(runsdir="D://Data/Dropbox/Rwork/pophelperRpackage/tessoriginal")
+```
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
-df <- tabulateRunsStructure(files=choose.files())
+collectRunsTess(runsdir="path-to-tess-runs-root-dir")
 
 # another usage
-files = choose.files(multi=TRUE)
-tr1 <- tabulateRunsStructure(files=files)
+path <- "path-to-tess-runs-root-dir"
+collectRunsTess(runsdir=path)
 
-?tabulateRunsStructure
-tabulateRunsStructure(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
+# another usage
+collectRunsTess(runsdir=choose.dir())
+```
+
+Within each TESS run folder, the function searches for filename ending with 'TR.txt' as the cluster file. This file is copied to the new folder and renamed with the name of the respective run directory. Therefore, DO NOT manually rename original TESS run files or directories.
+
+## readQ 
+
+All input filetypes (STRUCTURE, TESS, BASIC, CLUMPP) can be converted to a qlist using the function `readQ()`. The argument `filetype` is used to specify the input filetype. By default, `filetype` is set to 'auto' which automatically detects input filetype. If this does not work, `filetype` can also be manually set.
+
+```{r, eval=FALSE,echo=TRUE}
+readQ(filetype="auto")      # automatically detects input filetype
+readQ(filetype="structure") # Convert STRUCTURE run files to qlist
+readQ(filetype="tess")      # Convert TESS run files to qlist
+readQ(filetype="basic")     # Convert delimited numeric text files to qlist
+readQ(filetype="clumpp")    # Convert CLUMPP format files to qlist
+```
+
+For this tutorial, we will use the sample files accompanied with this package.
+
+```{r, echo=TRUE, eval=TRUE, results='hide'}
+# STRUCTURE files
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
+# basic usage
+slist <- readQ(files=sfiles)
+readQ(files=sfiles,filetype="structure")
+# select files interactively
+# readQ(files=choose.files(multi=TRUE))
+# check class of ouput
+class(slist)
+# view head of first converted file
+head(slist[[1]])
+
+# TESS files
+tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
+tlist <- readQ(files=tfiles)
+# select files interactively
+# readQ(files=choose.files(multi=TRUE))
+
+# use ADMIXTURE files
+afiles<- list.files(path=system.file("files/admixture",package="pophelper"),full.names=T)
+alist <- readQ(files=afiles)
+
+# use FASTSTRUCTURE files
+ffiles <- list.files(path=system.file("files/faststructure",package="pophelper"),full.names=T)
+flist <- readQ(files=ffiles)
+
+# use space-delimited text files
+msfiles <- list.files(path=system.file("files/basic/space",package="pophelper"),full.names=T)
+mslist <- readQ(files=msfiles)
+
+# use tab-delimited text files
+mtfiles <- list.files(path=system.file("files/basic/tab",package="pophelper"),full.names=T)
+mtlist <- readQ(files=mtfiles)
+
+# use comma-separated text files
+mcfiles <- list.files(path=system.file("files/basic/comma",package="pophelper"),full.names=T)
+mclist <- readQ(files=mcfiles)
+```
+
+Each run is converted to dataframes of assignment probabilities of all individuals in *K* clusters denoted as Cluster1, Cluster 2 etc. The dataframes are placed in named lists. The names are obtained from filenames. Filename suffixes such as .txt, .csv, .tsv and .meanQ are dropped. In case filenames are missing or not available, lists are named sample1, sample2 etc.
+
+Each data.frame has some associated metadata, which is especially important for STRUCTURE runs. When reading in STRUCTURE runs using `readQ()`, metadata such as number of loci, number of burnins, reps, estimated log probability etc., which are required for the Evanno method are stored with each data.frame as attributes. The attributes of the run can be accessed as below.
+
+```{r,echo=TRUE, eval=FALSE, results='hide'}
+# qlist attributes
+attributes(slist)
+# dataframe attributes
+attributes(slist[[1]])
+```
+
+If individual labels are present in the STRUCTURE file, they can be imported as rownames by setting `indlabfromfile=T`. Space in labels may be replaced by underscore. Incorrect parsing with internal population flags may introduce underscores. If duplicate labels are found, the labels are not imported. This is applicable only for STRUCTURE files.
+
+```{r,echo=TRUE, eval=FALSE, results='hide'}
+# include individual names from STRUCTURE file as row names
+readQ(files=sfiles,indlabfromfile=T)
+
+# read only one file
+readQ(files=sfiles[1],indlabfromfile=T)
+```
+
+CLUMPP files (COMBINED, ALIGNED and MERGED) files can also be converted to a qlist using `readQ`.
+
+```{r,echo=TRUE, eval=FALSE, results='hide'}
+co <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
+al <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper")
+me <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper")
+
+readQ(co)
+readQ(al)
+readQ(me)
+
+readQ(co,filetype="clumpp")
+```
+
+For CLUMPP files containing multiple runs, each run name is suffixed by a -1, -2 etc. `names(readQ(co))`.
+
+## tabulateQ 
+The function `tabulateQ()` takes a qlist and produces a table of runs with various parameters. The results can be pointed to a variable for further use.
+
+```{r,echo=TRUE, eval=FALSE, results='hide'}
+# basic usage
+tr1 <- tabulateQ(qlist=slist)
+tabulateQ(tlist)
+tabulateQ(alist, writetable=TRUE)
+
+# choose files
+# files=choose.files(multi=TRUE)
+tabulateQ(qlist=readQ(files))
+
+?tabulateQ
+tabulateQ(qlist=NULL, writetable=FALSE, sorttable=TRUE)
 # To write results to working directory, set writetable=TRUE
 # Result table is sorted by loci, ind and k. To see original order, set sorttable=FALSE
 ```
-For this tutorial, we will use the sample structure files accompanied with this library.
 
-```{r,echo=TRUE, eval=FALSE}
-slist <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
-tr1 <- tabulateRunsStructure(files=slist)
+For all filetypes, the `tabulateQ()` function returns a table with three columns namely filename, *K* and number of individuals. The table is sorted by ind and *K*.
 
-# view output
-head(tr1)
-
+```{r, echo=TRUE, eval=TRUE, results="asis"}
+library(knitr)
+kable(head(tabulateQ(tlist)),caption="Table 1: A tabulated table of TESS runs.")
 ```
 
-The `tabulateRunsStructure()` function produces a table listing all selected files showing 10 columns namely file names, value of *K*, number of individuals, number of loci, estimated ln probability of data, mean value of ln likelihood, variance of ln likelihood, number of burn-in and number of repeats. The table is sorted by loci, ind and *K*. Missing values are given NA.
+For STRUCTURE runs, the `tabulateQ()` function produces additional columns namely number of loci, number of burn-ins, number of replicates (reps), estimated ln probability of data (elpd), mean value of ln likelihood (mvll) and variance of ln likelihood (vll). The table is sorted by loci, ind and *K*. 
 
-By default, the `tabulateRunsStructure()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
+```{r, echo=TRUE, eval=TRUE, results="asis"}
+library(knitr)
+kable(head(tabulateQ(slist)),caption="Table 2: A tabulated table of STRUCTURE runs.")
+```
 
-### summariseRunsStructure  
+Missing values are given NA. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
 
-The table produced using `tabulateRunsStructure()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateRunsStructure()` can be passed as input to `summariseRunsStructure()`. 
+## summariseQ 
 
-```{r,echo=TRUE, eval=FALSE}
+The table produced using `tabulateQ()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateQ()` can be passed as input to `summariseQ()`. 
+
+```{r, echo=TRUE, eval=FALSE}
 # basic usage
-sr1 <- summariseRunsStructure(data=tr1)
-summariseRunsStructure(data=tr1,writetable=TRUE)
+sr1 <- summariseQ(tr1)
+summariseQ(tr1,writetable=TRUE)
 
 # another usage
-sr1 <- summariseRunsStructure(data=tabulateRunsStructure(files=choose.files()))
+# sr1 <- summariseQ(tabulateQ(qlist=choose.files()))
 
 # view output
 head(sr1)
 ```
 
-The `summariseRunsStructure()` function returns 6 columns namely Mean estimated ln probability of data, standard deviation, value of *K*, number of runs for each *K*, estimated ln probability of data plus standard deviation, estimated ln probability of data minus standard deviation.
+For all filetypes the `summariseQ()` function returns 3 columns namely individuals, *K* and the number of runs.
 
-### evannoMethodStructure  
+```{r, echo=TRUE, eval=TRUE, results="asis"}
+library(knitr)
+kable(head(summariseQ(tabulateQ(tlist))),caption="Table 3: A summarised table of TESS runs.")
+```
 
-The `evannoMethodStructure()` function is only applicable to STRUCTURE runs.
+For STRUCTURE runs, the `summariseQ()` function returns additional 5 columns namely loci, Mean estimated ln probability of data, standard deviation of estimated ln probability of data, estimated ln probability of data minus standard deviation and estimated ln probability of data plus standard deviation.
 
-The Evanno method^2^ is used to estimate the optimal number of *K*. The summarised runs table output from`summariseRunsStructure()` function can be input to `evannoMethodStructure()`. The `evannoMethodStructure()` function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument `exportplot=T`. The table can be written to file using `writetable=T`.
+```{r, echo=TRUE, eval=TRUE, results="asis"}
+library(knitr)
+kable(head(summariseQ(tabulateQ(slist))),caption="Table 4: A summarised table of STRUCTURE runs.")
+```
 
-```{r,echo=TRUE, eval=FALSE}
+The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
+
+## evannoMethodStructure  
+
+This function is only applicable to STRUCTURE runs.
+
+The Evanno method^2^ is used to estimate the optimal number of *K*. The summarised runs table output from`summariseQ()` function can be input to `evannoMethodStructure()`. The `evannoMethodStructure()` function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument `exportplot=T`. The table can be written to file using `writetable=T`.
+
+```{r,echo=TRUE, eval=FALSE, results='hide'}
 # basic usage
 evannoMethodStructure(data=sr1)
 
 # another usage
-em <- evannoMethodStructure(summariseRunsStructure(tabulateRunsStructure(slist)))
+em <- evannoMethodStructure(summariseQ(tabulateQ(slist)))
 
 ?evannoMethodStructure
 evannoMethodStructure(data=NULL, writetable=FALSE, 
 exportplot=FALSE, na.rm=TRUE, imgtype="png", height=NA, width=NA, 
 res=NA, units=NA)
-# To write result to working directory, set writetable=TRUE
-# To export the plots to the working directory, set exportplot=TRUE
-# To change export image format, set imgtype="png" or imgtype="jpeg" or imgtype="pdf"
-# Figure arguments can be changed if required such as height, width, res and dimension units
+# to write result to working directory, set writetable=TRUE
+# to export the plots to the working directory, set exportplot=TRUE
+# to change export image format, set imgtype="png" or imgtype="jpeg" or imgtype="pdf"
+# figure arguments can be changed if required such as height, width, res and dimension units
 
 # to export a plot
 evannoMethodStructure(data=sr1,exportplot=T)
@@ -228,927 +421,598 @@ evannoMethodStructure(data=sr1,exportplot=T,writetable=T,na.rm=T)
 ```
 
 ![evanno-method](evanno-plot.png)  
-__Fig. 6.__ *Plots produced from the Evanno method.*
+__Fig. 4:__ *Plots produced from the Evanno method.*
 
-The Evanno method can be computed only if these criteria are met: At least 3 values of *K* must be available, values of *K* must be sequential (ie; there must not be missing values of *K*), number of individuals and loci must be same in all runs. If number of repeats for any *K* is less than 2, then results may not be reliable. In case the Evanno method cannot be computed, a plot of ELPD over *K* is produced referred to as the kPlot.
+The Evanno method results table has 15 columns namely number of loci (loci), number of individuals (ind), *K* value (k), number of runs (runs), Mean estimated ln probability of data (elpdmean), Standard deviation (elpdsd), Estimated ln probability of data minus standard deviation (elpdmin), Estimated ln probability of data plus standard deviation (elpdmax), First derivative (lnk1), Max error of first derivative (lnk1max), Min error of first derivative (lnk1min), Second derivative (lnk2), Max error of second derivative (lnk2max), Min error of second derivative (lnk2min) and deltaK.  
 
-From the command above, a png file and text file is exported to the working directory. The peak of deltaK in Fig. 6D. is usually used to estimate the best value of *K*.
-
-### runsToDfStructure  
-
-STRUCTURE run files can be converted to R dataframes using the functions `runsToDfStructure()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-rtd1 <- runsToDfStructure(files=slist)
-
-# select files interactively
-rtd1 <- runsToDfStructure(files=choose.files(multi=TRUE))
+```{r, echo=TRUE, eval=TRUE, results="asis"}
+library(knitr)
+kable(evannoMethodStructure(summariseQ(tabulateQ(slist))),caption="Table 5: Results of the Evanno method.")
 ```
 
-If individual labels are present in the STRUCTURE file, they can be imported as rownames by setting `indlabfromfile=T`. Space in labels may be replaced by underscore. Incorrect parsing with internal population flags may introduce underscores. If duplicate labels are found, the labels are not imported.
+The Evanno method can be computed only if these criteria are met: At least 3 values of *K* must be available, values of *K* must be sequential (ie; there must not be missing values of *K*), number of individuals and loci must be same in all runs. If number of repeats for any *K* is less than 2, then results may not be reliable. In case the Evanno method cannot be computed, a plot of ELPD over *K* is produced referred to as the kPlot.  
 
-```{r,echo=TRUE, eval=FALSE}
-# convert all input files
-rtd1 <- runsToDfStructure(files=slist)
-# check class of ouput
-class(rtd1)
-# view head of first converted file
-head(rtd1)
+From the command above, a png file and text file is exported to the working directory. The peak of deltaK __Fig. 4D__ is usually used to estimate the best value of *K*.  
 
-# convert only one input file
-rtd1.1 <- runsToDfStructure(files=slist[1])
-# check class of output
-class(rtd1.1)
-# view head of first converted file
-head(rtd1[[1]])
-
-#include individual names from structure file as row names
-runsToDfStructure(files=slist[1],indlabfromfile = T)
-
-```
-
-The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
-
-### clumppExportStructure  
-
-When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.
-
-![clumpp-folder-preview](clumpp-folder.png)  
-__Fig. 7.__ *Folders created from clumpp export and the contents of each folder.*
-
-The function `clumppExportStructure()` takes multiple STRUCTURE files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The combined file contains the tabular cluster data from all the repeats and runs. The paramfile contains information for the CLUMPP executable. The name for the folder can be changed optionally using the argument `prefix="something"`.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-clumppExportStructure(files=slist)
-
-# select files interactively
-clumppExportStructure(files=choose.files(multi=TRUE))
-
-?clumppExportStructure 
-clumppExportStructure(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
-# export folders are prefixed as STRUCTUREpop by default, to change, use prefix="foo"
-# To change clumpp algorithm, set parammode=1, parammode=2 or parammode=3. 
-# If clumpp is slow, increase parammode
-# To change number of clumpp repeats, set paramrep=200, paramrep=500 etc.
-
-# optionally change folder name
-clumppExportStructure(files=slist,prefix="Set1")
-```
-
-The CLUMPP executable needs to be copied and pasted into each of these folder and executed by running it. Alternatively, the CLUMPP executable can now be run automatically by specifying `useexe=T`. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
-
-```{r,echo=TRUE, eval=FALSE}
-#auto execute CLUMPP
-clumppExportStructure(files=slist, useexe=T)
-```
-
-Remember to cite CLUMPP^4^ if this option is used.
-
-![clumpp-folder-results](clumpp-output.png)  
-__Fig. 8.__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
-
-The aligned file contains all the runs as in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
-
-The remaining workflow is common for all input filetypes. Head over to section 'Common functions'.
-
-## TESS runs Workflow  
-
-![Workflow Tess](workflow-tess.png)  
-__Fig 2.__ *Workflow for TESS files. Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
-
-### collectRunsTess  
-
-This function is applicable only to TESS runs. Unlike STRUCTURE runs which are exported into a single directory, TESS output files are exported into separate directories by run. This means that one needs to go into individual folders to obtain the run file. The function `collectRunsTess()` collects TESS cluster files from individual run folders into one new folder and rename each runfile by the folder name. Set working directory first and run basic usage.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-collectRunsTess(runsdir="D:\\RoyDocs\\Dropbox\\Rwork\\pophelperRpackage\\tessoriginal")
-
-# another usage
-collectRunsTess(runsdir = choose.dir())
-```
-
-Within each TESS run folder, the function searches for filename ending with 'TR.txt' as the cluster file. This file is copied to the new folder and renamed with the name of the respective run directory. Therefore, DO NOT manually rename original TESS run files or directories.
-
-### tabulateRunsTess  
-
-The function `tabulateRunsTess()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-df <- tabulateRunsTess(files=choose.files(multi=TRUE))
-
-# another usage
-files = choose.files(multi=TRUE)
-tr1 <- tabulateRunsTess(files=files)
-
-#help
-?tabulateRunsTess
-tabulateRunsTess(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
-# To write results to working directory, set writetable=TRUE
-# Result table is sorted by loci, ind and k. To see original order, set sorttable=FALSE
-```
-
-For this tutorial, we will use the sample files accompanied with this library.
-
-```{r,echo=TRUE, eval=FALSE}
-tlist <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
-tr2 <- tabulateRunsTess(files=tlist)
-
-# view output
-head(tr2)
-```
-
-The `tabulateRunsTess()` function returns a table with three columns namely filename, *K* and number of individuals.
-
-By default, the `tabulateRunsTess()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
-
-### summariseRunsTess  
-
-The table produced using `tabulateRunsTess()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateRunsTess()` can be passed as input to `summariseRunsTess()`. 
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-sr2 <- summariseRunsTess(tr2)
-
-# another usage
-sr2 <- summariseRunsTess(data=tabulateRunsTess(files=choose.files()))
-
-# view output
-head(sr2)
-```
-
-The `summariseRunsTess()` function returns 3 columns namely individuals, *K* and the number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
-
-### runsToDfTess  
-
-TESS run files can be converted to R dataframes using the functions `runsToDfTess()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-rtd2 <- runsToDfTess(files=tlist)
-
-# select files interactively
-rtd2 <- runsToDfTess(files=choose.files(multi=TRUE))
-```
-
-```{r,echo=TRUE, eval=FALSE}
-# convert all input files
-rtd2 <- runsToDfTess(files=tlist)
-# check class of ouput
-class(rtd2)
-# convert only one input file
-rtd2.1 <- runsToDfTess(files=tlist[1])
-# check class of output
-class(rtd2.1)
-
-# view head of first converted file
-head(rtd2[[1]])
-```
-
-The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
-
-### clumppExportTess  
-
-When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.
-
-The function `clumppExportTESS()` takes multiple TESS files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The combined file contains the tabular cluster data from all the repeats and runs. The paramfile contains information for the CLUMPP executable. The name for the folder can be changed optionally using the argument `prefix="something"`.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-clumppExportTess(files=tlist)
-
-# select files interactively
-clumppExportTess(files=choose.files(multi=TRUE))
-
-?clumppExportTess
-clumppExportTess(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
-# export folders are prefixed as STRUCTUREpop by default, to change, use prefix="foo"
-# To change clumpp algorithm, set parammode=1, parammode=2 or parammode=3. 
-# If clumpp is slow, increase parammode
-# To change number of clumpp repeats, set paramrep=200, paramrep=500 etc.
-
-# optionally change folder name
-clumppExportTess(files=slist,prefix="Set1")
-```
-
-The CLUMPP executable needs to be copied and pasted into each of these folder and executed.  Alternatively, setting `useexe=T` will automatically run CLUMPP. Remember to cite CLUMPP^4^ if this option is used. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
-
-```{r,echo=TRUE, eval=FALSE}
-#auto execute CLUMPP
-clumppExportTess(files=tlist, useexe=T)
-```
-
-The aligned file contains all the runs in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
-
-## MATRIX runs Workflow  
-
-![Workflow Tess](workflow-matrix.png)  
-__Fig 3.__ *Workflow for MATRIX files (fastSTRUCTURE, ADMIXTURE etc). Files/objects are indicated in black text and functions are indicated in blue. The `analyseRuns()` function is a wrapper function which can be used to run several functions together. This is indicated by the asterisk and the orange path. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T`.*
-
-Any run files from any software or manually created which are numeric, tabular, header-free and delimited by space, tab or comma are referred to as MATRIX files. The ADMIXTURE run files and fastSTRUCTURE meanQ files are such files that can be used this this workflow.  
-
-### tabulateRunsMatrix  
-
-The function `tabulateRunsMatrix()` is used to select any number of run files in a folder and produce a table of runs with various parameters. The only mandatory argument required for this function is a character vector of filenames. The results can be pointed to a variable for further use.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-df <- tabulateRunsMatrix(files=choose.files(multi=TRUE))
-
-# another usage
-files = choose.files(multi=TRUE)
-tr1 <- tabulateRunsMatrix(files=files)
-
-#help
-?tabulateRunsMatrix
-tabulateRunsMatrix(files=NULL, writetable=FALSE, sorttable=TRUE, quiet=FALSE)
-# To write results to working directory, set writetable=TRUE
-# Result table is sorted by loci, ind and k. To see original order, set sorttable=FALSE
-```
-
-For this tutorial, we will use the sample files accompanied with this library.
-
-```{r,echo=TRUE, eval=FALSE}
-#use admixture files
-alist <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=T)
-tr3 <- tabulateRunsMatrix(files=alist)
-
-#use faststructure files
-flist <- list.files(path=system.file("files/faststructure",package="pophelper"),full.names=T)
-tr4 <- tabulateRunsMatrix(files=flist)
-
-#use space-delimited tabular files
-msfiles <- list.files(path=system.file("files/matrix/space",package="pophelper"),full.names=T)
-tr5 <- tabulateRunsMatrix(files=msfiles)
-
-#use tab-delimited tabular files
-mtfiles <- list.files(path=system.file("files/matrix/tab",package="pophelper"),full.names=T)
-tr6 <- tabulateRunsMatrix(files=mtfiles)
-
-#use comma-separated tabular files
-mcfiles <- list.files(path=system.file("files/matrix/comma",package="pophelper"),full.names=T)
-tr7 <- tabulateRunsMatrix(files=mcfiles)
-
-# view output
-head(tr3)
-head(tr4)
-head(tr5)
-head(tr6)
-head(tr7)
-```
-
-The `tabulateRunsMatrix()` function returns a table with three columns namely filename, *K* and number of individuals.
-
-By default, the `tabulateRunsMatrix()` function prints the number of selected files as `Number of files selected: 10`. This can be turned off using the `quiet=T` argument. The tabulated output can be written to the working directory as a text file by setting the argument `writetable=T`.
-
-### summariseRunsMatrix
-
-The table produced using `tabulateRunsMatrix()` can be further collapsed by *K* based on number of runs. The output table from `tabulateRunsMatrix()` can be passed as input to `summariseRunsMatrix()` respectively. 
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-sr3 <- summariseRunsMatrix(tr3)
-sr4 <- summariseRunsMatrix(tr4)
-sr5 <- summariseRunsMatrix(tr5)
-sr6 <- summariseRunsMatrix(tr6)
-sr7 <- summariseRunsMatrix(tr7)
-
-# another usage
-sr3 <- summariseRunsMatrix(data=tabulateRunsMatrix(files=choose.files(multi=TRUE)))
-
-# view output
-head(sr3)
-head(sr4)
-head(sr5)
-head(sr5)
-head(sr7)
-```
-
-The `summariseRunsMatrix()` function returns 3 columns namely individuals, *K* and number of runs. The summarised runs can be written to the working directory as a text file by setting the argument `writetable=T`.
-
-### runsToDfMatrix  
-
-MATRIX run files (ADMIXTURE, fastSTRUCTURE etc) or any numeric, tabular, header-free space/tab/comma delimited files can be converted to R dataframes using the function `runsToDfMatrix()`. If one file is selected, a dataframe is returned. If multiple files are selected, then a list of dataframes are returned.
-
-```{r,echo=TRUE, eval=FALSE}
-# basic usage
-rtd3 <- runsToDfMatrix(files=alist)
-rtd4 <- runsToDfMatrix(files=flist)
-rtd5 <- runsToDfMatrix(files=msfiles)
-rtd6 <- runsToDfMatrix(files=mtfiles)
-rtd7 <- runsToDfMatrix(files=mcfiles)
-
-# select files interactively
-rtd3 <- runsToDfMatrix(files=choose.files(multi=TRUE))
-```
-
-```{r,echo=TRUE, eval=FALSE}
-# convert all input files
-rtd3 <- runsToDfMatrix(files=alist)
-# check class of ouput
-class(rtd3)
-# convert only one input file
-rtd3.1 <- runsToDfMatrix(files=alist[1])
-# check class of output
-class(rtd3.1)
-
-# view head of first converted file
-head(rtd3[[1]])
-```
-
-The dataframe contains the assignment probabilities of all individuals into *K* clusters denoted as Cluster1, Cluster 2 etc.
-
-### clumppExportMatrix  
+## clumppExport 
 
 When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly. The software CLUMPP helps to overcome this issue by reordering the clusters correctly. To read more about CLUMPP^4^, see references.  
 
-The function `clumppExportMatrix()` takes multiple MATRIX files and combines runs by *K* and generates a combined data file and a paramfile in separate directories. The combined file contains the tabular cluster data from all the repeats and runs. The paramfile contains information for the CLUMPP executable. The name for the folder can be change optionally if required using the argument `prefix="something"`.  
+![clumpp-folder-preview](clumpp-folder.png)  
+__Fig. 5:__ *Folders created from clumpp export (left) and the contents of each folder (right).*
+
+The function `clumppExport()` takes a qlist, combines runs by *K* and generates a combined data file and a paramfile in separate directories. The combined file contains the tabular cluster data from all the repeats and runs. The paramfile contains information for the CLUMPP executable. The name for the folder can be changed optionally using the argument `prefix="something"`.  
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
-clumppExportMatrix(files=alist)
-clumppExportMatrix(files=flist)
+clumppExport(qlist=slist)
 
 # select files interactively
-clumppExportMatrix(files=choose.files(multi=TRUE))
+# clumppExport(qlist=choose.files(multi=TRUE))
 
-?clumppExportMatrix
-clumppExportMatrix(files=NULL, prefix=NA, parammode=NA, paramrep=NA)
-# export folders are prefixed as STRUCTUREpop by default, to change, use prefix="foo"
+?clumppExport
+clumppExport(qlist=NULL, prefix=NA, parammode=NA, paramrep=NA)
+# export folders are prefixed as pop by default, to change, use prefix="foo"
 # To change clumpp algorithm, set parammode=1, parammode=2 or parammode=3. 
 # If clumpp is slow, increase parammode
 # To change number of clumpp repeats, set paramrep=200, paramrep=500 etc.
 
 # optionally change folder name
-clumppExportMatrix(files=slist,prefix="Set1")
+clumppExport(qlist=slist,prefix="Set1")
 ```
 
-The CLUMPP executable needs to be copied and pasted into each of these folder and executed. Alternatively, the CLUMPP executable can now be run automatically by specifying `useexe=T`. Remember to cite CLUMPP^4^ if this option is used. The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file.  
+The CLUMPP executable needs to be copied and pasted into each of these folder and executed by running it. Alternatively, the CLUMPP executable can now be run automatically by specifying `useexe=T`. This may not work on all OS and versions. Remember to cite CLUMPP^4^ if this option is used.  
 
 ```{r,echo=TRUE, eval=FALSE}
-#auto execute CLUMPP
-clumppExportMatrix(files=alist, useexe=T)
+# auto execute CLUMPP
+clumppExport(qlist=slist, useexe=T)
 ```
 
-The aligned file contains all the runs in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.
+The CLUMPP executable uses the combined file and the param file to generate three output files: aligned file, merged file and misc file. 
 
-## Common functions  
-These are functions common to all types of input run files.  
+![clumpp-folder-results](clumpp-output.png)  
+__Fig. 6:__ *Folder showing CLUMPP results: aligned file, merged file and misc file.*
 
-### collectClumppOutput  
+The aligned file contains all the runs as in the combined file after realignment of clusters. In contrast, the merged file contains only one table which merges all the aligned runs to create a consensus run. The merged file makes sense only if all the aligned runs have similar assignments. The merged file is not recommended for downstream use unless you know what you are doing. The miscfile contains run parameters and other details.  
 
-The CLUMPP output files are now distributed in multiple folders. The aligned, merged or both files can be copied from multiple folders into a single folder for further analyses using the function `collectClumppOutput()`. The working directory is set suitably before running this function. This function need a `prefix` argument which denotes the prefix used in the previous function or the text before the underscore. For ex. a directory named `STRUCTUREpop_K2` has the prefix `STRUCTUREpop`.
+## collectClumppOutput  
+
+The CLUMPP output files are now distributed in multiple folders. The aligned, merged or both files can be copied from multiple folders into a single folder for further analyses using the function `collectClumppOutput()`. The working directory is set suitably before running this function. This function need a `prefix` argument which denotes the prefix used in the previous function or the text before the underscore. For ex. a directory named `pop_K2` has the prefix `pop`.  
 
 ```{r,echo=TRUE, eval=FALSE}
-# basic usage
+# set working directory
 setwd(choose.dir())
-# collect aligned files from STRUCTURE CLUMPP results. Default prefix is STRUCTUREpop
+# collect aligned files. Default prefix is pop
 collectClumppOutput()
-# by default, collect aligned files from TESS CLUMPP results
-collectClumppOutput(prefix="TESSpop")
-# collect aligned files from MATRIX CLUMPP results
-collectClumppOutput(prefix="MATRIXpop")
 
 # working directory can also be set using runsdir argument
+collectClumppOutput(runsdir=choose.dir())
+
 # collect both aligned and merged files
-collectClumppOutput(prefix="STRUCTUREpop",filetype="both",runsdir=choose.dir())
-collectClumppOutput(prefix="TESSpop",filetype="both",runsdir=choose.dir())
-collectClumppOutput(prefix="MATRIXpop",filetype="both",runsdir=choose.dir())
+collectClumppOutput(filetype="both")
 
 ?collectClumppOutput
-collectClumppOutput(prefix = "STRUCTUREpop", filetype = "aligned", runsdir = NA, 
-+ newdir = NA, quiet = FALSE)
+collectClumppOutput(prefix="pop", filetype="aligned", runsdir=NA, 
++ newdir=NA, quiet=FALSE)
 
-# change prefix if a different folder prefix was used. copy merged files from 
-# to change folder prefix, set prefix="STRUCTUREpop" or prefix="TESSpop" etc
 # to change which files are copied, set filetype="aligned", filetype="both" or 
 # filetype="merged"
 # to change name of new directory, set newdir="somename"
 
-collectClumppOutput()
-collectClumppOutput(prefix="TESSpop")
+?collectClumppOutput()
 ```
 
-Collecting the aligned and merged files into a single folder can be helpful in plotting these files. From the command above, both aligned and merged files are copied into a new directory `STRUCTUREpop-aligned` within the working directory.
+Collecting the aligned and merged files into a single folder can be helpful in plotting these files. From the command above, both aligned and merged files are copied into a new directory `pop-aligned` within the working directory.  
 
-### plotRuns  
+## plotQ  
 
-The function `plotRuns()` is used to create barplots from STRUCTURE, TESS, MATRIX run files, combined files, aligned files or merged files. The combined, aligned or merged files are referred to as TAB files. When plotting STRUCTURE, TESS or MATRIX run files, use `imgoutput="sep"` or `imgoutput="join"`. When `imgoutput="sep"`, each run file is plotted and exported as separate figures. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. When plotting combined, aligned or merged files, set `imgoutput="tab"`.
+The function `plotQ()` is used to create population-level barplots from a qlist. A schematic of the plot parts is shown below.  
 
-![plotruns-overview](plotruns-overview.png) 
-__Fig 9.__ *An overview of the components of a plot from the function plotRuns() and the arguments used to modify them.*
+![plotq-overview](plotq-overview.png) 
+__Fig. 7:__ *An overview of the components of a `plotQ()` figure and the arguments used to modify them.*
 
-The default usage below (usage 1) creates barplots of all selected files individually/separately.
+### Separate and Joined plots
+
+The `imgoutput` argument is used to indicate if multiple runs must be plotted as separate plots or as a joined plot. When `imgoutput="sep"`, each run file is plotted and exported as separate figures. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. Default is set as `imgoutput="sep"`.
 
 ```{r,echo=TRUE, eval=FALSE}
-# basic usage 1 #plot first 2 runs
-plotRuns(files=slist[1])
+# plot first run separately
+plotQ(qlist=slist[1])
 
+# plot multiple runs separately
+plotQ(qlist=slist[1:3])
 # same as above
-plotRuns(files=slist[1:3], imgoutput="sep")
-plotRuns(files=tlist[1:3],imgoutput="sep")
-plotRuns(files=alist[1:3],imgoutput="sep")
-plotRuns(files=flist[1:3],imgoutput="sep")
-plotRuns(files=mcfiles[1:3],imgoutput="sep")
-plotRuns(files=msfiles[1:3],imgoutput="sep")
-plotRuns(files=mtfiles[1:3],imgoutput="sep")
+plotQ(qlist=slist[1:3], imgoutput="sep")
 
-# usage 2, join files into one figure
-plotRuns(files=slist[c(1,3)], imgoutput="join")
-plotRuns(files=tlist[1:3],imgoutput="join")
-plotRuns(files=alist[1:3],imgoutput="join")
-plotRuns(files=flist[1:3],imgoutput="join")
-plotRuns(files=mcfiles[1:3],imgoutput="join")
-plotRuns(files=msfiles[1:3],imgoutput="join")
-plotRuns(files=mtfiles[1:3],imgoutput="join")
+# TESS files
+plotQ(qlist=readQ(tfiles)[1:3],imgoutput="sep")
+# ADMIXTURE files
+plotQ(qlist=readQ(afiles)[1:3],imgoutput="sep")
+# FASTSTRUCTURE files
+plotQ(qlist=readQ(ffiles)[1:3],imgoutput="sep")
+# comma-delimited files
+plotQ(qlist=readQ(mcfiles)[1:3],imgoutput="sep")
+# space-delimited files
+plotQ(qlist=readQ(msfiles)[1:3],imgoutput="sep")
+# tab-delimited files
+plotQ(qlist=readQ(mtfiles)[1:3],imgoutput="sep")
 
-# change height and width of figure
-plotRuns(files=slist[1], imgoutput="sep", height = 1.5, width=8)
-plotRuns(files=slist[1:3], imgoutput="join", height = 1.5, width=8)
-
-# change colour of file name on plot
-plotRuns(files=slist[1], flabcol="blue")
-# change size of file name on plot
-plotRuns(files=slist[1], flabsize=7)
-# hide file name on plot
-plotRuns(files=slist[1], flabcol="white")
-# turn off side panel
-plotRuns(files=slist[1], flabcol=F)
-# change colour of clusters
-plotRuns(files=slist[3:4], imgoutput="join", 
-    popcol=c("coral","steelblue","lightblue","purple","orange"))
-#output as jpeg
-plotRuns(files=slist[1],imgtype = "jpeg")
-#output as pdf
-plotRuns(files=slist[1],imgtype = "pdf")
+# join files into one figure
+plotQ(qlist=readQ(sfiles)[c(1,3)],imgoutput="join")
+plotQ(qlist=readQ(tfiles)[1:3],imgoutput="join")
+plotQ(qlist=readQ(afiles)[1:3],imgoutput="join")
+plotQ(qlist=readQ(ffiles)[1:3],imgoutput="join")
+plotQ(qlist=readQ(mcfiles)[1:3],imgoutput="join")
+plotQ(qlist=readQ(msfiles)[1:3],imgoutput="join")
+plotQ(qlist=readQ(mtfiles)[1:3],imgoutput="join")
 ```
 
-![plotruns-nolab](structure-nolab.png)  
-__Fig. 10.__ *(A) Left: Single run plotted separately. (B) Right: Two runs joined together in one image.*
+![plotq-nolab](structure-nolab.png)  
+__Fig. 8:__ *(A) Left: Single run plotted separately. (B) Right: Two runs joined together in one image.*
 
-Individuals in a plot can be sorted using any one of the clusters or 'all'. The 'all' option produces a sort similar to that in the software STRUCTURE. Use the name of a cluster in the argument `sortind` like `sortind="Cluster1"`.
+### Strip panel
+
+The panel on the right side of the plot is the strip panel (`sp`). The strip panel can show labels referred to as the strip labels or strip panel labels. The strip panel by default shows the filename and the *K* value. Strip panel label can be changed to show custom labels or the panel can be turned off altogether. If custom labels are provided, they must be equal to the number of runs.
 
 ```{r,echo=TRUE, eval=FALSE}
-#sorted by cluster 1
-plotRuns(files=slist[c(1,3)],sortind = "Cluster1")
-#sorted by cluster 2
-plotRuns(files=slist[1],sortind = "Cluster2")
-#sorted by all
-plotRuns(files=slist[c(1,3)],sortind = "all")
+# turn off strip panel
+plotQ(qlist=slist[1], sp=F)
+# move strip panel to the left
+plotQ(qlist=slist[1], sppos="left")
+plotQ(qlist=slist[1:3], imgoutput="join", sppos="left")
+# custom strip panel label showing filename only
+plotQ(qlist=slist[1], splab=names(slist)[1])
 
-#sorted by cluster 3
-plotRuns(files=tlist[1],sortind = "Cluster3") # gives error because this file contains only 2 clusters
+# custom strip panel label showing k only
+fn1 <- function(x) attr(x,"k")
+spnames <- paste0("K=",sapply(slist,fn1))
+plotQ(qlist=slist[1], splab=spnames[1])
 
-#sorted by cluster 1, three files joined plot
-plotRuns(files=slist[c(1,3)],sortind = "Cluster1",imgoutput = "join")
-plotRuns(files=slist[c(1,3)],sortind = "all",imgoutput = "join")
+# two-line strip panel label
+plotQ(qlist=slist[1:3], splab=paste0(names(slist)[1:3],"\n",c("run1","run2","run3")))
+plotQ(qlist=slist[1:3], imgoutput="join",
+         splab=paste0(names(slist)[1:3],"\n",c("run1","run2","run3")))
+
+# change colour of strip label on plot
+plotQ(qlist=slist[1], splabcol="blue")
+# change size of strip label on plot
+plotQ(qlist=slist[1], splabsize=7)
+# change font face of strip label on plot
+plotQ(qlist=slist[1], splabface="bold")
+# hide strip label on plot
+plotQ(qlist=slist[1], splabcol="white")
 ```
 
-![plotruns-nolab-sort](structure-nolab-sort.png)  
-__Fig. 11.__ *(A) Left: Joined plot sorted by cluster 1. (B) Right: Joined plot sorted by 'all'.*
+### Cluster colours
 
-Population labels can be added to this barplot by providing a character vector of labels. The length must be equal to the number of individuals. In this demonstration, we will use the labels table in the `pophelper` library. In case of separate plots and joined plots, the labels are shown only once at the bottom of the plot.
+Each cluster gets a distinct colour. Up to 12 clusters get colours assigned from a pre-defined palette. Clusters >12 get colours derived from the function `rich.colors()`. The colours can also be manually supplied to `clustercol` as a character of R colours or hexadecimal values. The length of colours must be equal to the maximum *K* value in the runs provided.
+
+![cols](cols.png)  
+__Fig. 9:__ *(A) Top: Colour palette used when K<=12. (B) Bottom: Colour function used when K>12.*
+
+```{r,echo=TRUE, eval=FALSE}
+# change colour of clusters
+plotQ(qlist=slist[3:4], imgoutput="join", 
+    clustercol=c("coral","steelblue","lightblue","purple","orange"))
+
+plotQ(qlist=slist[16:17], imgoutput="join", 
+    clustercol=c("#A6CEE3", "#3F8EAA", "#79C360", "#E52829", "#FDB762","#ED8F47","#9471B4"))
+
+```
+
+### Legend
+
+A legend denoting colours and labels for clusters can be shown on the top of plots by setting `legend=T`.  
+
+```{r,echo=TRUE, eval=FALSE}
+# show legend
+plotQ(qlist=slist[3], legend=T)
+# move to right side
+plotQ(qlist=slist[3], legend=T, legendpos="right")
+# change legend key size
+plotQ(qlist=slist[3], legend=T, legendkeysize=5)
+# change legend text size
+plotQ(qlist=slist[3], legend=T, legendtextsize=5)
+```
+
+ The clusters in qlist are by default named Cluster1, Cluster2 etc. The cluster names can be renamed by providing custom labels to argument `legendlab`. The length of `legendlab` must be equal to the max number of clusters in the selected runs. 
+
+```{r,echo=TRUE, eval=FALSE}
+#number of columns or K value in selected runs
+sapply(slist[c(1,3)],ncol)
+# joined plot with custom legend labels
+plotQ(qlist=slist[c(1,3)], imgoutput="join", legend=T, legendlab=c("group1","group2","group3"))
+```
+
+![plotq-legend](structure-legend.png)  
+__Fig. 10:__ *(A) Left: Default legend when `legend=T`. (B) Right: Joined plot with custom legend labels using `legendlab=c("group1","group2","group3")`.*
+
+### Sort individuals
+
+Individuals in a plot are by default plotted in the order as in the input data. The individuals can be sorted based on the value of any one of the clusters or 'all'. The 'all' option produces a sort similar to that in the software STRUCTURE. Use the name of a cluster in the argument `sortind` like `sortind="Cluster1"` or `sortind="all"`.
+
+```{r,echo=TRUE, eval=FALSE}
+# sorted by cluster 1
+plotQ(slist[c(1,3)],sortind="Cluster1")
+# sorted by cluster 2
+plotQ(slist[1],sortind="Cluster2")
+# sorted by all
+plotQ(slist[c(1,3)],sortind="all")
+
+# sorted by cluster 3
+plotQ(tlist[1],sortind="Cluster3") # gives error because this file contains only 2 clusters
+
+# sorted by cluster 1, three files joined plot
+plotQ(slist[c(1,3)],sortind="Cluster1",imgoutput="join")
+plotQ(slist[c(1,3)],sortind="all",imgoutput="join")
+```
+
+![plotq-nolab-sort](structure-nolab-sort.png)  
+__Fig. 11:__ *(A) Left: Joined plot sorted by cluster 1. (B) Right: Joined plot sorted by 'all'.*
+
+### Group labels
+
+One or more sets of group labels can be added to the bottom of barplots by providing a character vector of labels. The length of each vector must be equal to the number of individuals. The vectors must be constructed as a named list. In this demonstration, we will use the labels in the `pophelper` library.  
 
 ```{r, echo=TRUE, eval=FALSE}
 # read labels for STRUCTURE runs
-pops <- read.delim(system.file("files/structurepoplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
-head(pops$V1)
-length(pops$V1)
-tpops <- read.delim(system.file("files/tesspoplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
-head(tpops$V1)
-apops <- read.delim(system.file("files/admixturepoplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
-head(apops$V1)
-fpops <- read.delim(system.file("files/faststructurepoplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
-head(fpops$V1)
+grp1 <- read.delim(system.file("files/structuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+head(grp1$V1)
+# length of labels equal to number of individuals?
+length(grp1$V1)
+# check if labels are a character data type
+is.character(grp1$V1)
+```
+
+Make sure that the labels are character datatype. When reading from a text file, use `stringsAsFactors=F` to ensure that each column in the dataframe is a character and not a factor.  
+
+Read more labels.  
+```{r, echo=TRUE, eval=FALSE}
+# group labels for TESS runs
+tgrp <- read.delim(system.file("files/tessgrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+head(tgrp$V1)
+# group labels for ADMIXTURE runs
+agrp <- read.delim(system.file("files/admixturegrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+head(agrp$V1)
+# group labels for FASTSTRUCTURE runs
+fgrp <- read.delim(system.file("files/faststructuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+head(fgrp$V1)
 
 ```
 
-```{r, echo=TRUE, eval=FALSE}
-# plot all files separately with labels
-plotRuns(files=slist[1],poplab=pops$V1)
-plotRuns(files=tlist,poplab=tpops$V1)
+Now we provide the group labels as a list. The 'lab1' is the title of the group labels.  
 
-# plot one of the run files with labels
-plotRuns(files=slist[1], imgoutput="sep", poplab=pops$V1)
-plotRuns(files=alist[1], imgoutput="sep", poplab=apops$V1)
-plotRuns(files=tlist[1],imgoutput="sep",poplab=labs1)
+```{r, echo=TRUE, eval=FALSE}
+plotQ(qlist=slist[1],grplab=list("lab1"=grp1$V1))
+```
+
+![plotq-incorrect](structure-unequal-spacing.png)  
+__Fig. 12:__ *STRUCTURE barplot showing incorrect alignment of labels and clusters.*
+
+In the above example, note how the group labels do not align with the barplot panels. This is because the strip panel has a label of 2 lines and the group label title has one line. This can be corrected by adding an extra line to grp label title or providing custom one-line strip panel label.
+
+```{r, echo=TRUE, eval=FALSE}
+#correctly align plot panel and label panel
+plotQ(qlist=slist[1],grplab=list("lab1\n"=grp1$V1))
+plotQ(qlist=slist[1],grplab=list("lab1"=grp1$V1),splab="K=2")
+# turn off strip panel
+plotQ(qlist=slist[1],grplab=list("lab1"=grp1$V1),sp=F)
+```
+
+![plotq-corrected](structure-corrected.png)  
+__Fig. 13:__ *STRUCTURE barplots showing corrected alignment of labels and clusters.*
+
+```{r, echo=TRUE, eval=FALSE}
+# plot separately with labels
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1))
+plotQ(tlist[1],grplab=list("lab1\n"=tgrp$V1))
 
 # plot multiple files with a common label
-plotRuns(files=slist[c(1,3)], imgoutput="join", poplab=pops$V1)
-plotRuns(files=tlist[1:2], imgoutput="join", poplab=tpops$V1)
-plotRuns(files=alist[1:2], imgoutput="join", poplab=apops$V1)
-plotRuns(files=flist[1:2], imgoutput="join", poplab=fpops$V1)
-plotRuns(files=msfiles[1:2], imgoutput="join", poplab=tpops$V1)
-plotRuns(files=mtfiles[1:2], imgoutput="join", poplab=tpops$V1)
-plotRuns(files=mcfiles[1:2], imgoutput="join", poplab=tpops$V1)
+plotQ(slist[c(1,3)], imgoutput="join", grplab=list("lab1\n"=grp1$V1))
+plotQ(tlist[1:2], imgoutput="join", grplab=list("lab1\n"=tgrp$V1))
+plotQ(alist[1:2], imgoutput="join", grplab=list("lab1\n"=agrp$V1))
+plotQ(flist[1:2], imgoutput="join", grplab=list("lab1\n"=fgrp$V1))
+plotQ(mslist[1:2], imgoutput="join", grplab=list("lab1\n"=tgrp$V1))
+plotQ(mtlist[1:2], imgoutput="join", grplab=list("lab1\n"=tgrp$V1))
+plotQ(mclist[1:2], imgoutput="join", grplab=list("lab1\n"=tgrp$V1))
 
 # adjust label angle and justification
-plotRuns(files=slist[1] ,poplab=pops$V1, labangle=90, labjust=0.5)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), labangle=90, labjust=0.5)
+# adjust labpanelheight to fit labels
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), labangle=90, labjust=0.5, labpanelheight=0.8)
 
-# adjust y position of labels, labpanel and colour
-plotRuns(files=slist[1] ,poplab=pops$V1, labangle=90, labpos=0.6, labcol="green",labpanelheight=0.6)
-plotRuns(files=slist[1] ,poplab=pops$V1, labangle=45, labpos=0.4, labcol="green",labpanelheight=0.5)
+# when labpanelheight is high enough, use labpos to move labels vertically
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), labpanelheight=0.9, labpos=0.5)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), labpanelheight=0.9, labpos=0.3)
+
+# adjust label colour
+plotQ(slist[1] ,grplab=list("lab1\n"=grp1$V1), labcol="green")
 
 # adjust marker points
-plotRuns(files=slist[1] ,poplab=pops$V1, pointtype=20, pointcol="steelblue", pointsize=2)
-plotRuns(files=slist[1] ,poplab=pops$V1, pointtype=21, pointcol="green", pointbgcol="red")
-plotRuns(files=slist[1] ,poplab=pops$V1, pointtype="$", pointcol="green", pointsize=2)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), pointtype=20, pointsize=1.2)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), pointtype=21, pointcol="green", pointbgcol="red")
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), pointtype="$", pointcol="green", pointsize=2)
 
 # adjust marker line
-plotRuns(files=slist[1] ,poplab=pops$V1, pointcol="steelblue", linethick=0.5, linecol="steelblue")
-plotRuns(files=slist[1] ,poplab=pops$V1, pointcol="steelblue", linecol="steelblue", 
-         linetype=3,linethick=0.2)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linethick=0.5, linecol="steelblue")
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linecol="steelblue", linetype=3, linethick=0.2)
 
 # 2 line label and adjust label text position
-lab1 <- as.factor(paste(as.character(pops$V1),c(rep("Group 1",107), rep("Group 2",42)),sep="\n"))
-plotRuns(files=slist[c(1,3,5)], imgoutput="join", poplab=lab1, labpos=0.1, labpanelheight=0.6,labsize=1.2, flabsize=3)
+lab1 <- paste(grp1$V1,c(rep("Group 1",107), rep("Group 2",42)),sep="\n")
+plotQ(slist[c(1,3,5)], imgoutput="join", grplab=list("lab1\n"=lab1),
+         labpanelheight=0.8, labpos=0.3)
 ```
 
-![plotruns-lab](structure-lab.png)  
-__Fig. 12.__ *(A) Left: Single run plotted separately with pop labels. (B) Middle: Two runs joined together in one image with pop labels. (C) Right: Three runs joined together with double line population labels.*
+![plotq-lab](structure-lab.png)  
+__Fig. 14:__ *(A) Left: Single run plotted separately with group labels. (B) Right: Two runs joined together in one image with group labels.*
 
-Individuals can be sorted while using population labels. The individuals are sorted within their population groups.
+More than one set of group label sets can be be added to the plot by providing multiple vectors of labels.
 
 ```{r, echo=TRUE, eval=FALSE}
-#with pop labels, sorted individuals
-plotRuns(files=slist[1],poplab=pops$V1,sortind = "Cluster1")
-plotRuns(files=slist[1],poplab=pops$V1,sortind = "all")
+# read another grp label set
+grp2 <- read.delim(system.file("files/structuregrplabels2.txt", package="pophelper"), header=F,stringsAsFactors=F)
 
-#with pop labels, sort individuals, multiple files single
-plotRuns(files=slist[1:3],poplab=pops$V1,sortind = "Cluster1")
-plotRuns(files=slist[1:3],poplab=pops$V1,sortind = "all")
-
-#with pop labels, sort individuals, multiple files joined
-plotRuns(files=slist[c(1,3)],poplab=pops$V1,sortind = "Cluster2",imgoutput="join")
-plotRuns(files=slist[c(1,3)],poplab=pops$V1,sortind = "all",imgoutput = "join")
-
-#tess files with pop labels, sort individuals
-plotRuns(files=tlist[1],poplab=tpops$V1,sortind = "Cluster1")
-plotRuns(files=tlist[1],poplab=tpops$V1,sortind = "all")
-
-#admixture files with pop labels, sort individuals
-plotRuns(files=alist[1],poplab=apops$V1,sortind = "Cluster1")
-plotRuns(files=alist[1],poplab=apops$V1,sortind = "all")
-
-#faststructure files with pop labels, sort individuals
-plotRuns(files=flist[2],poplab=fpops$V1,sortind = "Cluster1")
-plotRuns(files=flist[2],poplab=fpops$V1,sortind = "all")
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1))
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1), sp=F)
 ```
 
-![plotruns-lab-sort](structure-lab-sort.png)  
-__Fig. 13.__ *(A) Left: Joined plot with pop labels sorted by cluster 1. (B) Right: Joined plot with pop labels sorted by 'all'.*
+![plotq-dual-lab](structure-dual-labels.png) 
+__Fig. 15:__ *(A) Left: Single run plotted with two sets of group labels. (B) Right: Two runs joined together along with two sets of group labels and strip panel turned off (`sp=F`).*
 
-When using population labels, the plot can be subsetted or reordered by population groups.
+Multiple plot argument adjustments to obtain a new label style.
 
 ```{r, echo=TRUE, eval=FALSE}
-#subsetting populations
-plotRuns(files=slist[1],poplab=pops$V1,subsetpops="Pop A")
-#change order of populations
-plotRuns(files=slist[1],poplab=pops$V1,subsetpops=c("Pop B","Pop A"))
-
-#subsetting pop and sorting individuals
-plotRuns(files=slist[1],poplab=pops$V1,subsetpops="Pop A",sortind="Cluster1")
-plotRuns(files=slist[1],poplab=pops$V1,subsetpops="Pop A",sortind="all")
-#change order of pop and sorting individuals
-plotRuns(files=slist[1],poplab=pops$V1,subsetpops=c("Pop B","Pop A"),sortind="Cluster1")
-plotRuns(files=slist[c(1,3)],poplab=pops$V1,subsetpops=c("Pop B","Pop A"),sortind="all",imgoutput = "join")
+plotQ(slist[1] ,grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1), linethick=2.8, linealpha=0.2, pointcol="white", pointsize=2, labpos=0.5, linepos=0.5, labpanelheight=0.75)
 ```
 
-![plotruns-lab-subsetreorder](structure-lab-subsetreorder.png)  
-__Fig. 14.__ *(A) Left: Single run with with subsetted pop label. (B) Middle: Single run with reordered pop labels. (C) Right: Joined plot with reordered pop labels.*
+![plotq-newlook](structure-newlook.png)  
+__Fig. 16:__ *Group labels in a different style*.
 
-In similar manner, the `plotsRuns` function can be used to plot from combined, aligned or merged files. For this set argument `imgoutput="tab"`.
+### Divider line
+
+The white dotted line dividing the groups on the panels is called the divider line. By default, the divider line is drawn between groups in the first group label set (See figures above). This can be changed by providing titles of group labels to the argument `divgrp`.
+
+```{r, echo=TRUE, eval=FALSE}
+# use second group label set as dividers
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1),divgrp="lab2\n")
+# use both group label sets as dividers
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1),divgrp=c("lab1\n","lab2\n"))
+```
+
+![plotq-divgrp](structure-divgrp.png)  
+__Fig. 17:__ *(A) Left: Divider lines for the second group label set. (B) Right: Divider lines for both group label sets.*
+
+The divider liness can also be modified and adjusted.
+
+```{r, echo=TRUE, eval=FALSE}
+# change div colour, type and thickness
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),divcol="black",divtype=1,divthick=1)
+```
+
+### Sorting with group labels
+
+Individuals can be sorted while using group labels. The individuals are sorted within their groups. Only one group label set can be used when sorting individuals.
+
+```{r, echo=TRUE, eval=FALSE}
+# with grp labels, sort individuals
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),sortind="Cluster1")
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),sortind="all")
+
+# with grp labels, sort individuals, multiple files single
+plotQ(slist[1:3],grplab=list("lab1\n"=grp1$V1),sortind="Cluster1")
+plotQ(slist[1:3],grplab=list("lab1\n"=grp1$V1),sortind="all")
+
+# with grp labels, sort individuals, multiple files joined
+plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),sortind="Cluster2",imgoutput="join")
+plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),sortind="all",imgoutput="join")
+```
+
+![plotq-lab-sort](structure-lab-sort.png)  
+__Fig. 18:__ *(A) Left: Joined plot with group labels sorted by cluster 1. (B) Right: Joined plot with group labels sorted by 'all'.*
+
+### Subset/reorder groups
+
+When using group labels, the plot can be subsetted or reordered based on group labels. This applies only when one group label set is in use.
+
+```{r, echo=TRUE, eval=FALSE}
+# subsetting groups
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),subsetgrp="Pop A")
+# change order of groups
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),subsetgrp=c("Pop B","Pop A"))
+
+# subsetting group and sorting individuals
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),subsetgrp="Pop A",sortind="Cluster1")
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),subsetgrp="Pop A",sortind="all")
+
+# change order of groups and sorting individuals
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),subsetgrp=c("Pop B","Pop A"),sortind="Cluster1")
+plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),subsetgrp=c("Pop B","Pop A"),sortind="all",imgoutput="join")
+```
+
+![plotq-lab-subsetreorder](structure-lab-subsetreorder.png)  
+__Fig. 19:__ *(A) Left: Single run with with subsetted group. (B) Middle: Single run with reordered groups. (C) Right: Joined plot with reordered groups.*
+
+In similar manner, the `plotsRuns` function can be used to plot from COMBINED, ALIGNED or MERGED files.
 
 ```{r,echo=TRUE, eval=FALSE}
 # select files from package
-tabs1 <- c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
-          system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
-          system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
+co <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
+al <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper")
+me <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper")
 
-# basic usage
+# all runs within the file are plotted
 # combined
-plotRuns(files=tabs1[1],imgoutput="tab")
+plotQ(readQ(co),imgoutput="join")
 # aligned
-plotRuns(files=tabs1[2],imgoutput="tab")
-# merged
-plotRuns(files=tabs1[3],imgoutput="tab")
+plotQ(readQ(al),imgoutput="join")
+# merged only one run
+plotQ(readQ(me))
 
 # plot with labels
-plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1)
-plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1, height=1.4, width=6)
+plotQ(readQ(co),grplab=list("lab1\n"=grp1$V1))
+plotQ(readQ(al),imgoutput="join",grplab=list("lab1\n"=grp1$V1))
 ```
 
-![plotruns-tab-nolab](structure-tab-nolab.png)  
-__Fig. 15.__ *(A) Left: Combined file (Three STRUCTURE runs for K=4). (B) Middle: Aligned file (Three STRUCTURE runs for K=4 aligned using CLUMPP). (C) Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP)*  
+![plotq-tab-nolab](structure-tab-nolab.png)  
+__Fig. 20:__ *(A) Left: Combined file (Three STRUCTURE runs for K=4). (B) Middle: Aligned file (Three STRUCTURE runs for K=4 aligned using CLUMPP). (C) Right: Merged file (Three runs for K=4 merged into one table/figure using CLUMPP)*  
 
-TABLE files (Combined/aligned/merged) files can also be sorted and subsetted/ordered using pop labels.  
-```{r,echo=TRUE, eval=FALSE}
-#tab files sorting
-plotRuns(files=tabs1[1],imgoutput="tab",sortind="Cluster1")
-plotRuns(files=tabs1[1],imgoutput="tab",sortind="all")
+### Group mean  
 
-#tab files sorting with pop labels
-plotRuns(files=tabs1[1],imgoutput="tab",sortind="Cluster1",poplab=pops$V1)
-plotRuns(files=tabs1[1],imgoutput="tab",sortind="all",poplab=pops$V1)
-```
-
-![plotruns-tab-nolab-sort](structure-tab-nolab-sort.png)  
-__Fig. 16.__ *(A) Left: Combined file (Three STRUCTURE runs for K=4). (B) Middle: Combined file sorted by Cluster1. (C) Right: Combined file sorted by 'all'*  
-
-![plotruns-tab-lab-sort](structure-tab-lab-sort.png)  
-__Fig. 17.__ *(A) Left: Combined file (Three STRUCTURE runs for K=4) with pop labels. (B) Middle: Combined file with poplabels sorted by Cluster1. (C) Right: Combined file with pop labels sorted by 'all'* 
+An additional feature is the ability to plot mean values (`grpmean=T`) by group when group labels are in use. `grpmean` cannot be used when more than one set of group label sets is in use.
 
 ```{r,echo=TRUE, eval=FALSE}
-#tab files subsetting
-plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1,subsetpops="Pop A")
-#tab files subsetting sorting
-plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1,subsetpops="Pop A",sortind="all")
-#tab files change order of populations
-plotRuns(files=tabs1[1],imgoutput="tab",poplab=pops$V1,subsetpops=c("Pop B","Pop A"))
-#tab files change order of populations sort
-plotRuns(files=tabs1[2],imgoutput="tab",poplab=pops$V1,subsetpops=c("Pop B","Pop A"),sortind="all")
+# group mean
+plotQ(slist[4],grplab=list("lab1\n"=grp1$V1),grpmean=T)
+plotQ(readQ(al),imgoutput="join",grplab=list("lab1\n"=grp1$V1),grpmean=T)
 ```
 
-![plotruns-tab-lab-subsetreorder](structure-tab-lab-subsetreorder.png)  
-__Fig. 18.__ *(A) Left: Combined file with subsetted pop labels. (B) Right: Combined file with reordered pop labels.*
+![plotq-structure-lab-grpmean](structure-lab-grpmean.png)  
+__Fig. 21:__ *(A) Left: STRUCTURE file showing group mean values. (B) Right: Aligned CLUMPP file showing group mean.*
 
-Some additional features include ability to plot mean values by population when population labels are in use.
-
-![plotruns-structure-lab-popmean](structure-lab-popmean.png)  
-__Fig. 19.__ *(A) Left: STRUCTURE file showing population mean values. (B) Right: Aligned TAB file showing population mean.*
+The height, width, resolution and figure format can be changed as shown below. The height specifies the height of one panel if the plot is joined. The function multiplies the height values by the number of panels.
 
 ```{r,echo=TRUE, eval=FALSE}
-#pop mean
-plotRuns(sfiles[4],poplab=pops$V1,popmean=T)
-plotRuns(files=tabs1[2],imgoutput="tab",poplab=pops$V1,popmean=T)
+slist <- readQ(sfiles)
+
+# change height and width of figure
+plotQ(qlist=slist[1], imgoutput="sep", height=1.5, width=8)
+plotQ(qlist=slist[1:3], imgoutput="join", height=1.5, width=8)
+
+# change resolution
+plotQ(qlist=slist[1],dpi=600)
+# change export figure format
+plotQ(qlist=slist[1], imgtype="jpeg")
+plotQ(qlist=slist[1], imgtype="pdf")
 ```
 
-`plotRuns()` function has numerous arguments to tweak the plot as required. See `?plotRuns` for more arguments and descriptions.
+`plotQ()` function has numerous arguments to tweak the plot as required. See `?plotQ` for more arguments and descriptions.
 
-### plotMultiline  
+## plotQMultiline  
 
-The `plotMultiline` function is also used to plot STRUCTURE runs, TESS runs, ADMIXTURE runs and TAB files as barplots. This function automatically identifies these input file types. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced on A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` can be specified.
+The `plotQMultiline` function is also used to plot barplots from a qlist. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced as A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` is automatically calculated but it can also be specified manually.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
-plotMultiline(slist[1])
-plotMultiline(tlist[1])
-plotMultiline(alist[1])
-plotMultiline(flist[1])
-plotMultiline(mcfiles[1])
-plotMultiline(msfiles[1])
-plotMultiline(mtfiles[1])
+plotQMultiline(slist[1])
+plotQMultiline(tlist[1])
+plotQMultiline(alist[1])
+plotQMultiline(flist[1])
+plotQMultiline(mclist[1])
+plotQMultiline(mslist[1])
+plotQMultiline(mtlist[1])
 
 # manually modifying samples per line and lines per page
-plotMultiline(slist[1],spl=75,lpp=10)
-plotMultiline(slist[1],spl=149,lpp=9)
+plotQMultiline(slist[1],spl=75,lpp=10)
+plotQMultiline(slist[1],spl=149,lpp=9)
 # with TESS runs
-plotMultiline(tlist[1],spl=75,lpp=10)
+plotQMultiline(tlist[1],spl=75,lpp=10)
 # with TESS runs
-plotMultiline(alist[1],spl=168,lpp=10)
+plotQMultiline(alist[1],spl=168,lpp=10)
 
 # works with combined, aligned or merged files
-plotMultiline(tabs1,spl=75,lpp=10)
+plotQMultiline(readQ(co),spl=75,lpp=10)
 
 # change bar width and turn off labels
-plotMultiline(tabs1[1], barwidth=1, indlabs=F)
+plotQMultiline(readQ(al), barwidth=1, indlabs=F)
 # yaxis labels and ticks and modified height and width
-plotMultiline(tabs1[1],spl=75,lpp=2,indlabs=T,yaxislabs=T,ticks=T,height=5,width=20)
+plotQMultiline(readQ(al),spl=75,lpp=2,indlabs=T,yaxislabs=T,ticks=T,height=5,width=20)
 # modified spl
-plotMultiline(tabs1[1],spl=38,height=8,width=14)
+plotQMultiline(readQ(me),spl=38,height=8,width=14)
 ```
 
-Similar to `plotRuns()`, individuals can be sorted by any one cluster or 'all'. The 'all' option takes all clusters into account while sorting and produces a result similar to that produced in the STRUCTURE software 'Sort by Q' option.  
+Similar to `plotQ()`, individuals can be sorted by any one cluster or 'all'. The 'all' option takes all clusters into account while sorting and produces a result similar to that produced in the STRUCTURE software 'Sort by Q' option.  
 
 ```{r,echo=TRUE, eval=FALSE}
-plotMultiline(slist[1],sortind="Cluster1")
-plotMultiline(slist[1],sortind="all")
-plotMultiline(slist[1],spl=75,lpp=10,sortind="Cluster1")
-plotMultiline(slist[1],spl=75,lpp=10,sortind="all")
+plotQMultiline(slist[1],sortind="Cluster1")
+plotQMultiline(slist[1],sortind="all")
+plotQMultiline(slist[1],spl=75,lpp=10,sortind="Cluster1")
+plotQMultiline(slist[1],spl=75,lpp=10,sortind="all")
 ```
 
-![plotruns-plotmultiline](plotmultiline.png)  
-__Fig. 20.__ *Left: Default output from `plotMultiline`. Middle Left: Modified output with custom `spl` and `lpp`. Middle Right: Sorted by Cluster1. Right: Sorted by 'all'.*
+![plotqmultiline](plotqmultiline.png)  
+__Fig. 21:__ *Left: Default output from `plotQMultiline`. Middle Left: Modified output with custom `spl` and `lpp`. Middle Right: Sorted by Cluster1. Right: Sorted by 'all'.*
 
-Individual labels can be added as a character vector.
+By default, the individuals are labelled numerically (1,2,3..). Individual labels from the rownames of input data can be used by specifying `useindlab=T`. The individual labels can be turned off by using `indlab=F`.
+
 ```{r,echo=TRUE, eval=FALSE}
-inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE)
-#add ind labels.
-plotMultiline(slist[1],indlab=inds$V1)
-plotMultiline(slist[1],indlab=inds$V1,sortind="all")
-plotMultiline(slist[1],indlab=inds$V1,sortind="Cluster1")
+# get a qlist
+list1 <- slist[1]
 
-#long ind name
-inds <- read.delim(system.file("files/structureindlabelslong.txt",package="pophelper"),header=FALSE)
-plotMultiline(slist[1],indlab=inds$V1)
-plotMultiline(slist[1],indlab=inds$V1,spl=75,lpp=4)
-plotMultiline(slist[1:3],indlab=inds$V1,spl=75,lpp=4)
+#read some individual labels
+inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
+
+# add labels as rownames to qlist
+rownames(list1[[1]]) <- inds$V1
+
+# add ind labels.
+plotQMultiline(list1,useindlab=T)
+# turn off ind labels
+plotQMultiline(list1,indlab=F)
+
+#sort
+plotQMultiline(list1,useindlab=T,sortind="all")
+plotQMultiline(list1,useindlab=T,sortind="Cluster1")
+
+# long ind name
+longlabs <- paste0("this_is_a_real_long_label_",inds$V1)
+rownames(list1[[1]]) <- longlabs
+plotQMultiline(list1,useindlab=T)
+plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
+plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
+
+# change cluster colours
+plotQMultiline(list1,useindlab=T,clustercol=c("steelblue","coral"))
+# change bar width
+plotQMultiline(list1,useindlab=T,barwidth=1,spl=149,lpp=1,labsize=3,height=5)
 ```
 
-For STRUCTURE files, the individual labels if available within the file, can be imported and plotted using `indlabfromfile=T`. `sortlabels` has no effect when `indlabfromfile=T`
+![plotqmultiline-colours](plotqmultiline-colours.png)  
+__Fig. 22:__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
+
+Note that this function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
+
+## distructExport
+
+DISTRUCT^7^ is one of the original programs written to generate assignment barplots from a q-matrix. This function generates all output files necessary to run DISTRUCT from a qlist. A directory labelled 'filename-distruct' is created for each input file. Each directory contains the 'filename-indq.txt', 'filename-grpq.txt', 'filename-colours.txt' and 'drawparams'. If grplab is in use, then 'filename-grplabbottom.txt' and/or 'filename-grplabtop.txt' are also created. The DISTRUCT executable can be run in this directory to create a 'filename.ps' postcript vector file. Using `useexe=T` will run the DISTRUCT executable automatically. Remember to cite DISTRUCT^7^ if this option is used. The 'filename.ps' file can be imported into a vector image editing software or seen using a viewer.
 
 ```{r,echo=TRUE, eval=FALSE}
-#use ind labels from STRUCTURE file.
-plotMultiline(slist[1],indlabfromfile=T)
-plotMultiline(slist[1],indlabfromfile=T,sortind="all")
-```
+# basic usage
+distructExport(slist[1])
+distructExport(slist[1],quiet=T)
+# with bottom labels
+distructExport(qlist=slist[1],grplabbottom=grp1$V1)
+# with group mean
+distructExport(slist[1],grpmean=T)
+# grayscale colours
+distructExport(slist[1],grayscale=T)
+# automatically run distruct executable
+distructExport(slist[1],useexe=T)
 
-![plotmultiline-colours](plotmultiline-colours.png)  
-__Fig. 21.__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
-
-Note that this  function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
-
-### distructExport
-
-DISTRUCT^7^ is one of the original programs written to generate assignment barplots tabular output. This function generates all output files necessary to run DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files. A directory labelled 'filename-distruct' is created for each input file. Each directory contains the 'filename-indq.txt', 'filename-popq.txt', 'filename-colours.txt' and 'drawparams'. If poplab is in use, then 'filename-poplabbottom.txt' and/or 'filename-poplabtop.txt' are also created. The DISTRUCT executable can be run in this directory to create a 'filename.ps' postcript vector file. Using `useexe=T` will run the DISTRUCT executable automatically. Remember to cite DISTRUCT^7^ if this option is used. The 'filename.ps' file can be imported into a vector image editing software or seen using a viewer.
-
-```{r,echo=TRUE, eval=FALSE}
-#basic usage
-distructExport(files = sfiles[1])
-#with bottom labels
-distructExport(files = sfiles[1],poplabbottom=pops$V1)
-#with population means
-distructExport(files = sfiles[1],popmean=T)
-#grayscale colours
-distructExport(files = sfiles[1],grayscale=T)
-#run distruct executable
-distructExport(files = sfiles[1],useexe=T)
-
-#tess files
-distructExport(files = tfiles[2])
-#admixture files, adjust if plot does not fit on canvas
-distructExport(files = afiles[3],indwidth=0.36,xorigin=15)
-#TAB files
-distructExport(files = tabs1[1])
-distructExport(files = tabs1)
+# TESS files
+distructExport(tlist[2])
+# ADMIXTURE files, adjust if plot does not fit on canvas
+distructExport(alist[3],indwidth=0.36,xorigin=15)
+# CLUMPP files
+distructExport(readQ(co))
+distructExport(readQ(al))
+distructExport(readQ(me))
 ```
 
 ![distructexport](destruct-structure.png)  
-__Fig. 26.__ *Left: DISTRUCT plot with `popmean=F`. Middle: DISTRUCT plot with `popmean=T`. Right: DISTRUCT plot with `grayscale=T`.*  
+__Fig. 23:__ *Left: DISTRUCT plot with `grpmean=F`. Middle: DISTRUCT plot with `grpmean=T`. Right: DISTRUCT plot with `grayscale=T`.*  
 
-### analyseRuns  
+The `useexe=T` argument may not work on all OS and systems.  
 
-This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or MATRIX run files. The `analyseRuns()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
+## analyseQ  
+
+This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or BASIC run files. The `analyseQ()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
-analyseRuns(choose.files())
-analyseRuns(files=slist)
-analyseRuns(files=tlist)
-analyseRuns(files=alist)
-```
-
-### plotRunsInterpolate  
-
-The `plotRunsInterpolate()` function allows to spatially interpolate STRUCTURE, TESS or MATRIX runs. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232). Note that this is generally a slow function and can take several minutes.
-
-Here, we will use some sample files from the library.
-
-```{r,echo=TRUE, eval=FALSE}
-#specify path for datafile and coordsfile
-tlist <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
-cd1 <- system.file("files/coords75.txt",package="pophelper")
-
-# basic usage
-plotRunsInterpolate(datafile=tlist[2],coordsfile=cd1)
-
-#adjusting legend size and legend text
-plotRunsInterpolate(datafile=tlist[2],coordsfile=cd1,legendsize=0.4,legendtextsize=6)
-
-#removing legend
-plotRunsInterpolate(tlist[2],cd1,legend=FALSE)
-
-# try some structure files
-s1 <- system.file("files/Structure239_4",package="pophelper")
-cd2 <- system.file("files/coords239.txt",package="pophelper")
-plotRunsInterpolate(datafile=s1,coordsfile=cd2)
-# get dimensions and legend size as required
-plotRunsInterpolate(datafile=s1,coordsfile=cd2,height=15,width=22,legendsize=0.4)
-# finer grid # very slow
-plotRunsInterpolate(datafile=s1,coordsfile=cd2,height=15,width=22,legendsize=0.4, 
-                    gridsize=100)
-
-# try admixture files
-s1 <- system.file("files/admixture/admixture_01",package="pophelper")
-cd2 <- system.file("files/coords1592.txt",package="pophelper")
-plotRunsInterpolate(datafile=s1,coordsfile=cd2,method = "bilinear",height=10,width=26)
-
-# try fast-structure files
-s1 <- system.file("files/faststructure/fast-structure_02.meanQ",package="pophelper")
-cd2 <- system.file("files/coords22.txt",package="pophelper")
-plotRunsInterpolate(datafile=s1,coordsfile=cd2,method = "bilinear",height=10,width=26)
-```
-
-The default interpolation algorithm is Kriging (`method="krig"`). By default, `exportplot=T` exports an image to the working directory. By default `clusters=NA` which means that all clusters in the file are plotted. By default, `imgoutput="join"`, therefore all clusters are plotted in a single figure. The default `gridsize=60` produces rather pixellated grids. Increase gridsize to produce finer grid but at a higher computational cost.
-
-![plotruns-interpolate-join](plotruns-interpolate-join.png)  
-__Fig. 22.__ *Interpolated plot of one TESS run file containing 6 clusters (K=6). The default interpolation algorithm (method) used was kriging. In this particular case, it is known that K=2, therefore only cluster 2 has useful information.*
-
-We can choose only cluster 2 and try out different interpolation methods. Five methods are currently implemented: bilinear, bicubic, inverse distance weighting, nearest neighbour and kriging. Kriging is predictive while others are essentially direct spatial interpolation.
-
-```{r,echo=TRUE, eval=FALSE}
-df1 <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)[2]
-cd1 <- system.file("files/coords75.txt",package="pophelper")
-
-p1 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
-                          clusters=2,dataout=T,method="bilinear",exportplot=F)
-p2 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
-                          clusters=2,dataout=T,method="bicubic",exportplot=F)
-p3 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
-                          clusters=2,dataout=T,method="idw",exportplot=F)
-p4 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
-                          clusters=2,dataout=T,method="nn",exportplot=F)
-p5 <- plotRunsInterpolate(df1,cd1,legendsize=0.3,legendtextsize=5,
-                          clusters=2,dataout=T,method="krig",exportplot=F)
-
-library(gridExtra)
-png("MethodsComparison.png",height=16,width=22,res=200,units="cm",type="cairo")
-grid.arrange(p1[[1]],p2[[1]],p3[[1]],p4[[1]],p5[[1]],nrow=2,ncol=3)
-dev.off()
-```
-
-We specify `clusters=2` which plots only cluster 2. The `dataout=T` allows to save the ggplot plot object to a variable and then modify them or combine with other plots. Due to `exportplot=F`, no plots are exported.
-
-![plotruns-interpolate-methods](plotruns-interpolate-methods.png)  
-__Fig. 23.__ *Interpolated plot of one cluster (Cluster 2) of one TESS run file containing 6 clusters (K=6) showing different interpolation methods. Row 1 from left: bilinear, bicubic and Inverse distance weighting. Row 2 from left: Nearest neighbour and Kriging.*
-
-The colours can be easily changed by feeding in required colours to the argument `colours`. The R package `RColorBrewer` has a wide range of nice colours.
-
-```{r,echo=TRUE, eval=FALSE}
-# view Colorbrewer colours
-library(RColorBrewer)
-display.brewer.all()
-
-# sample plots with custom colours
-p1 <- plotRunsInterpolate(df1,cd1,clusters=2:3,colours=brewer.pal(8,"RdYlBu"),
-                          legend=F,exportplot=F,dataout=T)
-p2 <- plotRunsInterpolate(df1,cd1,clusters=2,colours=brewer.pal(8,"Spectral"),
-                          legend=F,exportplot=F,dataout=T)
-p3 <- plotRunsInterpolate(df1,cd1,clusters=2,colours=rev(brewer.pal(8,"BuPu")),
-                          legend=F,exportplot=F,dataout=T)
-
-png("PlotColours.png",height=8,width=24,res=200,units="cm",type="cairo")
-grid.arrange(p1[[1]],p1[[2]],p2[[1]],p3[[1]],ncol=4)
-dev.off()
-```
-
-![plotruns-interpolate-customcolours](plotruns-interpolate-customcolours.png)  
-__Fig. 24.__ *Interpolation plots showing some of the colour palettes available in package. Left 2 plots are `brewer.pal(8,"RdYlBu")`, 3^rd^ plot is `brewer.pal(8,"Spectral")` and 4^th^ plot is `brewer.pal(8,"BuPu")`.*  
-
-Note that when using `plotRunsInterpolate()`, all methods may not work with all sorts of coordinate inputs.  
-
-### plotRunsSpatial  
-
-Estimate clusters using the highest probability of assignment for each individual and plot these clusters to spatial coordinates. The clusters are denoted by colour or point shape. The clusters can also be marked by confidence ellipses or convex hulls. Files needed are STRUCTURE, TESS or MATRIX run files and geographical coordinate files of same length. Note that the coordinate file must be tab-delimited text file with no headers. The first column must be x (latitude) and second column y (longitude). Note that none of the methods are able to handle missing coordinate data. All coordinates must be available. Coordinates must be in standard longitude-latitude (LL) decimal format (eg: 21.0232, 43.0232).
-
-```{r,echo=TRUE, eval=FALSE}
-library(RColorBrewer)
-s1 <- system.file("files/Structure239_4",package="pophelper")
-cd2 <- system.file("files/coords239.txt",package="pophelper")
-
-# basic usage
-plotRunsSpatial(datafile=s1,coordsfile=cd2)
-# needs more height. set height and width as required in cm.
-plotRunsSpatial(datafile=s1,coordsfile=cd2,height=12)
-# set UTM coordinates. Better geographic distance representation over a scale 
-# such as normal countries.
-plotRunsSpatial(datafile=s1,coordsfile=cd2,height=12,setutm=T)
-# without ellipses
-plotRunsSpatial(datafile=s1,coordsfile=cd2,height=12,ellipse=F)
-
-# create a 2x2 montage with varying parameters
-# don't export plot, export data, add title
-p1 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottitle="Fig 1")
-# without ellipse, with square points and transparency added
-p2 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottitle="Fig 2",
-                      ellipse=F,pointtype=15,pointtransp=0.4)
-# without ellipse, with convex hulls, coordinates in UTM, points by cluster, 
-# custom colours,show axis
-p3 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, 
-                      plottitle="Fig 3",ellipse=F,chull=T, setutm=T,pointtype=NA,
-                      pointsize=2,popcol=brewer.pal(5,"Dark2"),showaxis=T)
-# no ellipse, with convex hull, decreased convexhull transparency, convexhull linetype, 
-# change cluster labels, custom colours, show axis
-p4 <- plotRunsSpatial(datafile=s1,coordsfile=cd2,exportplot=F,dataout=T, plottitle="Fig 4",
-                      ellipse=F,chull=T,chulltransp=0.2,chulltype=3,
-                      legendlabels=c("PopA","PopB","PopC","PopD","PopE"),
-                      popcol=brewer.pal(5,"Set1"),showaxis=T)
-
-png("PlotRunsSpatial.png",height=20,width=20,res=250,units="cm",type="cairo")
-gridExtra::grid.arrange(p1,p2,p3,p4,nrow=2,ncol=2)
-dev.off()
-```
-![plotruns-spatial](plotruns-spatial.png)  
-__Fig. 25.__ *Some of the plots created using the function `plotRunsSpatial()`. Fig 1: The basic usage of the function with title added `plottitle="Fig 1"`. Fig 2: The ellipses are turned off `ellipse=F` and the point shape is changed `pointtype=15` and transparency added to points `pointtransp=0.4`. Fig 3: Convex hulls are turned on `chull=T` and coordinates are transformed to UTM `setutm=T`. The points shapes are based on clusters `pointtype=NA`. Custom colours are used `brewer.pal(5,"Dark2")` and axis are shown `showaxis=T`. Fig 4: Convex hull transparency is lowered `chulltransp=0.2`, convex hull linetype is changed `chulltype=3`, legend labels are changed `legendlabels=c("PopA","PopB","PopC","PopD","PopE")`. Custom colours are used `brewer.pal(5,"Set1")`.*  
-
-```{r,echo=TRUE, eval=FALSE}
-# try some fast-structure files
-s1 <- system.file("files/faststructure/fast-structure_02.meanQ",package="pophelper")
-cd2 <- system.file("files/coords22.txt",package="pophelper")
-plotRunsSpatial(datafile=s1,coordsfile=cd2)
+analyseQ(choose.files())
+analyseQ(files=slist)
+analyseQ(files=tlist)
+analyseQ(files=alist)
 ```
 
 ----
@@ -1160,92 +1024,87 @@ Here is a list of all functions in a order typical of workflow.
 ## Structure  
 
 ```{r,echo=TRUE, eval=FALSE}
-#choose files
-slist <- choose.files(multi=TRUE)
-#tabulate runs
-df1 <- tabulateRunsStructure(slist)
-#summarise runs
-df2 <- summariseRunsStructure(df1)
-#Evanno method
+# choose files
+sfiles <- choose.files(multi=TRUE)
+# STRUCTURE runs to qlist
+slist <- readQ(sfiles,filetype="structure")
+# tabulate runs
+df1 <- tabulateQ(slist)
+# summarise runs
+df2 <- summariseQ(df1)
+# Evanno method
 evannoMethodStructure(df2,exportplot=T)
-#clumpp export
-clumppExportStructure(slist)
-#collect clumpp output
-collectClumppOutput(prefix="STRUCTUREpop",filetype="aligned")
-#plot runs
-plotRuns(files=slist)
-plotRuns(files=slist,imgoutput="join")
-#for clumpp output
-plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
-#plot multiline
-plotMultiline(slist[1])
-plotMultiline(slist[1],spl=70,lpp=10)
-#structure runs to data frame
-runsToDfStructure(slist)
+# clumpp export
+clumppExport(slist)
+# collect clumpp output
+collectClumppOutput(prefix="pop",filetype="aligned")
+# plot runs
+plotQ(slist)
+plotQ(slist,imgoutput="join")
+# plot multiline
+plotQMultiline(slist[1])
+plotQMultiline(slist[1],spl=70,lpp=10)
 
-#or all together
-analyseRuns(slist)
+# or all together
+analyseQ(sfiles)
 ```
 
 ## Tess  
 
 ```{r,echo=TRUE, eval=FALSE}
-#collect TESS output
+# collect TESS output
 collectRunsTess(runsdir=choose.dir())
-#choose files
-tlist <- choose.files(multi=TRUE)
-#tabulate runs
-df1 <- tabulateRunsTess(tlist)
-#summarisee runs
-df2 <- tabulateRunsTess(df1)
-#clumpp export
-clumppExportTess(tlist)
-#collect clumpp output
-collectClumppOutput(prefix="TESSpop",filetype="aligned")
-#plot runs
-plotRuns(files=tlist[1])
-plotRuns(files=tlist[1:2],imgoutput="join")
-#for clumpp outputs 
-plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
-#plot multiline
-plotMultiline(tlist[1])
-plotMultiline(tlist[1],spl=70,lpp=10)
-#TESS runs to data frame
-runsToDfTess(tlist)
+# choose files
+tfiles <- choose.files(multi=TRUE)
+# TESS runs to qlist
+tlist <- readQ(tfiles,filetype="tess")
+# tabulate runs
+df1 <- tabulateQ(tlist)
+# summarisee runs
+df2 <- summariseQ(df1)
+# clumpp export
+clumppExport(tlist)
+# collect clumpp output
+collectClumppOutput(prefix="pop",filetype="aligned")
+# plot runs
+plotQ(tlist)
+plotQ(tlist,imgoutput="join")
+# plot multiline
+plotQMultiline(tlist[1])
+plotQMultiline(tlist[1],spl=70,lpp=10)
 
-#or all together
-analyseRuns(tlist)
+# or all together
+analyseQ(tfiles)
 ```
 
-## Admixture/fastStructure/Other  
+## Basic  
+Run files such as Admixture, fastStructure or any delimited numeric text files. 
 
 ```{r,echo=TRUE, eval=FALSE}
-#choose files
-alist <- choose.files(multi=TRUE)
-#tabulate runs
-df1 <- tabulateRunsMatrix(alist)
-#summarise runs
-df2 <- summariseRunsMatrix(df1)
-#clumpp export
-clumppExportMatrix(alist)
-#collect clumpp output
-collectClumppOutput(prefix="MATRIXpop",filetype="aligned")
-#plot runs
-plotRuns(files=alist[1])
-plotRuns(files=alist[1:2],imgoutput="join")
-#for clumpp outputs
-plotRuns(files=choose.files(multi=TRUE),imgoutput="tab")
-#plot multiline
-plotMultiline(alist[1])
-plotMultiline(alist[1],spl=70,lpp=10)
-#TESS runs to data frame
-runsToDfMatrix(alist)
+# choose files
+afiles <- choose.files(multi=TRUE)
+# delimited-text-runs to qlist
+alist <- readQ(afiles,filetype="basic")
+# tabulate runs
+df1 <- tabulateQ(alist)
+# summarise runs
+df2 <- summariseQ(df1)
+# clumpp export
+clumppExport(alist)
+# collect clumpp output
+collectClumppOutput(prefix="pop",filetype="aligned")
+# plot runs
+plotQ(files=alist)
+plotQ(files=alist,imgoutput="join")
+# plot multiline
+plotQMultiline(alist[1])
+plotQMultiline(alist[1],spl=70,lpp=10)
 
-#or all together
-analyseRuns(alist)
+# or all together
+analyseQ(afiles)
 ```
 
-Most of the functionalities in this package have been implented in the online tool [Pophelper web app](https://www.pophelper.com). For those who prefer a graphical web interface, this may be useful.  
+Many of the functionalities in this package have been implented in the online tool [Pophelper web app](https://www.pophelper.com). For those who prefer a graphical web interface, this may be useful.  
 
 ----
 
@@ -1280,15 +1139,189 @@ Most of the functionalities in this package have been implented in the online to
 
 ----
 
+# Compatibility
+
+`pophelper 2.0.0` has been tested on the following systems:
+
++ Windows 10 64bit, R 3.3.2
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.2 (2016-10-31)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows >= 8 x64 (build 9200)
+
+locale:
+[1] LC_COLLATE=English_United Kingdom.1252 
+[2] LC_CTYPE=English_United Kingdom.1252   
+[3] LC_MONETARY=English_United Kingdom.1252
+[4] LC_NUMERIC=C                           
+[5] LC_TIME=English_United Kingdom.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] testthat_1.0.2  pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.8      tidyr_0.6.0      dplyr_0.5.0      crayon_1.3.2    
+ [5] assertthat_0.1   R6_2.2.0         grid_3.3.2       plyr_1.8.4      
+ [9] DBI_0.5-1        gtable_0.2.0     magrittr_1.5     scales_0.4.1    
+[13] stringi_1.1.2    reshape2_1.4.2   lazyeval_0.2.0   labeling_0.3    
+[17] tools_3.3.2      stringr_1.1.0    munsell_0.4.3    colorspace_1.3-1
+[21] gridExtra_2.2.1  tibble_1.2 
+```
+
++ Windows 10 64bit, R 3.3.1
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.1 (2016-06-21)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows >= 8 x64 (build 9200)
+
+locale:
+[1] LC_COLLATE=English_United Kingdom.1252 
+[2] LC_CTYPE=English_United Kingdom.1252   
+[3] LC_MONETARY=English_United Kingdom.1252
+[4] LC_NUMERIC=C                           
+[5] LC_TIME=English_United Kingdom.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
+
+loaded via a namespace (and not attached):
+ [1] colorspace_1.2-7 scales_0.4.1     magrittr_1.5     assertthat_0.1  
+ [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.1      gtable_0.2.0    
+ [9] tibble_1.2       gridExtra_2.2.1  Rcpp_0.12.7      grid_3.3.1      
+[13] tidyr_0.6.0      munsell_0.4.3   
+```
+
++ Windows 7 64bit, R 3.3.0
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.0 (2016-05-03)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 7 x64 (build 7601) Service Pack 1
+
+locale:
+[1] LC_COLLATE=English_United Kingdom.1252  LC_CTYPE=English_United Kingdom.1252   
+[3] LC_MONETARY=English_United Kingdom.1252 LC_NUMERIC=C                           
+[5] LC_TIME=English_United Kingdom.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] pophelper_2.0.0 Cairo_1.5-9     ggplot2_2.2.0  
+
+loaded via a namespace (and not attached):
+ [1] colorspace_1.2-7 scales_0.4.1     magrittr_1.5     assertthat_0.1  
+ [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.0      gtable_0.2.0    
+ [9] tibble_1.2       gridExtra_2.2.1  Rcpp_0.12.7      grid_3.3.0      
+[13] tidyr_0.6.0      munsell_0.4.3  
+```
+
++ Windows 7 64bit, R 3.3.2
+
+DISTRUCT executable worked but unstable.
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.2 (2016-10-31)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 7 x64 (build 7601) Service Pack 1
+
+locale:
+[1] LC_COLLATE=English_United Kingdom.1252  LC_CTYPE=English_United Kingdom.1252   
+[3] LC_MONETARY=English_United Kingdom.1252 LC_NUMERIC=C                           
+[5] LC_TIME=English_United Kingdom.1252    
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9     devtools_1.12.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.8      tidyr_0.6.0      assertthat_0.1   digest_0.6.10   
+ [5] withr_1.0.2      plyr_1.8.4       grid_3.3.2       R6_2.2.0        
+ [9] gtable_0.2.0     magrittr_1.5     git2r_0.16.0     scales_0.4.1    
+[13] httr_1.2.1       lazyeval_0.2.0   curl_2.3         tools_3.3.2     
+[17] munsell_0.4.3    colorspace_1.3-1 memoise_1.0.0    knitr_1.15.1    
+[21] gridExtra_2.2.1  tibble_1.2 
+```
+
++ Ubuntu Linux 16.04.1 LTS 64bit, R 3.3.2
+
+DISTRUCT executable does not work.
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.2 (2016-10-31)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 16.04.1 LTS
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods  
+[7] base     
+
+other attached packages:
+[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
+
+loaded via a namespace (and not attached):
+ [1] colorspace_1.2-6 scales_0.4.1     magrittr_1.5     assertthat_0.1  
+ [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.2      gtable_0.2.0    
+ [9] tibble_1.1       gridExtra_2.2.1  Rcpp_0.12.6      grid_3.3.2      
+[13] tidyr_0.5.1      munsell_0.4.3 
+```
+
++ Scientific Linux 6.8 (Carbon) 64bit, R 3.3.1
+
+```{coffee,echo=TRUE, eval=FALSE}
+R version 3.3.1 (2016-06-21)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Scientific Linux release 6.8 (Carbon)
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+other attached packages:
+[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9
+
+loaded via a namespace (and not attached):
+ [1] colorspace_1.2-6 scales_0.4.1     magrittr_1.5     assertthat_0.1
+ [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.1      gtable_0.2.0
+ [9] tibble_1.1       gridExtra_2.2.1  Rcpp_0.12.6      grid_3.3.1
+[13] tidyr_0.6.0      munsell_0.4.3
+```
+
+---
+
 # Disclaimer
 
-The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3. Please make sure you verify all your results by eye atleast once per batch.  
+The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3. Please make sure you verify all your results.  
 
 ----
 
 # Contact
 
-Feel free to email me if you have any comments, suggestions or issues. Preferred email is roy[dot]m[dot]francis[at]outlook[dot]com.  
+If you have any comments, suggestions or issues, report on the [Github issues page](https://github.com/royfrancis/pophelper/issues).  
   
-  
-__2016 Roy M Francis__  
+__End of Document.__  

@@ -5,7 +5,7 @@
 \title{Internal: Get dimensions for figures.}
 \usage{
 getDim(ind = NA, units = NA, height = NA, width = NA, res = NA,
-  imgtype = NA, labpanelheight = NA, plotnum = NA)
+  imgtype = NA, labpanelheight = NA, labs = NA, plotnum = NA)
 }
 \arguments{
 \item{ind}{A numeric indicating the number of individuals.}
@@ -21,6 +21,8 @@ getDim(ind = NA, units = NA, height = NA, width = NA, res = NA,
 \item{imgtype}{A character denoting image format. "png", "jpeg" or "pdf".}
 
 \item{labpanelheight}{A numeric denoting the height of the label panel.}
+
+\item{labs}{An integer denoting number of label groups.}
 
 \item{plotnum}{A numeric indicating the number of plots in the figure.}
 }
