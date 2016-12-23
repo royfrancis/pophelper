@@ -2,21 +2,21 @@
 
 `pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output run files generated from population analysis programs such as STRUCTURE, TESS and numeric delimited formats such as ADMIXTURE or fastSTRUCTURE. The `pophelper` package can be used to tabulate runs, summarise runs, estimate *K* using the Evanno method, export files for CLUMPP, export files for DISTRUCT and generate barplot figures.  
 
-For a detailed demonstration and walkthrough, refer the online [vignette](http://royfrancis.github.io/pophelper/). New versions and updates are shown only on this GitHub page.
+For a detailed demonstration and walkthrough, refer the online [vignette](http://royfrancis.github.io/pophelper/). A quick intro video is available [here](https://www.youtube.com/watch?v=Jyo-88g9dDg). New versions and updates are shown only on this GitHub page.
 
 ## Installation  
 You need to have R (> 3.3.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the `devtools` package. Then, you can install `pophelper` from `github` using the `devtools` package.  
 __Note that functions, function names, workflow and arguments are significantly different in this version (2.0.0) compared to previous versions. This version is not back compatible with previous versions. ggplot2 version must be 2.2.0 or above.__
 
 ```coffee
-#install devtools package from CRAN
+# install devtools package from CRAN
 install.packages('devtools',dependencies=T)
 library(devtools)
 
-#install pophelper package from GitHub
+# install pophelper package from GitHub
 install_github('royfrancis/pophelper')
 
-#load library for use
+# load library for use
 library(pophelper)
 ```
 
@@ -35,7 +35,7 @@ Note that `pophelper 1.2.0` and later includes binary executables for CLUMPP and
 An online interactive version of pophelper is available at [pophelper.com](http://www.pophelper.com). Not all features of the R package is supported in the online app.  
 
 ## List of Functions  
-  
+
 For help on any function, use  
 `?tabulateQ`  
 `?evannoMethodStructure`  
@@ -56,7 +56,7 @@ collectRunsTess()         # Collect TESS output from multiple directories into o
 analyseQ()                # A wrapper function to quickly tabulate, summarise, 
                           # perform evanno method, clumpp output and generate
                           # barplots from filenames/paths.
-```  
+```
 
 ## Workflow 
 
