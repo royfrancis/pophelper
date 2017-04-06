@@ -34,6 +34,8 @@ Note that `pophelper 1.2.0` and later includes binary executables for CLUMPP and
 ## Web App   
 An online interactive version of pophelper is available at [pophelper.com](http://www.pophelper.com). Not all features of the R package is supported in the online app.  
 
+__NOTE: The web app has been suspended by the hosting service from Apr 4, 2017 to Apr 12, 2017 due to "exceeded usage hours". If anyone would be interested in hosting shiny apps on a linux server with higher bandwidth, please get in touch.__
+
 ## List of Functions  
 
 For help on any function, use  
