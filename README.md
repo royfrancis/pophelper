@@ -8,15 +8,16 @@ For a detailed demonstration and walkthrough, refer the online [vignette](http:/
 
 This version 2.1.0 no longer supports any of the functions deprecated in version <2.0.0. `ggplot2` version must be 2.2.0 or above. Some of the important changes from the previous version 2.0.0 are listed below:
 
-+ Order of arguments have changed in `plotQ()`,`plotQMultiline()` and `evannoMethodStructure()`.
-+ `plotQMultiline()`: Group labels, sorting within groups, subsetting groups, reordering groups etc.
-+ `plotQMultiline()`: Sorting by individual labels.
-+ `plotQ()`: Sorting by individual labels.
-+ More plot customisation arguments added to `evannoMethodStructure()`.
-+ tiff export added to all export functions.
-+ Argument 'barwidth' replaced with 'barsize'.
-+ Argument 'linethick' replaced with 'linesize'.
++ Order of arguments have changed in `plotQ()`,`plotQMultiline()` and `evannoMethodStructure()`
++ `plotQMultiline()`: Group labels, sorting within groups, subsetting groups, reordering groups etc
++ `plotQMultiline()`: Sorting by individual labels
++ `plotQ()`: Sorting by individual labels
++ More plot customisation arguments added to `evannoMethodStructure()`
++ tiff export added to all export functions
++ Argument 'barwidth' replaced with 'barsize'
++ Argument 'linethick' replaced with 'linesize'
 + Argument 'divthick' replaced with 'divsize'
++ Argument 'res' replaced with 'dpi'
 
 For full list of changes, refer to the [NEWS](https://github.com/royfrancis/pophelper/blob/master/NEWS).
 
@@ -24,7 +25,6 @@ For full list of changes, refer to the [NEWS](https://github.com/royfrancis/poph
 You need to have R (> 3.3.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the `devtools` and other dependency packages. Then, you can install `pophelper` from `github` using the `devtools` package.  
 
 ```coffee
-
 # install dependencies and devtools
 install.packages(c("Cairo","ggplot2","gridExtra","gtable","tidyr","devtools"),dependencies=T)
 
