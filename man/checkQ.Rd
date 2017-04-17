@@ -17,4 +17,3 @@ A character or character vector indicating input type 'STRUCTURE', 'TESS', 'BASI
 \description{
 Internal: Check input filetype.
 }
-

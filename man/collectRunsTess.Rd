@@ -29,4 +29,3 @@ See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details
 collectRunsTess("path")
 }
 }
-

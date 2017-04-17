@@ -4,7 +4,7 @@
 \alias{unitConverter}
 \title{Internal: Convert value between dimension units}
 \usage{
-unitConverter(value = NA, fromunit = NA, tounit = NA, res = NA)
+unitConverter(value = NA, fromunit = NA, tounit = NA, dpi = NA)
 }
 \arguments{
 \item{value}{A numeric value or numeric vector to convert}
@@ -13,7 +13,7 @@ unitConverter(value = NA, fromunit = NA, tounit = NA, res = NA)
 
 \item{tounit}{A character indicating the unit to change to. Options are "cm", "mm", "in" or "px".}
 
-\item{res}{A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).}
+\item{dpi}{A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).}
 }
 \value{
 Returns a numeric value or numeric vector in changed units.
@@ -21,4 +21,3 @@ Returns a numeric value or numeric vector in changed units.
 \description{
 Internal: Convert value between dimension units
 }
-

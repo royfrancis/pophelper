@@ -41,4 +41,3 @@ summariseQ(tr1)
 \seealso{
 \code{\link{tabulateQ}}
 }
-

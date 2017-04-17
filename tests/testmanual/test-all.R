@@ -3,17 +3,30 @@
 
 library(testthat)
 library(pophelper)
-
 #devtools::test()
 
 # Start ------------------------------------------------------------------------
 
 #Preparation
-deleteoutput = TRUE
+deleteoutput <- TRUE
+testfont <- FALSE
+testtiff <- FALSE
+
+if(testfont)
+{
+  library(extrafont)
+  font_import(pattern="^Verdana",prompt=F)
+  loadfonts()
+}
+
 #create a new folder and set as wd
 currwd <- getwd()
-dir.create(paste(currwd,"/pophelper-demo",sep=""))
-setwd(paste(currwd,"/pophelper-demo",sep=""))
+if(basename(currwd) != "pophelper-demo") 
+{
+  dir.create(paste(currwd,"/pophelper-demo",sep=""))
+  setwd(paste(currwd,"/pophelper-demo",sep=""))
+}
+
 #read sample STRUCTURE files from R package
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
 sfiles1 <- list.files(path=system.file("files/structure-ci",package="pophelper"),full.names=TRUE)
@@ -30,14 +43,14 @@ msfiles <- list.files(path=system.file("files/basic/space",package="pophelper"),
 tabs1 <- c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
-pops1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
-pops2 <- read.delim(system.file("files/structuregrplabels2.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
+grps1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
+grps2 <- read.delim(system.file("files/structuregrplabels2.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 
 # checkQ --------------------------------------------------------------------
 
 #checkQ
 context("Check runs")
-cat("checkQ\n")
+cat("checkQ ---------------------------------------------------------------\n")
 cr1 <- pophelper:::checkQ(sfiles)
 cr2 <- pophelper:::checkQ(tfiles)
 cr3 <- pophelper:::checkQ(afiles)
@@ -73,7 +86,7 @@ test_that("check runs output",{
 # readQ ------------------------------------------------------------------------
 
 context("readQ")
-cat("readQ\n")
+cat("readQ ---------------------------------------------------------------\n")
 
 test_that("Is output dataframe or list?",{
   expect_equal(class(readQ(sfiles)),"list")
@@ -150,10 +163,30 @@ test_that("Error: wrong input format",{
   expect_error(readQ(tabs1,filetype="structure"))
 })
 
+# is.qlist ---------------------------------------------------------------------
+
+context("is.qlist")
+cat("is.qlist ---------------------------------------------------------------\n")
+q1 <- readQ(sfiles)
+
+expect_equal(is.qlist(q1,warn=TRUE),TRUE)
+names(q1)[2] <- NA
+expect_error(is.qlist(q1,warn=TRUE))
+names(q1)[2] <- ""
+expect_warning(is.qlist(q1,warn=TRUE))
+expect_equal(is.qlist(q1,warn=TRUE),FALSE)
+names(q1)[2] <- "trial"
+names(q1)[3] <- "trial"
+expect_warning(is.qlist(q1,warn=TRUE))
+expect_equal(is.qlist(q1,warn=TRUE),FALSE)
+q1[3] <- "new"
+expect_warning(is.qlist(q1,warn=TRUE))
+expect_equal(is.qlist(q1,warn=TRUE),FALSE)
+
 # tabulateQ -----------------------------------------------------------------
 
 context("Tabulate")
-cat("tabulateQ\n")
+cat("tabulateQ ---------------------------------------------------------------\n")
 
 tr1 <- tabulateQ(qlist=readQ(sfiles))
 tr2 <- tabulateQ(qlist=readQ(tfiles))
@@ -267,7 +300,7 @@ test_that("Error: no input",{
 # summariseQ ----------------------------------------------------------------
 
 context("Summarise")
-cat("summariseQ\n")
+cat("summariseQ ---------------------------------------------------------------\n")
 
 test_that("writetable=TRUE",{
   sr1 <- summariseQ(tr1,writetable=TRUE)
@@ -321,58 +354,96 @@ test_that("Error: no input",{
 # evannoMethodStucture ---------------------------------------------------------
 
 context("Evanno method")
-cat("evannoMethodStructure\n")
+cat("evannoMethodStructure ----------------------------------------------------\n")
 
+#returns dataframe
 sr1 <- summariseQ(tr1,writetable=FALSE)
-test_that("Is output dataframe?",{
-  expect_equal(class(evannoMethodStructure(sr1)),"data.frame")
-})
+expect_equal(class(evannoMethodStructure(sr1)),"data.frame")
+
+#export text ouput
 evannoMethodStructure(sr1,writetable=TRUE)
-test_that("writetable=TRUE",{
-  expect_equal("evannoMethodStructure.txt" %in% list.files(),TRUE)
-})
+expect_equal("evannoMethodStructure.txt" %in% list.files(),TRUE)
 if(deleteoutput) file.remove("evannoMethodStructure.txt")
 
+#PLOTS
+#export plot png
 evannoMethodStructure(sr1,exportplot=TRUE)
-test_that("exportplot=TRUE",{
-  expect_equal("evannoMethodStructure.png" %in% list.files(),TRUE)
-})
 if(deleteoutput) file.remove("evannoMethodStructure.png")
 
+#export plot jpeg
 evannoMethodStructure(sr1,exportplot=TRUE,imgtype="jpeg")
-test_that("exportplot=TRUE jpeg",{
-  expect_equal("evannoMethodStructure.jpg" %in% list.files(),TRUE)
-})
 if(deleteoutput) file.remove("evannoMethodStructure.jpg")
 
+if(testtiff)
+{
+  #export plot tiff
+  evannoMethodStructure(sr1,exportplot=TRUE,imgtype="tiff")
+  if(deleteoutput) file.remove("evannoMethodStructure.tiff")
+}
+
+#export plot pdf
 evannoMethodStructure(sr1,exportplot=TRUE,imgtype="pdf")
-test_that("exportplot=TRUE pdf",{
-  expect_equal("evannoMethodStructure.pdf" %in% list.files(),TRUE)
-})
 if(deleteoutput) file.remove("evannoMethodStructure.pdf")
 
-evannoMethodStructure(sr1,exportplot=TRUE,height=4,width=4, res=400)
-test_that("exportplot=TRUE change dim res",{
-  expect_equal("evannoMethodStructure.png" %in% list.files(),TRUE)
-})
+#change errorbar features, pointcol, linecol
+evannoMethodStructure(sr1,exportplot=TRUE,ebwidth=0.1,
+                      ebcol="coral",pointcol="firebrick",
+                      linecol="green",textcol="blue",gridsize=0.6)
 if(deleteoutput) file.remove("evannoMethodStructure.png")
 
-test_that("Error: Two input K",{
-  expect_error(evannoMethodStructure(sr1[1:2,]))
-})
+#change plot linesize, pointsize
+evannoMethodStructure(sr1,exportplot=TRUE,linesize=0.9,pointsize=8)
+if(deleteoutput) file.remove("evannoMethodStructure.png")
 
-test_that("Error: Non sequential K",{
-  expect_error(evannoMethodStructure(sr1[c(1,2,4),],exportplot=TRUE))
-})
+#plot change dim, dpi, units, basesize for web plot
+evannoMethodStructure(sr1,exportplot=TRUE,height=800,width=800,dpi=72,units="px",basesize=20)
+if(deleteoutput) file.remove("evannoMethodStructure.png")
 
-test_that("exportplot=TRUE with error",{
-  expect_equal("kPlot.png" %in% list.files(),TRUE)
-})
+#change font
+if(testfont)
+{
+  evannoMethodStructure(sr1,exportplot=TRUE,font="Verdana")
+  if(deleteoutput) file.remove("evannoMethodStructure.png")
+  
+  #change theme
+  evannoMethodStructure(sr1,exportplot=TRUE,font="Verdana",theme="theme_grey")
+  if(deleteoutput) file.remove("evannoMethodStructure.png")
+}
+
+#ERRORS
+#error only 2 values of k
+expect_error(evannoMethodStructure(sr1[1:2,],exportplot=TRUE))
+expect_equal("kPlot.png" %in% list.files(),TRUE)
 if(deleteoutput) file.remove("kPlot.png")
 
-test_that("Warning: runs < 2",{
-  expect_warning(evannoMethodStructure(summariseQ(tr1[1:16,])[4:6,]))
-})
+#error test kplot features
+expect_error(evannoMethodStructure(sr1[1:2,],exportplot=TRUE,linesize=1,
+                                   pointsize=8))
+expect_equal("kPlot.png" %in% list.files(),TRUE)
+if(deleteoutput) file.remove("kPlot.png")
+
+#error test kplot features
+expect_error(evannoMethodStructure(sr1[1:2,],exportplot=TRUE,ebwidth=0.05,
+                                   ebcol="coral",pointcol="firebrick",
+                                   linecol="green",textcol="blue",
+                                   gridsize=0.6,theme="theme_grey",font="Verdana"))
+expect_equal("kPlot.png" %in% list.files(),TRUE)
+if(deleteoutput) file.remove("kPlot.png")
+
+if(testfont)
+{
+  expect_error(evannoMethodStructure(sr1[1:2,],exportplot=TRUE,font="Verdana"))
+  expect_equal("kPlot.png" %in% list.files(),TRUE)
+  if(deleteoutput) file.remove("kPlot.png")  
+}
+
+#error non sequential values of k
+expect_error(evannoMethodStructure(sr1[c(1,2,4),],exportplot=TRUE))
+expect_equal("kPlot.png" %in% list.files(),TRUE)
+if(deleteoutput) file.remove("kPlot.png")
+
+#warning less than 2 runs
+expect_warning(evannoMethodStructure(summariseQ(tr1[1:16,])[4:6,]))
 
 test_that("Errors",{
   expect_error(evannoMethodStructure())
@@ -385,118 +456,117 @@ test_that("Errors",{
 
 #clumppExport
 context("Clumpp Output")
-cat("clumppExport\n")
-  
+cat("clumppExport -------------------------------------------------------------\n")
+
 clumppExport(readQ(sfiles))
-test_that("structure clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
 if(FALSE) {
+  
+#structure clumpp export check prefix
 clumppExport(readQ(sfiles),prefix="Boom")
-test_that("structure clumpp export check prefix",{
-  expect_equal(all(grepl("Boom",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("Boom",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("Boom*", recursive = TRUE, force = TRUE)
 
+#structure clumpp export useexe
 clumppExport(readQ(sfiles),useexe=T)
-test_that("structure clumpp export useexe",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#tess clumpp export check
 clumppExport(readQ(tfiles))
-test_that("tess clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#tess clumpp export check prefix
 clumppExport(readQ(tfiles),prefix="Hahaha")
-test_that("tess clumpp export check prefix",{
-  expect_equal(all(grepl("Hahaha",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("Hahaha",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("Hahaha*", recursive = TRUE, force = TRUE)
 
+#tess clumpp export check
 clumppExport(readQ(tfiles),useexe=TRUE)
-test_that("tess clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#matrix clumpp export check
 clumppExport(readQ(afiles),useexe=TRUE)
-test_that("matrix clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#tructure clumpp export check prefix
 clumppExport(readQ(sfiles),prefix="Nanana")
-test_that("structure clumpp export check prefix",{
-  expect_equal(all(grepl("Nanana",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("Nanana",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("Nanana*", recursive = TRUE, force = TRUE)
 
+#matrix clumpp export check
 clumppExport(readQ(afiles))
-test_that("matrix clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#matrix clumpp export check
 clumppExport(readQ(ffiles))
-test_that("matrix clumpp export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
-
+#structure clumpp list export check
 clumppExport(readQ(sfiles))
-test_that("structure clumpp list export check",{
-  expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
-})
+expect_equal(all(grepl("pop",list.dirs()[-1])),TRUE)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
 context("Clumpp Output useexe")
 
+#structure clumpp export useexe
 clumppExport(readQ(sfiles),useexe=T)
-test_that("structure clumpp export useexe",{
-  expect_equal(sum(grepl("aligned",list.files(recursive=T))),6)
-  expect_equal(sum(grepl("merged",list.files(recursive=T))),6)
-})
+expect_equal(sum(grepl("aligned",list.files(recursive=T))),6)
+expect_equal(sum(grepl("merged",list.files(recursive=T))),6)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#tess clumpp export useexe
 clumppExport(readQ(tfiles),useexe=T)
-test_that("tess clumpp export useexe",{
-  expect_equal(sum(grepl("aligned",list.files(recursive=T))),7)
-  expect_equal(sum(grepl("merged",list.files(recursive=T))),7)
-})
+expect_equal(sum(grepl("aligned",list.files(recursive=T))),7)
+expect_equal(sum(grepl("merged",list.files(recursive=T))),7)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
+#matrix admixture clumpp export useexe
 clumppExport(readQ(afiles),useexe=T)
-test_that("matrix admixture clumpp export useexe",{
-  expect_equal(sum(grepl("aligned",list.files(recursive=T))),1)
-  expect_equal(sum(grepl("merged",list.files(recursive=T))),1)
-})
+expect_equal(sum(grepl("aligned",list.files(recursive=T))),1)
+expect_equal(sum(grepl("merged",list.files(recursive=T))),1)
 if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
 
 }
+
 # collectClumppOutput ----------------------------------------------------------
 
 context("Collect clumpp output")
-cat("collectClumppOutput\n")
+cat("collectClumppOutput ------------------------------------------------------\n")
 
 clumppExport(readQ(sfiles),useexe=T)
+
 collectClumppOutput(filetype = "aligned")
 expect_equal(sum(grepl("aligned",list.dirs())),1)
+
 collectClumppOutput(filetype = "merged")
 expect_equal(sum(grepl("merged",list.dirs())),1)
+
 collectClumppOutput(filetype = "both")
 expect_equal(sum(grepl("both",list.dirs())),1)
-if(deleteoutput) unlink("pop*", recursive = TRUE, force = TRUE)
+
+if(deleteoutput) unlink("pop*", recursive=TRUE, force=TRUE)
+
+# getPlotParams ----------------------------------------------------------------
+
+context("getPlotParams")
+cat("getPlotParams ------------------------------------------------------------\n")
+
+pophelper:::getPlotParams(grplab=grps1$V1, plotnum=1)
+pophelper:::getPlotParams(grplab=grps1$V1, plotnum=2)
+pophelper:::getPlotParams(grplab=grps1$V1, plotnum=1,labsize=5,labangle=90,labjust=0.5,pointsize=2,linesize=1)
 
 # grpLabels --------------------------------------------------------------------
 
 context("grpLabels")
-cat("grpLabels\n")
+cat("grpLabels ---------------------------------------------------------------\n")
 
 grps1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 test_that("check if grps df",{expect_equal(class(grps1),"data.frame")})
@@ -527,220 +597,255 @@ test_that("subsetgrp change order",{
 # plotQ Structure -----------------------------------------------------------
 
 context("plotQ Structure")
-cat("plotQ Structure\n")
+cat("plotQ Structure ----------------------------------------------------------\n")
 
 slist <- readQ(sfiles)
+
+#check output
 plotQ(slist[1])
-test_that("check output",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#change barsize
+plotQ(slist[1],barsize=0.8)
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#one ind plot
+t1 <- slist[1:2]
+t1[[1]] <- t1[[1]][1,]
+t1[[2]] <- t1[[2]][1,]
+plotQ(t1[1])
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#check output
 plotQ(readQ(sfiles))
-test_that("check output",{
-  expect_equal(length(grep("structure\\w+.png$",list.files())),17)
-})
+expect_equal(length(grep("structure\\w+.png$",list.files())),17)
 if(deleteoutput) file.remove(paste0(basename(sfiles),".png"))
 
+#check output
+plotQ(readQ(sfiles1,indlabfromfile=TRUE))
+expect_equal(length(grep("structure\\w+.png$",list.files())),2)
+if(deleteoutput) file.remove(paste0(basename(sfiles1),".png"))
+
+#check orderind cluster
 plotQ(slist[1],sortind="Cluster1")
-test_that("check orderind cluster",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check orderind all
 plotQ(slist[1],sortind="all")
-test_that("check orderind all",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check orderind label
+plotQ(slist[1],sortind="label")
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#5 ind plot
+t1 <- slist[1:2]
+t1[[1]] <- t1[[1]][1:5,]
+t1[[2]] <- t1[[2]][1:5,]
+plotQ(t1,imgoutput="join",barsize=0.9)
+expect_equal(length(grep("Joined.+",list.files())),1)
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+#check output
+plotQ(readQ(sfiles1,indlabfromfile=TRUE),sortind="label")
+expect_equal(length(grep("structure\\w+.png$",list.files())),2)
+if(deleteoutput) file.remove(paste0(basename(sfiles1),".png"))
+
+#check output joined
 plotQ(slist[1:2],imgoutput="join")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#one ind plot join
+plotQ(t1,imgoutput="join")
+expect_equal(length(grep("Joined.+",list.files())),1)
+if(deleteoutput) file.remove(list.files()[grep("Joined",list.files())])
+
+#check join orderind cluster1
 plotQ(slist[1:2],imgoutput="join",sortind="Cluster1")
-test_that("check join orderind cluster1",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined",list.files())])
 
+#check join orderind label
+plotQ(slist[1:2],imgoutput="join",sortind="label")
+expect_equal(length(grep("Joined.+",list.files())),1)
+if(deleteoutput) file.remove(list.files()[grep("Joined",list.files())])
+
+#check join clustercol
 plotQ(slist[1:2],imgoutput="join",clustercol=c("red","green"))
-test_that("check join clustercol",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined",list.files())])
 
+#check output sep with labels
 plotQ(slist[1],grplab=list("pops\n"=as.character(grps1$V1)))
-test_that("check output sep with labels",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#line size
+plotQ(slist[1],linesize=6,grplab=list("pops\n"=as.character(grps1$V1)))
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#check popmean
 plotQ(slist[1],grplab=list("pop\n"=as.character(grps1$V1)),grpmean=T)
-test_that("check popmean",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check long pop title and heights
 plotQ(slist[1],grplab=list("population\n"=as.character(grps1$V1)),labpanelheight=0.8,height=2.5)
-test_that("check long pop title and heights",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check popmean
 plotQ(slist[1:4],grplab=list("pop\n"=as.character(grps1$V1)),grpmean=T)
-test_that("check popmean",{
-  expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
-})
+expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1:4]),".png"))
 
+#check output sep with labels sort cluster
 plotQ(slist[1],grplab=list("pop\n"=grps1$V1),sortind="Cluster1")
-test_that("check output sep with labels sort cluster",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check output sep with labels sort all
 plotQ(slist[1],grplab=list("pop\n"=grps1$V1),sortind="all")
-test_that("check output sep with labels sort all",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check popmean with sortind
 plotQ(readQ(sfiles[1:4]),grplab=list("pop\n"=grps1$V1),grpmean=T,sortind="all")
-test_that("check popmean with sortind",{
-  expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
-})
+expect_equal(all(paste0(basename(sfiles[1:4]),".png") %in% list.files()),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1:4]),".png"))
 
+#check output joined with labels
 plotQ(readQ(sfiles[1:2]),imgoutput="join",grplab=list("pop\n"=grps1$V1))
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check popmean with join
 plotQ(slist[1:4],grplab=list("pop\n"=grps1$V1),grpmean=T,imgoutput="join")
-test_that("check popmean with join",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#imgtype jpeg
+plotQ(slist[1],imgtype="jpeg")
+expect_equal(paste0(basename(sfiles[1]),".jpg") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".jpg"))
+
+#imgtype pdf
+plotQ(slist[1],imgtype="pdf")
+expect_equal(paste0(basename(sfiles[1]),".pdf") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".pdf"))
+
+if(testtiff)
+{
+  #imgtype tiff
+  plotQ(slist[1],imgtype="tiff")
+  expect_equal(paste0(basename(sfiles[1]),".tiff") %in% list.files(),TRUE)
+  if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".tiff"))
+}
+
+#replicate grps
 grpsrep <- read.delim(system.file("files/structuregrplabels-rep.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 
+#check output sep with rep labels
 plotQ(slist[1],grplab=list("pop\n"=grpsrep$V1))
-test_that("check output sep with rep labels",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check popmean with rep labels
 plotQ(slist[1],grplab=list("pop\n"=grpsrep$V1),grpmean=T)
-test_that("check popmean with rep labels",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check output sep with rep labels sort all
 plotQ(slist[1],grplab=list("pop\n"=grpsrep$V1),sort="all")
-test_that("check output sep with rep labels sort all",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
+#check output sep with rep labels sort cluster
 plotQ(slist[1],grplab=list("pop\n"=grpsrep$V1),sort="Cluster2")
-test_that("check output sep with rep labels sort cluster",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
 expect_error(plotQ(slist[1],grplab=list("pop"=grpsrep$V1),subsetgrp="Pop A"))
 expect_error(plotQ(slist[1],grplab=list("pop"=grpsrep$V1),subsetgrp=c("Pop B","Pop A")))
 
-test_that("check less colours",{
-  expect_error(plotQ(readQ(sfiles[4]),clustercol=c("red","green")))
-})
+#check less colours
+expect_error(plotQ(readQ(sfiles[4]),clustercol=c("red","green")))
 
+#check custom colours
 plotQ(readQ(sfiles)[4],clustercol=c("red","green","blue"))
-test_that("check custom colours",{
-  expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[4]),".png"))
 
+#sp
 plotQ(slist[4],sp=F)
-test_that("sp",{
-  expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[4]),".png"))
 
+#sppos left
+plotQ(slist[4],sppos="left")
+expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[4]),".png"))
+
+#splab
 plotQ(slist[4],splab="filename")
-test_that("splab",{
-  expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[4]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[4]),".png"))
 
+#
 expect_error(plotQ(slist[4],sp=NA))
 expect_error(plotQ(slist[4],splab=NULL))
 
 #multiple label sets
 plotQ(qlist=slist[1],grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1))
-test_that("dual grp labs",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
-#sp off
+#two grplab sp off
 plotQ(qlist=slist[1],grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1),sp=F)
-test_that("dual grp labs sp off",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
-#change divgrp
+#two grplab change divgrp
 plotQ(qlist=slist[1],grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1),divgrp=c("pop\n","Loc\n"))
-test_that("dual grp labs divgrp",{
-  expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
-})
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
 
 #multiple labels multiple files
 plotQ(qlist=slist[1:2],grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1))
-test_that("dual grp labs divgrp",{
-  expect_equal(all(paste0(basename(sfiles[1:2]),".png") %in% list.files()),TRUE)
-})
+expect_equal(all(paste0(basename(sfiles[1:2]),".png") %in% list.files()),TRUE)
 if(deleteoutput) file.remove(paste0(basename(sfiles[1:2]),".png"))
 
 #multiple labels join
 plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1))
-test_that("dual grp labs join",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 #multiple labels join change sp
 plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("pop"=grps1$V1,"Loc"=grps2$V1),splab=c("run1","run2"))
-test_that("dual grp labs join change sp",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 #multiple labels join change splab
 plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1),splab=c("k","filename"))
-test_that("dual grp labs join change sp",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 #multiple labels join sp off
 plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1),sp=F)
-test_that("dual grp labs join sp off",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 #multiple labels join 3
 plotQ(qlist=slist[1:5],imgoutput="join",grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1,"Loc1\n"=grps2$V1))
-test_that("dual grp labs join 5 runs 3 labs",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 #duplicate group lab titles
@@ -749,10 +854,64 @@ expect_error(plotQ(qlist=slist[1],grplab=list("pop\n"=grps1$V1,"pop\n"=grps2$V1)
 #multiple labels join 6
 plotQ(qlist=slist[1:5],imgoutput="join",grplab=list("pop\n"=grps1$V1,"Loc\n"=grps2$V1,"Loc1\n"=grps2$V1,"Loc2\n"=grps2$V1,"Loc3\n"=grps2$V1,"Loc4\n"=grps2$V1))
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+#sort label no grplab
+plotQ(qlist=slist[1],sortind="label")
+expect_equal(paste0(basename(sfiles[1]),".png") %in% list.files(),TRUE)
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#indlab
+plotQ(qlist=slist[1],useindlab=TRUE,sortind="label")
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#sort lab use grplab
+plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),sortind="all")
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#sort lab use grplab
+plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),useindlab=T,sortind="label")
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#sort lab use grplab subset
+plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),useindlab=T,sortind="label",subsetgrp="Pop B")
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#sort lab use grplab reorder
+plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),useindlab=T,sortind="label",subsetgrp=c("Pop B","Pop A"))
+if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+
+#join sort lab use grplab reorder
+plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("grp\n"=grps1$V1),useindlab=T,sortind="label",subsetgrp=c("Pop B","Pop A"))
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+#join sort lab use grplab reorder
+plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("grp\n"=grps1$V1),useindlab=F,sortind="label",subsetgrp=c("Pop B","Pop A"))
+if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+
+if(testfont)
+{
+  #change font
+  plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),font="Verdana")
+  if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".png"))
+  
+  #join change font
+  plotQ(qlist=slist[1:2],imgoutput="join",grplab=list("grp\n"=grps1$V1),font="Verdana")
+  if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
+  
+  if(testtiff)
+  {
+    #tiff output single
+    plotQ(qlist=slist[1],grplab=list("grp\n"=grps1$V1),font="Verdana",imgtype="tiff")
+    if(deleteoutput) file.remove(paste0(basename(sfiles[1]),".tiff"))
+  }
+}
+
+
+
 # plotQ Tess ----------------------------------------------------------------
 
 context("plotQ Tess")
-cat("plotQ Tess\n")
+cat("plotQ Tess ---------------------------------------------------------------\n")
 tlist <- readQ(tfiles)
 
 plotQ(tlist[1])
@@ -839,7 +998,7 @@ if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 # plotQ Admixture -----------------------------------------------------------
 
 context("plotQ Admixture")
-cat("plotQ Admixture\n")
+cat("plotQ Admixture ----------------------------------------------------------\n")
 
 alist <- readQ(afiles)
 plotQ(alist[1])
@@ -919,7 +1078,7 @@ if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 # plotQ Basic --------------------------------------------------------------
 
 context("plotQ Basic fastSTRUCTURE")
-cat("plotQ Basic fastSTRUCTURE\n")
+cat("plotQ Basic fastSTRUCTURE ------------------------------------------------\n")
 flist <- readQ(ffiles)
 
 plotQ(flist[2])
@@ -948,420 +1107,455 @@ if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 fastgrps <- read.delim(system.file("files/faststructuregrplabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 
+#check output sep with labels
 plotQ(flist[2],grplab=list("\npop"=fastgrps$V1))
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("fast",list.files())),TRUE)
-})
+expect_equal(any(grepl("fast",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
 
 plotQ(flist[2],grplab=list("\npop"=fastgrps$V1),grpmean=T)
-test_that("check output sep with labels and pop mean",{
-  expect_equal(any(grepl("fast",list.files())),TRUE)
-})
+expect_equal(any(grepl("fast",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("adm",list.files())])
 
 plotQ(flist[2:3],imgoutput="join",grplab=list("\npop"=fastgrps$V1))
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 plotQ(flist[2:4],imgoutput="join",grplab=list("\npop"=fastgrps$V1),grpmean=T)
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 # plotQ mcfiles -------------------------------------------------------------
 
 context("plotQ Matrix mcfiles")
-cat("plotQ Basic mcfiles\n")
+cat("plotQ Basic mcfiles ------------------------------------------------------\n")
+
 mclist <- readQ(mcfiles)
 
+#check output
 plotQ(mclist[1])
-test_that("check output",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort cluster1
 plotQ(mclist[1],sortind="Cluster1")
-test_that("check output sort cluster1",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort all
 plotQ(mclist[1],sortind="all")
-test_that("check output sort all",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined
 plotQ(mclist[1:2],imgoutput="join")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined
 plotQ(mclist[1:2],imgoutput="join",sortind="Cluster1")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined
 plotQ(mclist[1:2],imgoutput="join",sortind="all")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 matgrps <- read.delim(system.file("files/basicgrplabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 
+#check output sep with labels
 plotQ(mclist[1],grplab=list("pop"=matgrps$V1))
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels
 plotQ(mclist[1],grplab=list("pop"=matgrps$V1),grpmean=T)
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels
 plotQ(mclist[1],grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels
 plotQ(mclist[1],grplab=list("pop"=matgrps$V1),sortind="all")
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined with labels
 plotQ(mclist[1:2],imgoutput="join",grplab=list("pop"=matgrps$V1))
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort cluster1
 plotQ(mclist[1:2],imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output joined with labels sort cluster1",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort cluster1
 plotQ(mclist[1:2],imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="all")
-test_that("check output joined with labels sort cluster1",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort cluster1
 plotQ(mclist[1:3],imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="all",grpmean=T)
-test_that("check output joined with labels sort cluster1",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 # plotQ mtfiles -------------------------------------------------------------
 
 context("plotQ basic mtfiles")
-cat("plotQ Basic mtfiles\n")
+cat("plotQ Basic mtfiles ------------------------------------------------------\n")
 
+#check output
 plotQ(readQ(mtfiles[1]))
-test_that("check output",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort cluster
 plotQ(readQ(mtfiles[1]),sortind="Cluster1")
-test_that("check output sort cluster",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort cluster
 plotQ(readQ(mtfiles[1]),sortind="all")
-test_that("check output sort cluster",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined
 plotQ(readQ(mtfiles[1:2]),imgoutput="join")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined
 plotQ(readQ(mtfiles[1:2]),imgoutput="join",sortind="Cluster1")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined
 plotQ(readQ(mtfiles[1:2]),imgoutput="join",sortind="all")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output sep with labels
 plotQ(readQ(mtfiles[1]),grplab=list("pop"=matgrps$V1))
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels sort cluster
 plotQ(readQ(mtfiles[1]),grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output sep with labels sort cluster",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels sort all
 plotQ(readQ(mtfiles[1]),grplab=list("pop"=matgrps$V1),sortind="all")
-test_that("check output sep with labels sort all",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined with labels
 plotQ(readQ(mtfiles[1:2]),imgoutput="join",grplab=list("pop"=matgrps$V1))
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort cluster
 plotQ(readQ(mtfiles[1:2]),imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output joined with labels sort cluster",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 # plotQ msfiles -------------------------------------------------------------
 
 context("plotQ basic msfiles")
-cat("plotQ Basic msfiles\n")
+cat("plotQ Basic msfiles ------------------------------------------------------\n")
 
+#check output
 plotQ(readQ(msfiles[1]))
-test_that("check output",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort cluster
 plotQ(readQ(msfiles[1]),sortind="Cluster1")
-test_that("check output sort cluster",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sort all
 plotQ(readQ(msfiles[1]),sortind="all")
-test_that("check output sort all",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined
 plotQ(readQ(msfiles[1:2]),imgoutput="join")
-test_that("check output joined",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined sort cluster
 plotQ(readQ(msfiles[1:2]),imgoutput="join",sortind="Cluster1")
-test_that("check output joined sort cluster",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined sort all
 plotQ(readQ(msfiles[1:2]),imgoutput="join",sortind="all")
-test_that("check output joined sort all",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output sep with labels
 plotQ(readQ(msfiles[1]),grplab=list("pop"=matgrps$V1))
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels
 plotQ(readQ(msfiles[1]),grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output sep with labels
 plotQ(readQ(msfiles[1]),grplab=list("pop"=matgrps$V1),sortind="all")
-test_that("check output sep with labels",{
-  expect_equal(any(grepl("basic",list.files())),TRUE)
-})
+expect_equal(any(grepl("basic",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("basic",list.files())])
 
+#check output joined with labels
 plotQ(readQ(msfiles[1:2]),imgoutput="join",grplab=list("pop"=matgrps$V1))
-test_that("check output joined with labels",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort cluster
 plotQ(readQ(msfiles[1:2]),imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="Cluster1")
-test_that("check output joined with labels sort cluster",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
+#check output joined with labels sort all
 plotQ(readQ(msfiles[1:2]),imgoutput="join",grplab=list("pop"=matgrps$V1),sortind="all")
-test_that("check output joined with labels sort all",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined*",list.files())])
 
 # plotQ Clumpp --------------------------------------------------------------
 
 context("plotQ Clumpp")
-cat("plotQ Clumpp\n")
+cat("plotQ Clumpp --------------------------------------------------------------\n")
 
 tabs1 <- c(system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper"),
            system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper"))
 
+#check output table
 plotQ(qlist=readQ(tabs1))
-test_that("check output table",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table
 plotQ(qlist=readQ(tabs1),grpmean=T)
-test_that("check output table",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table sort cluster
 plotQ(qlist=readQ(tabs1),sortind="Cluster1")
-test_that("check output table sort cluster",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table sort cluster
 plotQ(qlist=readQ(tabs1),imgoutput="join",sortind="Cluster1")
-test_that("check output table sort cluster",{
-  expect_equal(length(grep("Joined.+",list.files())),1)
-})
+expect_equal(length(grep("Joined.+",list.files())),1)
 if(deleteoutput) file.remove(list.files()[grep("Joined.+",list.files())])
 
+#check output table pop lab
 plotQ(qlist=readQ(tabs1),grplab=list("pop"=grps1$V1))
-test_that("check output table pop lab",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab sort all
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grps1$V1),sortind="all")
-test_that("check output table pop lab sort all",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab sort cluster
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grps1$V1),sortind="Cluster1")
-test_that("check output table pop lab sort cluster",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab pop mean
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grps1$V1),grpmean=T)
-test_that("check output table pop lab pop mean",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab rep
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grpsrep$V1))
-test_that("check output table pop lab rep",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab rep sort
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grpsrep$V1),sortind="all")
-test_that("check output table pop lab rep sort",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
+#check output table pop lab rep sort pop mean
 plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grpsrep$V1),sortind="all",grpmean=T)
-test_that("check output table pop lab rep sort pop mean",{
-  expect_equal(length(grep("STRUCTUREpop",list.files())),7)
-})
+expect_equal(length(grep("STRUCTUREpop",list.files())),7)
 if(deleteoutput) file.remove(list.files()[grep("STRUCTUREpop",list.files())])
 
 expect_error(plotQ(qlist=readQ(tabs1),imgoutput="sep",grplab=list("pop"=grpsrep$V1),subsetgrp="Pop B"))
 
-# plotQMultiline Structure ------------------------------------------------------
+# plotQMultiline ---------------------------------------------------------------
 
 slist <- readQ(sfiles)
 
-cat("plotQMultiline\n")
+cat("plotQMultiline -----------------------------------------------------------\n")
 
 #plotQMultiline
 context("plotQMultiline STRUCTURE")
 
+#sfiles 1 check output
 plotQMultiline(slist[1])
-test_that("sfiles 1 check output",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles 1 check output sort cluster
 plotQMultiline(slist[1],sortind="Cluster1")
-test_that("sfiles 1 check output sort cluster",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles 1 check output sort all
 plotQMultiline(slist[1],sortind="all")
-test_that("sfiles 1 check output sort all",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles >1 check output
 plotQMultiline(slist[1:2])
-test_that("sfiles >1 check output",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles >1 sort cluster
 plotQMultiline(slist[1:2],sortind="Cluster1")
-test_that("sfiles >1 sort cluster",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles >1 sort all
 plotQMultiline(slist[1:2],sortind="all")
-test_that("sfiles >1 sort all",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles 1 sort NA indlabfromfile
 plotQMultiline(slist[1:2],sortind=NA,useindlab=T)
-test_that("sfiles 1 sort NA indlabfromfile",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles 1 sort all indlabfromfile=T
 plotQMultiline(slist[1:2],sortind="all",indlab=T)
-test_that("sfiles 1 sort all indlabfromfile=T",{
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#jpeg output
+plotQMultiline(slist[1],imgtype="jpeg")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+if(testtiff)
+{
+  #tiff output
+  plotQMultiline(slist[1],imgtype="tiff")
   expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+  if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+}
+
+#pdf output
+plotQMultiline(slist[1],imgtype="pdf")
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
 inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 
+#files 1 indlab
 rownames(slist[[1]]) <- inds$V1
 plotQMultiline(slist[1],useindlab=T)
-test_that("sfiles 1 indlab",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#sfiles 1 check output sort cluster1 indlab
 plotQMultiline(slist[1],sortind="Cluster1",useindlab=T)
-test_that("sfiles 1 check output sort cluster1 indlab",{
-  expect_equal(any(grepl("structure",list.files())),TRUE)
-})
+expect_equal(any(grepl("structure",list.files())),TRUE)
 if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
+#grplab with useind
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T)
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sortind cluster1
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="Cluster1")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sortind all
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="all")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sortind label
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="label")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, sortind label
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=F, sortind="label")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, subset
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=F, subsetgrp="Pop A")
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=F, subsetgrp=c("Pop B","Pop A"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, sort cluster, subset
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=F, sortind="Cluster1", subsetgrp=c("Pop B"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sort cluster, subset
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="Cluster1", subsetgrp=c("Pop B"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sort cluster, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="Cluster1", subsetgrp=c("Pop B","Pop A"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sort all, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="all", subsetgrp=c("Pop B","Pop A"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab with useind, sort label, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=T, sortind="label", subsetgrp=c("Pop B","Pop A"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, sort label, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1),useindlab=F, sortind="label", subsetgrp=c("Pop B","Pop A"))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+#grplab without useind, sort label, reorder
+plotQMultiline(slist[1],barsize=1,lpp=7,grplab=list("grp"=grps1$V1), grpmean=T)
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+if(testfont)
+{
+  #grplab theme font
+  plotQMultiline(slist[1],theme="theme_bw",font="Verdana")
+  expect_equal(any(grepl("structure",list.files())),TRUE)
+  if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+}
+
+# plotQMultiline Other ----------------------------------------------------------
+  
 context("plotQMultiline TESS")
+cat("plotQMultiline Tess -------------------------------------------------------\n")
 tlist <- readQ(tfiles)
 
 plotQMultiline(tlist[1])
@@ -1519,12 +1713,12 @@ if(deleteoutput) file.remove(list.files()[grep("basic.+",list.files())])
 
 # collectTessRuns --------------------------------------------------------------
 
-context("Collect Tess runs")
+context("Collect Tess runs ----------------------------------------------------\n")
 
 # analyseQ ------------------------------------------------------------------
 
 context("analyseQ Structure")
-cat("analyseQ Structure\n")
+cat("analyseQ Structure ------------------------------------------------------\n")
 
 analyseQ(sfiles)
 test_that("check output",{
@@ -1572,7 +1766,7 @@ if(deleteoutput) file.remove(list.files())
 # distructExport Structure -----------------------------------------------------
 
 context("distructExport Structure")
-cat("distructExport Structure\n")
+cat("distructExport Structure ------------------------------------------------\n")
 
 grps1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE)
 
@@ -1679,7 +1873,7 @@ if(pophelper:::getOS()!="unix64")
 # distructExport Tess ----------------------------------------------------------
 
 context("exportDistruct Tess")
-cat("distructExport Tess\n")
+cat("distructExport Tess ------------------------------------------------------\n")
 
 grps1 <- read.delim(system.file("files/tessgrplabels.txt",package="pophelper"),header=FALSE)
 
@@ -1722,7 +1916,7 @@ if(deleteoutput) unlink(list.files(),recursive=T,force=T)
 
 if(deleteoutput) unlink(list.files(),recursive=T,force=T)
 context("distructExport Other formats")
-cat("distructExport Basic\n")
+cat("distructExport Basic -----------------------------------------------------\n")
 
 #admixture multiple
 distructExport(qlist = readQ(afiles)[1:4],grpmean=F)
@@ -1792,18 +1986,19 @@ if(pophelper:::getOS()!="unix64")
 
 # Deprecated -------------------------------------------------------------------
 
-expect_error(tabulateRunsStructure(sfiles))
-expect_error(tabulateRunsTess(tfiles))
-expect_error(tabulateRunsMatrix(afiles))
-expect_error(summariseRunsStructure(tabulateRunsStructure(sfiles)))
-expect_error(summariseRunsTess(tabulateRunsTess(tfiles)))
-expect_error(summariseRunsMatrix(tabulateRunsMatrix(tfiles)))
-expect_error(clumppExportStructure(sfiles))
-expect_error(clumppExportTess(tfiles))
-expect_error(clumppExportMatrix(afiles))
-expect_error(runsToDfStructure(sfiles))
-expect_error(runsToDfTess(tfiles))
-expect_error(runsToDfMatrix(afiles))
+cat("Deprecated ---------------------------------------------------------------\n")
+
+expect_warning(plotQMultiline(slist[1],barwidth=1))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+expect_warning(plotQ(slist[1],linethick=1))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
+
+expect_warning(plotQ(slist[1],divthick=3))
+expect_equal(any(grepl("structure",list.files())),TRUE)
+if(deleteoutput) file.remove(list.files()[grep("structure",list.files())])
 
 # End --------------------------------------------------------------------------
 

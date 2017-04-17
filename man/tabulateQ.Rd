@@ -47,4 +47,3 @@ tabulateQ(qlist=alist)
 \seealso{
 \code{\link{summariseQ}}
 }
-

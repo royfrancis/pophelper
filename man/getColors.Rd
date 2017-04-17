@@ -18,4 +18,3 @@ Internal: Generate colours based on number of K.
 \details{
 Colours 1 to 12 are custom unique colours. Colours beyond 15 are generated from colour ramp \code{rich.colors()} from package \code{gplots}.
 }
-

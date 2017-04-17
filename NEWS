@@ -1,3 +1,52 @@
+pophelper 2.1.0
+===========
+* 17-Apr-2017
+* Changes to plotQMultiline()
+  + Argument 'grplab' added
+  + Argument 'grpmean' added
+  + Argument 'subsetgrp' added
+  + Argument 'sortind' has extra option 'label' to sort by individual labels
+  + Argument 'labsep' added
+  + tiff option added to 'imgtype'
+  + Argument 'theme' added
+  + Argument 'font' added
+  + Argument 'barwidth' changed to 'barsize'
+  + Arguments 'height' and 'width' must always be in specified units. No special change for pdf
+  + Argument 'res' changed to 'dpi' to be consistent with other functions in the package
+  + Uses function is.qlist() to test qlist input validity.
+* Changes to plotQ()
+  + Argument 'sortind' has extra option 'label' to sort by individual labels
+  + Argument 'theme' added 
+  + Argument 'font' added
+  + Argument 'useindlab' added
+  + Argument 'labsep' added
+  + Argument 'barsize' added
+  + tiff option added to 'imgtype'
+  + Uses is.qlist() to test qlist input validity.
+  + Argument 'linethick' deprecated and replaced with linesize
+  + Argument 'divthick' deprecated and replaced with divsize
+* tabulateQ() uses is.qlist() to test qlist input validity.
+* clumppExport() uses is.qlist() to test qlist input validity.
+* distructExport() uses is.qlist() to test qlist input validity.
+* Changes to evannoMethodStructure()
+  + Argument 'pointsize' added
+  + Argument 'pointtype' added
+  + Argument 'pointcol' added
+  + Argument 'linesize' added
+  + Argument 'linecol' added
+  + Argument 'ebwidth' added
+  + Argument 'ebcol' added
+  + Argument 'textcol' added
+  + Argument 'gridsize' added
+  + Argument 'theme' added
+  + Argument 'font' added
+  + Argument 'res' changed to dpi
+  + Arguments 'height' and 'width' must always be in specified units. No special change for pdf
+  + tiff option added to 'imgtype'
+  + Default margins slightly increased
+  + Minor grid lines removed to reduce clutter
+
+
 pophelper 2.0.0
 ===========
 * 19-Dec-2016
@@ -67,7 +116,7 @@ pophelper 1.2.1
 pophelper 1.2.0
 ===========
 * 25-July-2016
-* Function exportDistruct() added to generate input files for software DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files.
+* exportDistruct() added to generate input files for software DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files.
 * Argument 'indlabfromfile' added to runsToDfStructure() to read individual labels from structure file if available and adds as row names.
 * Argument 'indlabfromfile' added to plotMultiline() to read individual labels from structure file if available and use as labels.
 * Argument 'indlab' added to plotMultiline() to provide individual labels externally.

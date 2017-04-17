@@ -29,4 +29,3 @@ they are included in the list.
 Internal: Takes a q-matrix dataframe along with grp labels. Pop labels
 can be reordered or subsetted. The function also creates labelpos and markerpos dfs.
 }
-

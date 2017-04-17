@@ -5,19 +5,20 @@
 \title{Generate barplots from qlists.}
 \usage{
 plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, grplab = NA,
-  sortind = NA, subsetgrp = NA, grpmean = FALSE, na.rm = TRUE,
-  imgtype = "png", height = NA, width = NA, dpi = 300, units = "cm",
-  panelspacer = 0.06, sp = TRUE, splab = NA, splabsize = 4,
-  splabcol = "grey30", splabface = "plain", spbgcol = NA,
+  sortind = NA, subsetgrp = NA, grpmean = FALSE, useindlab = FALSE,
+  labsep = " ", panelspacer = 0.06, sp = TRUE, splab = NA,
+  splabsize = 4, splabcol = "grey30", splabface = "plain", spbgcol = NA,
   sppos = "right", labspacer = 0, labpanelheight = NA, labpos = 0.25,
   labsize = NA, labangle = NA, labjust = NA, labcol = "grey30",
   labalpha = 1, pointsize = NA, pointcol = "grey30",
   pointbgcol = "grey30", pointtype = "|", pointalpha = 1,
-  linepos = 0.75, linethick = NA, linecol = "grey30", linetype = 1,
-  linealpha = 1, div = TRUE, divgrp = NA, divcol = "white",
-  divtype = "21", divthick = 0.25, divalpha = 1, legend = FALSE,
-  legendlab = NA, legendpos = "left", legendkeysize = 4,
-  legendtextsize = 3, font = "")
+  linepos = 0.75, linethick = NA, linesize = NA, linecol = "grey30",
+  linetype = 1, linealpha = 1, div = TRUE, divgrp = NA,
+  divcol = "white", divtype = "21", divthick = NA, divsize = 0.25,
+  divalpha = 1, legend = FALSE, legendlab = NA, legendpos = "left",
+  legendkeysize = 4, legendtextsize = 3, imgtype = "png", height = NA,
+  width = NA, dpi = 300, units = "cm", barsize = 1,
+  theme = "theme_grey", font = "", na.rm = TRUE)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
@@ -28,23 +29,15 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, grplab = NA,
 
 \item{grplab}{A named list of group labels equal to the length of individuals. See details.}
 
-\item{sortind}{A character indicating how individuals are sorted. Default is NA which means sort order in the input file. Other options are 'all' or any one cluster (eg. 'Cluster1'). See details.}
+\item{sortind}{A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.}
 
 \item{subsetgrp}{A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA. See details.}
 
 \item{grpmean}{A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and only one set of group labels are used.}
 
-\item{na.rm}{A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.}
+\item{useindlab}{A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as individual labels. Only useful with \code{sortind="label"} and not for display.}
 
-\item{imgtype}{A character indicating output image file type. Possible options are "png","jpeg" or "pdf".}
-
-\item{height}{A numeric indicating the height of a single run panel. By default, automatically generated based on number of runs. Separate plots use 1.8cm and joined plots use 1.2cm for single panel. See details.}
-
-\item{width}{A numeric indicating the width of the whole plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.}
-
-\item{dpi}{A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300.}
-
-\item{units}{A numeric indicating the units of height and width. Default set to "cm".}
+\item{labsep}{A character used as separator when concatenating individual labels and group labels. Defaults to space \code{labsep=" "}.}
 
 \item{panelspacer}{A numeric indicating the spacing between barplot panels in cm. Defaults to 0.06cm.}
 
@@ -90,7 +83,9 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, grplab = NA,
 
 \item{linepos}{A numeric indicating the y position of the label marker line and the points. Applicable only with group labels. Defaults to 1.}
 
-\item{linethick}{A numeric indicating the thickness of the label marker line. Default range between 0.3 and 0.6 depending on number of individuals.}
+\item{linethick}{Deprecated. Use argument 'linesize'.}
+
+\item{linesize}{A numeric indicating the thickness of the label marker line. Default range between 0.3 and 0.6 depending on number of individuals.}
 
 \item{linecol}{A colour character for the label marker line. Defaults to "grey30".}
 
@@ -106,7 +101,9 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, grplab = NA,
 
 \item{divtype}{A numeric indicating the type of line for the divider line. Same as lty in standard R. Default value is '21'.}
 
-\item{divthick}{A numeric indicating the thickness of the divider line. Default is 0.25.}
+\item{divthick}{Deprecated. Use argument 'divsize' instead.}
+
+\item{divsize}{A numeric indicating the thickness of the divider line. Default is 0.25.}
 
 \item{divalpha}{A numeric between 0 and 1 denoting transparency of the divider line. Defaults to 1.}
 
@@ -120,7 +117,23 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, grplab = NA,
 
 \item{legendtextsize}{A numeric indicating size of the legend text. Defaults to 3.}
 
-\item{font}{A character indicating font to be used in the plot. This may not work on all systems.}
+\item{imgtype}{A character indicating output image file type. Possible options are "png","jpeg","tiff" or "pdf".}
+
+\item{height}{A numeric indicating the height of a single run panel. By default, automatically generated based on number of runs. Separate plots use 1.8cm and joined plots use 1.2cm for single panel. See details.}
+
+\item{width}{A numeric indicating the width of the whole plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.}
+
+\item{dpi}{A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.}
+
+\item{units}{A numeric indicating the units of height and width. Default set to "cm". Other options are 'px', 'in' or 'mm'.}
+
+\item{barsize}{A numeric indicating the width of the bars. Defaults to 1.}
+
+\item{theme}{A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.}
+
+\item{font}{A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.}
+
+\item{na.rm}{A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.}
 }
 \value{
 Nothing is returned.
@@ -135,8 +148,14 @@ final_image_height = (height*num_of_runs)+labpanelheight
 It is possible to set either height or width and leave other as default.\cr
 
 \strong{sortind}\cr
-This argument takes one character as input.  Default NA means individuals are plotted in the same order as input. Individuals can be ordered by one cluster. For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
-To order by all clusters as the 'Sort by Q' option in STRUCTURE software, use \code{sortind="all"}. When using \code{sortind} with \code{subsetgrp}, individuals
+This argument takes one character as input.  Default NA means individuals are 
+plotted in the same order as input. Individuals can be ordered by any one cluster. 
+For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
+use \code{sortind="all"}. When using \code{sortind="label"}, individuals are
+sorted by individual labels (along with grplab if present). These individual
+labels are not displayed in \code{plotQ()} but can be displayed using \code{plotQMultiline()}.
+When using \code{sortind} with \code{grplab}, individuals
 are sorted within the groups.\cr
 
 \strong{grplab}\cr
@@ -171,6 +190,8 @@ plotQ(qlist=slist[1:2],imgoutput="join")
 
 # sort individuals
 plotQ(qlist=slist[c(1,3)],sortind="all")
+plotQ(qlist=slist[c(1,3)],sortind="Cluster1")
+plotQ(qlist=slist[c(1,3)],sortind="label")
 plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join")
 
 # read group labels
@@ -182,6 +203,9 @@ plotQ(qlist=slist[1:2],grplab=list("grps\\n"=grps1$V1),imgoutput="join")
 
 # sort within groups
 plotQ(qlist=slist[1:2],grplab=list("grps\\n"=grps1$V1),imgoutput="join",sortind="Cluster1")
+
+# reorder groups
+plotQ(qlist=slist[1],grplab=list("grps\\n"=grps1$V1),subsetgrp=c("Pop B","Pop A"))
 
 # plot two sets of labels
 grps2 <- read.delim(system.file("files/structuregrplabels2.txt", package="pophelper"), header=F,stringsAsFactors=F)
@@ -196,4 +220,3 @@ plotQ(temp)
 \seealso{
 \code{\link{plotQMultiline}}
 }
-

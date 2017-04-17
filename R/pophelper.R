@@ -1,11 +1,11 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.0.0
+# pophelper v2.1.0
 # Functions
-# 22-Dec-2016
+# 17-Apr-2017
 
 #check packages
-pkgs <- c("akima","fields","grid","gridExtra","ggplot2","gtable","PBSmapping","spatstat","tidyr")
+pkgs <- c("Cairo","grid","gridExtra","ggplot2","gtable","tidyr")
 if(any(!pkgs %in% installed.packages()))
 {
   warning(paste0("Package(s) '",paste0(pkgs[which(!pkgs %in% installed.packages())],collapse=", "),"' is not installed."))
@@ -13,11 +13,6 @@ if(any(!pkgs %in% installed.packages()))
 rm(pkgs)
 
 #compiler::enableJIT(3)
-
-# utils::suppressForeignCheck(c("k", "elpdmean","geom_path","geom_point","geom_errorbar","elpdmax","elpdmin","theme_bw","labs","theme",
-#                             "element_text","element_blank","lnk1","lnk1max","lnk1min","lnk2","lnk2max","lnk2min","deltaK","aes","ind",
-#                             "value","variable","geom_bar","scale_x_discrete","scale_y_continuous","scale_fill_manual","labs","theme",
-#                             "element_blank","element_line","element_text"))
 
 # getColours -------------------------------------------------------------------
 
@@ -146,6 +141,95 @@ checkQ <- function(files=NULL, warn=FALSE)
   return(list(type=checkvec,subtype=subtype))
 }
 
+# is.qlist --------------------------------------------------------------------
+
+#' @title Verify if a qlist is formatted correctly.
+#' @description Verify if a qlist is formatted correctly.
+#' @param qlist A qlist object.
+#' @param warn A logical indicating if a warning must be printed to screen.
+#' @return A logical TRUE or FALSE depending on if the list meets critical qlist 
+#' requirements. For non-critical issues, a warning is printed if \code{warn=TRUE}.
+#' @export
+#' 
+is.qlist <- function(qlist=NULL,warn=TRUE)
+{
+  if(is.null(qlist)) stop("is.qlist: Input is empty.")
+  if(!is.logical(warn)) stop("is.qlist: Argument 'warn' is not set correctly. Set as TRUE or FALSE.")
+  
+  pass <- TRUE
+  
+  #is it a list
+  if(!is.list(qlist))
+  {
+    if(warn) warning("is.qlist: Input is not a list object.")
+    pass <- FALSE
+  }
+  
+  #does it have dataframes
+  if(!all(sapply(qlist,is.data.frame)))
+  {
+    if(warn) warning("is.qlist: One or more list elements are not data.frame datatype.")
+    pass <- FALSE
+  }
+  
+  #are dataframe lists named
+  if(is.null(names(qlist)))
+  {
+    if(warn) warning("is.qlist: List elements are not named.")
+    pass <- FALSE
+  }
+  
+  #are dataframe lists named
+  if(any(is.na(names(qlist))))
+  {
+    if(warn) warning("is.qlist: One or more list element name is NA.")
+    pass <- FALSE
+  }
+  
+  #are all dataframe lists named
+  if(any(nchar(names(qlist))==0))
+  {
+    if(warn) warning("is.qlist: One or more list elements are not named.")
+    pass <- FALSE
+  }
+  
+  #duplicated list names
+  if(any(duplicated(names(qlist))))
+  {
+    if(warn) warning("is.qlist: One or more list element names are duplicated.")
+    pass <- FALSE
+  }
+  
+  #are dataframes all numeric
+  if(!all(unlist(lapply(qlist,sapply,is.numeric))))
+  {
+    if(warn) warning("is.qlist: One or more qlist dataframes have non-numeric columns.")
+    pass <- FALSE
+  }
+  
+  #duplicated rownames
+  if(any(unlist(lapply(lapply(qlist,rownames),duplicated))))
+  {
+    if(warn) warning("is.qlist: One or more qlist dataframes have duplicated row names.")
+    pass <- FALSE
+  }
+  
+  #duplicated column names
+  if(any(unlist(lapply(lapply(qlist,colnames),duplicated))))
+  {
+    if(warn) warning("is.qlist: One or more qlist dataframes have duplicated column names.")
+    pass <- FALSE
+  }
+  
+  #do column names have format Cluster
+  if(!all(grepl("Cluster[0-9]+$",unlist(lapply(qlist,colnames)))))
+  {
+    if(warn) warning("is.qlist: One or more qlist dataframes have column names that do not conform to format 'ClusterNumber' like 'Cluster1', 'Cluster12' etc.")
+    #pass <- FALSE
+  }
+  
+  return(pass)
+}
 
 # unitConverter ----------------------------------------------------------------
 
@@ -154,10 +238,10 @@ checkQ <- function(files=NULL, warn=FALSE)
 #' @param value A numeric value or numeric vector to convert
 #' @param fromunit A character indicating the current unit of the value. Options are "cm", "mm", "in" or "px".
 #' @param tounit A character indicating the unit to change to. Options are "cm", "mm", "in" or "px".
-#' @param res A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).
+#' @param dpi A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).
 #' @return Returns a numeric value or numeric vector in changed units.
 # @export
-unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
+unitConverter <- function(value=NA, fromunit=NA, tounit=NA, dpi=NA)
 {
   #check
   if(all(is.na(value))) stop("unitConverter: Argument value is empty.")
@@ -171,9 +255,9 @@ unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
     if(tounit=="in") outvalue <- round(value*0.3937,2)
     if(tounit=="px")
     {
-      if(is.na(res)) stop("unitConverter: Argument res is empty.")
-      #convert res to 1 cm
-      pxpercm <- res/2.54
+      if(is.na(dpi)) stop("unitConverter: Argument dpi is empty.")
+      #convert dpi to 1 cm
+      pxpercm <- dpi/2.54
       outvalue <- round(pxpercm*value,0)
     }
   }
@@ -185,9 +269,9 @@ unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
     if(tounit=="in") outvalue <- round(value*0.03937,2)
     if(tounit=="px")
     {
-      if(is.na(res)) stop("unitConverter: Argument res is empty.")
-      #convert res to 1 mm
-      pxpermm <- res/25.4
+      if(is.na(dpi)) stop("unitConverter: Argument dpi is empty.")
+      #convert dpi to 1 mm
+      pxpermm <- dpi/25.4
       outvalue <- round(pxpermm*value,0)
     }
   }
@@ -199,8 +283,8 @@ unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
     if(tounit=="mm") outvalue <- round(value*0.254,2)
     if(tounit=="px")
     {
-      if(is.na(res)) stop("unitConverter: Argument res is empty.")
-      outvalue <- round(res*value,0)
+      if(is.na(dpi)) stop("unitConverter: Argument dpi is empty.")
+      outvalue <- round(dpi*value,0)
     }
   }
   
@@ -208,21 +292,21 @@ unitConverter <- function(value=NA, fromunit=NA, tounit=NA, res=NA)
   if(fromunit=="px")
   {
     if(tounit=="px") outvalue <- value
-    if(is.na(res)) stop("unitConverter: Argument res is empty.")
+    if(is.na(dpi)) stop("unitConverter: Argument dpi is empty.")
     
     if(tounit=="cm")
     {
-      pxpercm <- res/2.54
+      pxpercm <- dpi/2.54
       outvalue <- value/pxpercm
     }
     
     if(tounit=="mm")
     {
-      pxpermm <- res/25.4
+      pxpermm <- dpi/25.4
       outvalue <- value/pxpermm
     }
     
-    if(tounit=="in") outvalue <- value/res
+    if(tounit=="in") outvalue <- value/dpi
     
   }
   
@@ -457,6 +541,7 @@ readQStructure <- function(files=NULL, indlabfromfile=FALSE)
     dframe <- as.data.frame(sapply(dframe, as.numeric),stringsAsFactors=FALSE)
     colnames(dframe) <- paste0("Cluster", 1:ncol(dframe))
     row.names(dframe) <- 1:nrow(dframe)
+    #row.names(dframe) <- sprintf(paste0("%",paste0(rep(0,nchar(nrow(dframe))),collapse=""),nchar(nrow(dframe)),"d"),1:nrow(dframe))
     
     #labels
     if(indlabfromfile)
@@ -733,17 +818,15 @@ readQClumpp <- function(files=NULL)
 #'
 tabulateQ <- function(qlist=NULL, writetable=FALSE, sorttable=TRUE)
 {
-  #if no files chosen, stop excecution, give error message
-  if(is.null(qlist) | (length(qlist)==0)) stop("tabulateQ: No input qlist.")
+  
+  #check input
+  if(!is.qlist(qlist,warn=T)) stop("tabulateQ: Input is not a valid qlist.")
   if(!is.logical(writetable)) stop("tabulateQ: Argument 'writetable' not set correctly. Set as TRUE or FALSE.")
   if(!is.logical(sorttable)) stop("tabulateQ: Argument 'sorttable' not set correctly. Set as TRUE or FALSE.")
   
   #check data format
   #if(exportdataformat != "excel" && exportdataformat != "txt") stop("tabulateQ: Argument 'exportdataformat' set incorrectly. Set as 'excel' or 'txt'.")
-  
-  #check file
-  if(class(qlist) != "list") stop("tabulateQ: Argument 'qlist' must be a list.")
-  
+
   #get filenames from selection
   filenames <- names(qlist)
   if(is.null(filenames)) filenames <- paste0("sample",1:length(qlist))
@@ -907,20 +990,27 @@ summariseQ <- summarizeQ <- function(data=NULL, writetable=FALSE)
 #' @param writetable A logical indicating if the output table is to be exported as a file in the working directory.
 # @param exportdataformat A character to indicate format of exported data. Set as 'excel' to export an Excel .xlsx file or set as 'txt' to export a tab-delimited .txt text file.
 #' @param exportplot A logical indicating if the Evanno plots are to be exported as an image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.
+#' @param pointsize A numeric indicating size of points. Default for \code{basesize=6} is 1.8.
+#' @param pointype A character or number for the type of points. Defaults to 20. Same as pch in standard R.
+#' @param pointcol A colour character for the colour of points. Defaults to "steelblue".
+#' @param linesize A numeric indicating the thickness of the line. Default for \code{basesize=6} is 0.24.
+#' @param linecol A colour character for the colour of line. Defaults to "steelblue".
+#' @param ebwidth A numeric indicating size od width of error abrs. Defaults to 0.2.
+#' @param ebcol A colour character for colour for errorbar. Defaults to "grey30".
+#' @param textcol A colour character for all text elements on the plot. Defaults to "grey30".
+#' @param basesize A numeric indicating the base size of various plot elements such as pointsize, linesize etc. Increase basesize with larger figure dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) override basesize.
+#' @param gridsize A numeric indicating thickness of background grid. Default for \code{basesize=6} is 0.18.
+#' @param imgtype A character indicating the type of exported image. Default set to 'png'. Other possible 
+#' options are 'jpeg', 'tiff' or 'pdf'.
+#' @param height A numeric denoting the height of exported image. Default units in 'cm'.
+#' @param width A numeric denoting the width of exported image. Default units in 'cm'.
+#' @param dpi A numeric denoting the resolution of exported image. Default set to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
+#' @param units A character denoting the unit of measure of the export image. Default is 'cm'. Other options are 'px', 'in' or 'mm'. 
+#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
+#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
 #' @param na.rm Default set to FALSE. Does not remove NAs for plot and this 
 #' generates warnings from \code{ggplot}. If set to TRUE, NAs are removed before 
 #' plotting and warning messages from \code{ggplot} are avoided.
-#' @param imgtype A character indicating the type of exported image. Default set to 'png'. Other possible 
-#' options are 'jpeg' or 'pdf'.
-#' @param basesize A numeric indicating the base size of various plot elements such as point size, line thickness etc. Increase basesize with larger figure dimensions. Defaults to 5.
-#' @param height A numeric denoting the height of exported image. Default units in 'cm'. If imgtype is 
-#' pdf, height must be in inches.
-#' @param width A numeric denoting the width of exported image. Default units in 'cm'. If imgtype is 
-#' pdf, height must be in inches.
-#' @param res A numeric denoting the resolution of exported image. Default set to 200. If imgtype is 
-#' pdf, this option does not apply.
-#' @param units A character denoting the unit of measure of the export image. By default, units is set to 'cm' for png and jpeg and to 'in' if imgtype is 'pdf'. 
-#' Other options include 'px', 'in' and 'mm' etc. 
 #' @return Returns a dataframe with all values sorted by K. The table has 16 
 #' columns namely Mean estimated ln probability of data, Standard deviation, 
 #' Value of K, Number of runs for each K, Number of runs for each K, Number of 
@@ -952,7 +1042,12 @@ summariseQ <- summarizeQ <- function(data=NULL, writetable=FALSE)
 #' @import gridExtra
 #' @export
 #' 
-evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE, na.rm=TRUE, imgtype="png", basesize=NA, height=NA, width=NA, res=NA, units=NA)
+evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
+                                  pointsize=NA,pointtype=20,pointcol="steelblue",linesize=NA,linecol="steelblue",
+                                  ebwidth=0.2,ebcol="grey30",
+                                  textcol="grey30",basesize=6,gridsize=NA,
+                                  imgtype="png", height=NA, width=NA, dpi=300, units="cm", 
+                                  theme="theme_bw", font="", na.rm=TRUE)
 {
   #does df data contain any data
   if(is.null(data) | length(data)==0) stop("evannoMethodStructure: No input files.")
@@ -961,12 +1056,8 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
   if(!is.logical(exportplot)) stop("evannoMethodStructure: Argument 'exportplot' not set correctly. Set as TRUE or FALSE.")
   if(!is.logical(na.rm)) stop("evannoMethodStructure: Argument 'na.rm' not set correctly. Set as TRUE or FALSE.")
   imgtype <- tolower(imgtype)
-  if(imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg") stop("evannoMethodStructure: Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg' or 'pdf'.")
-  height1 <- height
-  width1 <- width
-  if(is.na(units)) units <- "cm"
-  if(is.na(res)) res <- 300
-  
+  if(imgtype != "png" && imgtype != "pdf" && imgtype != "tiff" && imgtype != "jpeg") stop("evannoMethodStructure: Argument 'imgtype' set incorrectly. Options are 'png', 'jpeg', 'tiff' or 'pdf'.")
+
   #check data format
   #if(exportdataformat != "excel" && exportdataformat != "txt") stop("evannoMethodStructure: Argument 'exportdataformat' set incorrectly. Set as 'excel' or 'txt'.")
   
@@ -1006,9 +1097,18 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
   if(any(data$runs < 2)) warning("evannoMethodStructure: Results may not be meaningful if repeats (runs) for any value of K is less than 2.")
   
   base_size <- basesize
-  plotcol <- "grey30"
-  plotcol1 <- "steelblue"
-  pointsh <- 20
+  height1 <- height
+  width1 <- width
+  #if(is.na(units)) units <- "cm"
+  #if(is.na(dpi)) dpi <- 300
+  if(imgtype=="pdf") dpi <- 300
+  if(imgtype=="pdf" && font=="") font <- "Helvetica"
+  if(is.na(pointsize)) pointsize <- base_size*0.3
+  if(is.na(linesize)) linesize <- base_size*0.04
+  if(is.na(gridsize)) gridsize <- base_size*0.03
+  #plotcol <- "grey30"
+  #plotcol1 <- "steelblue"
+  #pointsh <- 20
   #linewd <- 0.20
   #pointsz <- 1.5
   #linewd <- base_size*0.04
@@ -1022,41 +1122,49 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
       plist <- vector("list",1)
       
       #settings for kPlot
-      if(is.na(height)) height1 <- 7
-      if(is.na(width)) width1 <- 7
+      if(is.na(height)) {height1 <- 7}else{height1 <- height}
+      if(is.na(width)) {width1 <- 7}else{width1<-width}
       if(is.na(basesize)) base_size <- round((5*height1)/7,1)
       
-      if(is.na(height) && imgtype=="pdf") height1 <- pophelper:::unitConverter(value=height1, fromunit="cm", tounit="in", res=res)
-      if(is.na(width) && imgtype =="pdf") width1 <- pophelper:::unitConverter(value=width1, fromunit="cm", tounit="in", res=res)
-      if(!is.na(height) && imgtype=="pdf" && units != "in") height1 <- pophelper:::unitConverter(value=height, fromunit=units, tounit="in", res=res)
-      if(!is.na(width) && imgtype =="pdf" && units != "in") width1 <- pophelper:::unitConverter(value=width, fromunit=units, tounit="in", res=res)
+      if(imgtype=="pdf") height1 <- pophelper:::unitConverter(height1,units,"in",dpi)
+      if(imgtype=="pdf") width1 <- pophelper:::unitConverter(width1,units,"in",dpi)
+      
+      #if(is.na(height) && imgtype=="pdf") height1 <- pophelper:::unitConverter(value=height1, fromunit="cm", tounit="in", dpi)
+      #if(is.na(width) && imgtype =="pdf") width1 <- pophelper:::unitConverter(value=width1, fromunit="cm", tounit="in", res=res)
+      #if(!is.na(height) && imgtype=="pdf" && units != "in") height1 <- pophelper:::unitConverter(value=height, fromunit=units, tounit="in", dpi)
+      #if(!is.na(width) && imgtype =="pdf" && units != "in") width1 <- pophelper:::unitConverter(value=width, fromunit=units, tounit="in", dpi)
       
       plist[[1]] <- ggplot2::ggplot(data, aes(x=k, y=elpdmean))+
-        geom_path(colour=plotcol1, size=base_size*0.04, na.rm=na.rm)+
-        geom_point(colour=plotcol1,fill=plotcol1, size=base_size*0.3, shape=pointsh, na.rm=na.rm)+
-        geom_errorbar(aes(x=k, ymax=elpdmax, ymin=elpdmin, width=0.2), size=base_size*0.04, colour=plotcol, na.rm=na.rm)+
-        theme_bw(base_size=base_size)+
+        geom_path(colour=linecol, size=linesize, na.rm=na.rm)+
+        geom_point(colour=pointcol,fill=pointcol, size=pointsize, shape=pointtype, na.rm=na.rm)+
+        geom_errorbar(aes(x=k, ymax=elpdmax, ymin=elpdmin, width=ebwidth), size=linesize, colour=ebcol, na.rm=na.rm)+
+        get(theme)(base_family=font)+
         labs(x=expression(paste(italic(K))), 
              y=expression(paste("Mean L(", italic(K), ") " %+-% " SD")))+
-        theme(legend.position="none",
-              axis.text.y=element_text(angle=90, hjust=0.5,size=base_size, colour=plotcol),
-              axis.text.x=element_text(size=base_size, colour=plotcol),
-              axis.title=element_text(size=base_size+1, colour=plotcol,face="bold"),
-              plot.title=element_text(size=base_size+3, hjust=0, colour=plotcol),
+              theme(legend.position="none",
+              axis.text.y=element_text(angle=90, hjust=0.5,size=base_size, colour=textcol),
+              axis.text.x=element_text(size=base_size, colour=textcol),
+              axis.title=element_text(size=base_size+1, colour=textcol,face="bold"),
+              plot.title=element_text(size=base_size+3, hjust=0, colour=textcol),
               axis.ticks=element_blank(),
               panel.border=element_blank(),
+              panel.grid.minor=element_blank(),
+              panel.grid.major=element_line(size=gridsize),
               plot.margin=grid::unit(c(0.15,0.15,0.15,0.15),"cm"))
       
       #show plot
       print(plist[[1]])
       
       #check image imgtype
-      if(imgtype=="pdf") pdf(file="kPlot.pdf", height=height1, width=width1)
-      if(imgtype=="png") png(filename="kPlot.png", height=height1, width=width1, res=res, units=units, type="cairo")
-      if(imgtype=="jpeg") jpeg(filename="kPlot.jpg", height=height1, width=width1, res=res, units=units, quality=100)
+      if(imgtype=="pdf") pdf(file="kPlot.pdf", height=height1, width=width1, family=font)
+      if(imgtype=="png") png(filename="kPlot.png", height=height1, width=width1, res=dpi, units=units, type="cairo", family=font)
+      if(imgtype=="jpeg") jpeg(filename="kPlot.jpg", height=height1, width=width1, res=dpi, units=units, quality=100, family=font)
+      if(imgtype=="tiff") tiff(filename="kPlot.tiff", height=height1, width=width1, res=dpi, units=units, compression="lzw", type="cairo", family=font)
+      
       print(plist[[1]])
       dev.off()
       
+      if(imgtype=="tiff") cat("kPlot.tiff exported.\n")
       if(imgtype=="pdf") cat("kPlot.pdf exported.\n")
       if(imgtype=="png") cat("kPlot.png exported.\n")
       if(imgtype=="jpeg") cat("kPlot.jpg exported.\n")
@@ -1131,51 +1239,54 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
   #show plot
   if(exportplot)
   {
-    if(is.na(height)) height1 <- 8
-    if(is.na(width)) width1 <- 8
+    if(is.na(height)) {height1 <- 8}else{height1 <- height}
+    if(is.na(width)) {width1 <- 8}else{width1 <- width}
     if(is.na(basesize)) base_size <- round((5*height1)/7,1)
     
-    if(is.na(height) && imgtype=="pdf") height1 <- pophelper:::unitConverter(value=height1, fromunit="cm", tounit="in", res=res)
-    if(is.na(width) && imgtype =="pdf") width1 <- pophelper:::unitConverter(value=width1, fromunit="cm", tounit="in", res=res)
-    if(!is.na(height) && imgtype=="pdf" && units != "in") height1 <- pophelper:::unitConverter(value=height, fromunit=units, tounit="in", res=res)
-    if(!is.na(width) && imgtype =="pdf" && units != "in") width1 <- pophelper:::unitConverter(value=width, fromunit=units, tounit="in", res=res)
+    if(imgtype=="pdf") height1 <- pophelper:::unitConverter(height1,units,"in",dpi)
+    if(imgtype=="pdf") width1 <- pophelper:::unitConverter(width1,units,"in",dpi)
+    
+    #if(is.na(height) && imgtype=="pdf") height1 <- pophelper:::unitConverter(value=height1, fromunit="cm", tounit="in", res=dpi)
+    #if(is.na(width) && imgtype =="pdf") width1 <- pophelper:::unitConverter(value=width1, fromunit="cm", tounit="in", res=dpi)
+    #if(!is.na(height) && imgtype=="pdf" && units != "in") height1 <- pophelper:::unitConverter(value=height, fromunit=units, tounit="in", res=dpi)
+    #if(!is.na(width) && imgtype =="pdf" && units != "in") width1 <- pophelper:::unitConverter(value=width, fromunit=units, tounit="in", res=dpi)
     
     #create plots list
     plist <- vector("list",4)
     
     #plot1
     plist[[1]] <- ggplot2::ggplot(data, aes(x=k, y=elpdmean))+
-      geom_path(colour=plotcol1, size=base_size*0.04, na.rm=na.rm)+
-      geom_point(colour=plotcol1,fill=plotcol1, size=base_size*0.3, shape=pointsh, na.rm=na.rm)+
-      geom_errorbar(aes(x=k, ymax=elpdmax, ymin=elpdmin, width=0.2), size=base_size*0.04, colour=plotcol, na.rm=na.rm)+
-      theme_bw(base_size=base_size)+
+      geom_path(colour=linecol, size=linesize, na.rm=na.rm)+
+      geom_point(colour=pointcol,fill=pointcol, size=pointsize, shape=pointtype, na.rm=na.rm)+
+      geom_errorbar(aes(x=k, ymax=elpdmax, ymin=elpdmin, width=ebwidth), size=linesize, colour=ebcol, na.rm=na.rm)+
+      get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))), y=expression(paste("Mean L(", italic(K), ") " %+-% " SD")),title="A")
     
     #plot 2
     plist[[2]] <- ggplot2::ggplot(data, aes(x=k, y=lnk1))+
-      geom_path(colour=plotcol1, size=base_size*0.04, na.rm=na.rm)+
-      geom_point(colour=plotcol1, fill=plotcol1, size=base_size*0.3, shape=pointsh, na.rm=na.rm)+
-      geom_errorbar(aes(x=k, ymax=lnk1max, ymin=lnk1min, width=0.2), 
-                    size=base_size*0.04, colour=plotcol, na.rm=na.rm)+
-      theme_bw(base_size=base_size)+
+      geom_path(colour=linecol, size=linesize, na.rm=na.rm)+
+      geom_point(colour=pointcol, fill=pointcol, size=pointsize, shape=pointtype, na.rm=na.rm)+
+      geom_errorbar(aes(x=k, ymax=lnk1max, ymin=lnk1min, width=ebwidth), 
+                    size=linesize, colour=ebcol, na.rm=na.rm)+
+      get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))), y=expression(paste("L'(", italic(K), ") " %+-% " SD")), title="B")
     
     #plot 3
     plist[[3]] <- ggplot2::ggplot(data, aes(x=k, y=lnk2))+
-      geom_path(colour=plotcol1, size=base_size*0.04, na.rm=na.rm)+
-      geom_point(colour=plotcol1, fill=plotcol1, size=base_size*0.3, shape=pointsh, na.rm=na.rm)+
+      geom_path(colour=linecol, size=linesize, na.rm=na.rm)+
+      geom_point(colour=pointcol, fill=pointcol, size=pointsize, shape=pointtype, na.rm=na.rm)+
       geom_errorbar(aes(x=k, ymax=lnk2max, ymin=lnk2min, width=0.2), 
-                    size=base_size*0.04, colour=plotcol, na.rm=na.rm)+
-      theme_bw(base_size=base_size)+
+                    size=linesize, colour=ebcol, na.rm=na.rm)+
+      get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))), y=expression(paste("|L\"(", italic(K), ")| " %+-% " SD")), title="C")
     
     #plot 4
     if(is.finite(sum(data$drv3, na.rm=TRUE)))
     {
       plist[[4]] <- ggplot2::ggplot(data, aes(x=k, y=deltaK))+
-        geom_path(colour=plotcol1, size=base_size*0.04, na.rm=na.rm)+
-        geom_point(colour=plotcol1, fill=plotcol1, size=base_size*0.3, shape=pointsh, na.rm=na.rm)+
-        theme_bw(base_size=base_size)+
+        geom_path(colour=linecol, size=linesize, na.rm=na.rm)+
+        geom_point(colour=pointcol, fill=pointcol, size=pointsize, shape=pointtype, na.rm=na.rm)+
+        get(theme)(base_family=font)+
         labs(x=expression(paste(italic(K))), y=expression(paste(Delta, italic(K))), title="D")
     }
     
@@ -1183,26 +1294,30 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
     for (r in 1:plen)
     {
       plist[[r]] <- plist[[r]] + theme(legend.position="none",
-                                       axis.text.y=element_text(angle=90, hjust=0.5,size=base_size-0.5, colour=plotcol),
-                                       axis.text.x=element_text(size=base_size-0.5, colour=plotcol),
-                                       axis.title=element_text(size=base_size+0.6, colour=plotcol,face="bold"),
-                                       plot.title=element_text(size=base_size+2.5, hjust=0, colour=plotcol),
+                                       axis.text.y=element_text(angle=90, hjust=0.5,size=base_size-0.5, colour=textcol),
+                                       axis.text.x=element_text(size=base_size-0.5, colour=textcol),
+                                       axis.title=element_text(size=base_size+0.6, colour=textcol,face="bold"),
+                                       plot.title=element_text(size=base_size+2.5, hjust=0, colour=textcol),
                                        panel.border=element_blank(),
                                        axis.ticks=element_blank(),
-                                       plot.margin=grid::unit(c(0.01,0.1,0.01,0.01),"cm"))
+                                       panel.grid.minor=element_blank(),
+                                       panel.grid.major=element_line(size=gridsize),
+                                       plot.margin=grid::unit(c(0.1,0.1,0.1,0.1),"cm"))
     }
     
     #export image
     
     #check image imgtype  
-    if(imgtype=="pdf") pdf("evannoMethodStructure.pdf", height=height1, width=width1)
-    if(imgtype =="png") png("evannoMethodStructure.png", height=height1, width=width1, res=res, units=units, type="cairo")
-    if(imgtype=="jpeg") jpeg("evannoMethodStructure.jpg", height=height1, width=width1, res=res, units=units, quality=100)
+    if(imgtype=="pdf") pdf("evannoMethodStructure.pdf", height=height1, width=width1, family=font)
+    if(imgtype =="png") png("evannoMethodStructure.png", height=height1, width=width1, res=dpi, units=units, type="cairo", family=font)
+    if(imgtype =="tiff") tiff("evannoMethodStructure.tiff", height=height1, width=width1, res=dpi, units=units, compression="lzw",type="cairo", family=font)
+    if(imgtype=="jpeg") jpeg("evannoMethodStructure.jpg", height=height1, width=width1, res=dpi, units=units, quality=100, family=font)
     
     if(plen==3) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]], ncol=2, nrow=2)
     if(plen==4) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]], plist[[4]], ncol=2, nrow=2)
-    
     dev.off()
+    
+    if(imgtype=="tiff") cat("evannoMethodStructure.tiff exported.\n")
     if(imgtype=="pdf") cat("evannoMethodStructure.pdf exported.\n")
     if(imgtype=="png") cat("evannoMethodStructure.png exported.\n")
     if(imgtype=="jpeg") cat("evannoMethodStructure.jpg exported.\n")
@@ -1285,15 +1400,12 @@ evannoMethodStructure <- function(data=NULL, writetable=FALSE, exportplot=FALSE,
 #' 
 clumppExport <- function(qlist=NULL, prefix=NA, parammode=NA, paramrep=NA, useexe=FALSE)
 {
-  if(is.null(qlist) | (length(qlist)==0)) stop("clumppExport: No input qlist.")
-  if(class(qlist) != "list") stop("clumppExport: Argument 'qlist' is not a list data type.")
+  #check input
+  if(!is.qlist(qlist,warn=T)) stop("clumppExport: Input is not a valid qlist.")
   
   if(is.na(prefix)) prefix <- "pop"
   prefix <- paste0(prefix, "_K")
   if(!is.logical(useexe)) stop("clumppExport: Argument 'useexe' set incorrectly. Set as TRUE or FALSE.")
-  
-  #check file
-  if(any(pophelper:::checkQ(qlist)$type != "data.frame")) stop("clumppExport: Input list contains one or more elements that are not data.frame.")
   
   #get tabulated runs
   df1 <- pophelper::tabulateQ(qlist)
@@ -1571,7 +1683,7 @@ collectClumppOutput <- function(prefix="pop", filetype="aligned", runsdir=NA, ne
 #' @param units A character indicating the unit of dimension: "cm","mm","in".
 #' @param height A numeric indicating the height of each plot.
 #' @param width A numeric indicating the width of each plot.
-#' @param res A numeric indicating the resolution of the figure.
+#' @param dpi A numeric indicating the resolution of the figure.
 #' @param imgtype A character denoting image format. "png", "jpeg" or "pdf".
 #' @param labpanelheight A numeric denoting the height of the label panel.
 #' @param labs An integer denoting number of label groups.
@@ -1579,11 +1691,11 @@ collectClumppOutput <- function(prefix="pop", filetype="aligned", runsdir=NA, ne
 #' @return a vector with height and width.
 # @export
 #'
-getDim <- function(ind=NA, units=NA, height=NA, width=NA, res=NA, imgtype=NA, labpanelheight=NA, labs=NA, plotnum=NA)
+getDim <- function(ind=NA, units=NA, height=NA, width=NA, dpi=NA, imgtype=NA, labpanelheight=NA, labs=NA, plotnum=NA)
 {
   if(is.na(units)) units <- "cm"
   if(is.na(units) && imgtype=="pdf") units <- "in"
-  if(is.na(res)) res <- 300
+  if(is.na(dpi)) dpi <- 300
   if(is.na(plotnum)) plotnum <- 1
   if(is.na(labs)) labs <- 1
   
@@ -1592,14 +1704,14 @@ getDim <- function(ind=NA, units=NA, height=NA, width=NA, res=NA, imgtype=NA, la
   {
     if(plotnum==1) height <- 1.8
     if(plotnum > 1) height <- 1.2
-    if(imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="cm", tounit="in", res=res)
+    if(imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="cm", tounit="in", dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="mm", tounit="cm", res=res)
-    if(units=="px" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="px", tounit="cm", res=res)
-    if(units=="in" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="in", tounit="cm", res=res)
-    if(units=="cm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="cm", tounit="in", res=res)
-    if(units=="mm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="mm", tounit="in", res=res)
-    if(units=="px" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="px", tounit="in", res=res)
+    if(units=="mm" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="mm", tounit="cm", dpi=dpi)
+    if(units=="px" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="px", tounit="cm", dpi=dpi)
+    if(units=="in" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height, fromunit="in", tounit="cm", dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="cm", tounit="in", dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="mm", tounit="in", dpi=dpi)
+    if(units=="px" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height, fromunit="px", tounit="in", dpi=dpi)
   }
   height <- height*plotnum
   
@@ -1610,14 +1722,14 @@ getDim <- function(ind=NA, units=NA, height=NA, width=NA, res=NA, imgtype=NA, la
     width <- ind*0.020 
     if(width < 5) width <- 5
     if(width > 30) width <- 30
-    if(imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="cm", tounit="in", res=res)
+    if(imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="cm", tounit="in", dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="mm", tounit="cm", res=res)
-    if(units=="px" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="px", tounit="cm", res=res)
-    if(units=="in" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="in", tounit="cm", res=res)
-    if(units=="cm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="cm", tounit="in", res=res)
-    if(units=="mm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="mm", tounit="in", res=res)
-    if(units=="px" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="px", tounit="in", res=res)
+    if(units=="mm" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="mm", tounit="cm", dpi=dpi)
+    if(units=="px" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="px", tounit="cm", dpi=dpi)
+    if(units=="in" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width, fromunit="in", tounit="cm", dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="cm", tounit="in", dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="mm", tounit="in", dpi=dpi)
+    if(units=="px" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width, fromunit="px", tounit="in", dpi=dpi)
   }
   
   #labpanelheight
@@ -1625,14 +1737,14 @@ getDim <- function(ind=NA, units=NA, height=NA, width=NA, res=NA, imgtype=NA, la
   {
     labpanelheight <- 0.4
     labpanelheight <- labpanelheight * labs
-    if(imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="cm", tounit="in", res=res)
+    if(imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="cm", tounit="in", dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="mm", tounit="cm", res=res)
-    if(units=="in" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="in", tounit="cm", res=res)
-    if(units=="px" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="px", tounit="cm", res=res)
-    if(units=="mm" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="mm", tounit="in", res=res)
-    if(units=="cm" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="cm", tounit="in", res=res)
-    if(units=="px" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="px", tounit="in", res=res)
+    if(units=="mm" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="mm", tounit="cm", dpi=dpi)
+    if(units=="in" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="in", tounit="cm", dpi=dpi)
+    if(units=="px" && imgtype != "pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="px", tounit="cm", dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="mm", tounit="in", dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="cm", tounit="in", dpi=dpi)
+    if(units=="px" && imgtype=="pdf") labpanelheight <- pophelper:::unitConverter(value=labpanelheight, fromunit="px", tounit="in", dpi=dpi)
   }
   
   if(imgtype!="pdf") units1 <- "cm"
@@ -1653,12 +1765,12 @@ getDim <- function(ind=NA, units=NA, height=NA, width=NA, res=NA, imgtype=NA, la
 #' @param labjust A numeric indicating the justification of labels. Defaults to 0.5 if labangle=0  or 1 if 
 #' labangle between 20 and 135.
 #' @param pointsize  A numeric indicating the size of points on label marker line.
-#' @param linethick A numeric indicating the thickness of the label marker line.
+#' @param linesize A numeric indicating the thickness of the label marker line.
 #' @return A list with following plot parameters: grplab, plotnum, labsize, 
-#' labangle, labjust, pointsize, linethick.
+#' labangle, labjust, pointsize, linesize.
 # @export
 #' 
-getPlotParams <- function(grplab=NA, plotnum=1, labsize=NA, labangle=NA, labjust=NA, pointsize=NA, linethick=NA)
+getPlotParams <- function(grplab=NA, plotnum=1, labsize=NA, labangle=NA, labjust=NA, pointsize=NA, linesize=NA)
 {
   if(all(is.na(grplab))) stop("getPlotParams: Labels are empty.")
   
@@ -1684,7 +1796,7 @@ getPlotParams <- function(grplab=NA, plotnum=1, labsize=NA, labangle=NA, labjust
   #labpos1 <- labpos
   labsize1 <- labsize
   pointsize1 <- pointsize
-  linethick1 <- linethick
+  linesize1 <- linesize
   
   #if(is.na(linepos)) linepos1 <- lp*-0.000035
   #if(is.na(linepos)) linepos1 <- 1
@@ -1692,22 +1804,22 @@ getPlotParams <- function(grplab=NA, plotnum=1, labsize=NA, labangle=NA, labjust
   #if(is.na(labpos)) labpos1 <- 0.2
   if(is.na(labsize)) labsize1 <- lp*0.00125
   if(is.na(pointsize)) pointsize1 <- lp*0.0015
-  if(is.na(linethick)) linethick1 <- lp*0.0003
+  if(is.na(linesize)) linesize1 <- lp*0.0003
   
   #if(is.na(linepos)) {if(linepos1 < -0.08) linepos1 <- -0.08}
   #if(is.na(labpos)) {if(linepos1 < -0.192) labpos1 <- linepos1*2.4}
   if(is.na(labsize)) {if(labsize1 < 1.5) labsize1 <- 1.5}
   if(is.na(pointsize)) {if(pointsize1 < 1.2) pointsize1 <- 1.2}
-  if(is.na(linethick)) {if(linethick1 < 0.3) linethick1 <- 0.3}
+  if(is.na(linesize)) {if(linesize1 < 0.3) linesize1 <- 0.3}
   
   #if(is.na(linepos)) {if(linepos1 > -0.07) linepos1 <- -0.07}
   #if(is.na(labpos)) {if(labpos1 > -0.168) labpos1 <- linepos1*2.4}
   if(is.na(labsize))  {if(labsize1 > 2.5) labsize1 <- 2.5}
   if(is.na(pointsize)) {if(pointsize1 > 3.2) pointsize1 <- 3.2}
-  if(is.na(linethick)) {if(linethick1 > 0.6) linethick1 <- 0.6}
+  if(is.na(linesize)) {if(linesize1 > 0.6) linesize1 <- 0.6}
   
   dlist <- list(grplab=grplab, plotnum=plotnum, labsize=labsize1, labangle=labangle, labjust=labjust, 
-                pointsize=pointsize1, linethick=linethick1)
+                pointsize=pointsize1, linesize=linesize1)
   return(dlist)
 }
 
@@ -1820,15 +1932,11 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' @param imgoutput A character with options: 'sep' or 'join'.If set to "sep", each run is plotted as separate image file. If set to "join", multiple runs are joined into a single image.
 #' @param clustercol A vector of colours for clusters. If NA, colours are automatically generated. K=1 to K=12 are custom unique colours while K>12 are coloured by function \code{gplots::rich.colors()}.
 #' @param grplab A named list of group labels equal to the length of individuals. See details.
-#' @param sortind A character indicating how individuals are sorted. Default is NA which means sort order in the input file. Other options are 'all' or any one cluster (eg. 'Cluster1'). See details.
+#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.
 #' @param subsetgrp A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA. See details.
 #' @param grpmean A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and only one set of group labels are used.
-#' @param na.rm A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
-#' @param imgtype A character indicating output image file type. Possible options are "png","jpeg" or "pdf".
-#' @param height A numeric indicating the height of a single run panel. By default, automatically generated based on number of runs. Separate plots use 1.8cm and joined plots use 1.2cm for single panel. See details.
-#' @param width A numeric indicating the width of the whole plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
-#' @param dpi A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300.
-#' @param units A numeric indicating the units of height and width. Default set to "cm".
+#' @param useindlab A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as individual labels. Only useful with \code{sortind="label"} and not for display.
+#' @param labsep A character used as separator when concatenating individual labels and group labels. Defaults to space \code{labsep=" "}.
 #' @param panelspacer A numeric indicating the spacing between barplot panels in cm. Defaults to 0.06cm.
 #' @param sp A logical indicating if strip panels on right side must be shown. Strip panel by default displays file name and K value. Defaults to TRUE.
 #' @param splab A character or character vector denoting items displayed in the strip panels. Length must be equal to number of runs.
@@ -1851,7 +1959,8 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' @param pointtype A character or number for the type of points on the label marker line. Defaults to |. Same as pch in standard R.
 #' @param pointalpha A numeric between 0 and 1 denoting transparency of the points. Defaults to 1.
 #' @param linepos A numeric indicating the y position of the label marker line and the points. Applicable only with group labels. Defaults to 1.
-#' @param linethick A numeric indicating the thickness of the label marker line. Default range between 0.3 and 0.6 depending on number of individuals.
+#' @param linethick Deprecated. Use argument 'linesize'.
+#' @param linesize A numeric indicating the thickness of the label marker line. Default range between 0.3 and 0.6 depending on number of individuals.
 #' @param linecol A colour character for the label marker line. Defaults to "grey30".
 #' @param linetype A numeric indicating the type of line for marker line. Same as lty in standard R. Default value is 1.
 #' @param linealpha A numeric between 0 and 1 denoting transparency of the marker line. Defaults to 1.
@@ -1859,14 +1968,23 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' @param divgrp A character or character vector with group label titles denoting which groups are used to draw divider lines.
 #' @param divcol A character or hexadecimal colour denoting the colour of the divider line. Default is white.
 #' @param divtype A numeric indicating the type of line for the divider line. Same as lty in standard R. Default value is '21'.
-#' @param divthick A numeric indicating the thickness of the divider line. Default is 0.25.
+#' @param divthick Deprecated. Use argument 'divsize' instead.
+#' @param divsize A numeric indicating the thickness of the divider line. Default is 0.25.
 #' @param divalpha A numeric between 0 and 1 denoting transparency of the divider line. Defaults to 1.
 #' @param legend A logical indicating if legend denoting cluster colours must be plotted. Defaults to FALSE.
 #' @param legendlab A character or character vector to for legend cluster labels. Must be equal to max number of clusters.
 #' @param legendpos A character 'right' or 'left' denoting position of the legend. Defaults to 'left'.
 #' @param legendkeysize A numeric indicating size of the legend key. Defaults to 4.
 #' @param legendtextsize A numeric indicating size of the legend text. Defaults to 3.
-#' @param font A character indicating font to be used in the plot. This may not work on all systems.
+#' @param imgtype A character indicating output image file type. Possible options are "png","jpeg","tiff" or "pdf".
+#' @param height A numeric indicating the height of a single run panel. By default, automatically generated based on number of runs. Separate plots use 1.8cm and joined plots use 1.2cm for single panel. See details.
+#' @param width A numeric indicating the width of the whole plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
+#' @param dpi A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
+#' @param units A numeric indicating the units of height and width. Default set to "cm". Other options are 'px', 'in' or 'mm'.
+#' @param barsize A numeric indicating the width of the bars. Defaults to 1.
+#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
+#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
+#' @param na.rm A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
 #' @return Nothing is returned.
 #' @details 
 #' \strong{height}\cr
@@ -1875,8 +1993,14 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' It is possible to set either height or width and leave other as default.\cr
 #' 
 #' \strong{sortind}\cr
-#' This argument takes one character as input.  Default NA means individuals are plotted in the same order as input. Individuals can be ordered by one cluster. For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
-#' To order by all clusters as the 'Sort by Q' option in STRUCTURE software, use \code{sortind="all"}. When using \code{sortind} with \code{subsetgrp}, individuals
+#' This argument takes one character as input.  Default NA means individuals are 
+#' plotted in the same order as input. Individuals can be ordered by any one cluster. 
+#' For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+#' To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
+#' use \code{sortind="all"}. When using \code{sortind="label"}, individuals are
+#' sorted by individual labels (along with grplab if present). These individual
+#' labels are not displayed in \code{plotQ()} but can be displayed using \code{plotQMultiline()}.
+#' When using \code{sortind} with \code{grplab}, individuals
 #' are sorted within the groups.\cr
 #' 
 #' \strong{grplab}\cr
@@ -1912,6 +2036,8 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' 
 #' # sort individuals
 #' plotQ(qlist=slist[c(1,3)],sortind="all")
+#' plotQ(qlist=slist[c(1,3)],sortind="Cluster1")
+#' plotQ(qlist=slist[c(1,3)],sortind="label")
 #' plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join")
 #' 
 #' # read group labels
@@ -1923,6 +2049,9 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' 
 #' # sort within groups
 #' plotQ(qlist=slist[1:2],grplab=list("grps\n"=grps1$V1),imgoutput="join",sortind="Cluster1")
+#' 
+#' # reorder groups
+#' plotQ(qlist=slist[1],grplab=list("grps\n"=grps1$V1),subsetgrp=c("Pop B","Pop A"))
 #' 
 #' # plot two sets of labels
 #' grps2 <- read.delim(system.file("files/structuregrplabels2.txt", package="pophelper"), header=F,stringsAsFactors=F)
@@ -1939,35 +2068,36 @@ grpLabels <- function(df=NULL,grplab=NA,subsetgrp=NA,grpmean=FALSE,labpos=NA,lin
 #' @import tidyr
 #' @export
 #' 
-plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind=NA, subsetgrp=NA, grpmean=FALSE, na.rm=TRUE, 
-                     imgtype="png", height=NA, width=NA, dpi=300, units="cm", panelspacer=0.06, 
-                     sp=TRUE, splab=NA, splabsize=4, splabcol="grey30", splabface="plain", spbgcol=NA, sppos="right",
-                     labspacer=0,labpanelheight=NA, labpos=0.25, labsize=NA, labangle=NA, labjust=NA, labcol="grey30", labalpha=1,
-                     pointsize=NA, pointcol="grey30", pointbgcol="grey30", pointtype="|", pointalpha=1, 
-                     linepos=0.75, linethick=NA, linecol="grey30", linetype=1, linealpha=1,
-                     div=TRUE, divgrp=NA, divcol="white", divtype="21", divthick=0.25, divalpha=1,
-                     legend=FALSE, legendlab=NA, legendpos="left", legendkeysize=4, legendtextsize=3, font="")
+plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind=NA, subsetgrp=NA, grpmean=FALSE,
+                    useindlab=FALSE, labsep=" ",panelspacer=0.06, 
+                    sp=TRUE, splab=NA, splabsize=4, splabcol="grey30", splabface="plain", spbgcol=NA, sppos="right",
+                    labspacer=0,labpanelheight=NA, labpos=0.25, labsize=NA, labangle=NA, labjust=NA, labcol="grey30", labalpha=1,
+                    pointsize=NA, pointcol="grey30", pointbgcol="grey30", pointtype="|", pointalpha=1, 
+                    linepos=0.75, linethick=NA, linesize=NA, linecol="grey30", linetype=1, linealpha=1,
+                    div=TRUE, divgrp=NA, divcol="white", divtype="21", divthick=NA, divsize=0.25, divalpha=1,
+                    legend=FALSE, legendlab=NA, legendpos="left", legendkeysize=4, legendtextsize=3,
+                    imgtype="png", height=NA, width=NA, dpi=300, units="cm",
+                    barsize=1,theme="theme_grey", font="", na.rm=TRUE)
 {
-  #if no files chosen, stop excecution, give error message
-  if(is.null(qlist) | (length(qlist)==0)) stop("plotQ: No input qlist.")
-  if(any(qlist=="")) stop("plotQ: Input is empty.")
-  if((class(qlist) != "list")) stop("plotQ: Argument 'qlist' must be a list datatype.")
-  if(!all(sapply(qlist,is.data.frame))) stop("plotQ: One or more list elements are not data.frame datatype.")
+  #check input
+  if(!is.qlist(qlist,warn=T)) stop("plotQ: Input is not a valid qlist.")
   
   #check imgoutput
   imgoutput <- tolower(imgoutput)
   if(imgoutput != "sep" && imgoutput != "join") stop("plotQ: Argument 'imgoutput' set incorrectly. Set as 'sep' to export as separate plots. Set as 'join' to export as one joined plot.")
   
-  #check image
+  #check imagetype
   imgtype <- tolower(imgtype)
-  if(imgtype!="png" && imgtype != "pdf" && imgtype != "jpeg") stop("plotQ: Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.")
+  if(imgtype!="png" && imgtype != "pdf" && imgtype != "tiff" && imgtype != "jpeg") stop("plotQ: Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg', 'tiff' or 'pdf'.")
   if(all(!is.na(sortind)))
   {
     if(length(sortind) > 1) stop("plotQ: Argument 'sortind' must be of length 1. Use 'all' or a cluster like 'Cluster1'.")
-    if(sortind != "all" && !grepl("Cluster[0-9+]",sortind)) stop("plotQ: Argument 'sortind' must be set to 'all' or a cluster like 'Cluster1'.")
+    if(sortind != "all" && sortind != "label" && !grepl("Cluster[0-9+]",sortind)) stop("plotQ: Argument 'sortind' must be set to 'all', 'label' or a cluster like 'Cluster1'.")
   }
   
   if(!any(is.na(clustercol))) {if(!is.character(clustercol)) stop("plotQ: Argument 'clustercol' must be a character datatype.")}
+  if(!is.logical(useindlab)) stop("plotQ: Argument 'useindlab' set incorrectly. Set as TRUE or FALSE.")
+  if(!is.character(labsep)) stop("plotQ: Argument 'labsep' must be a character datatype.")
   if(!is.logical(grpmean)) stop("plotQ: Argument 'grpmean' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(na.rm)) stop("plotQ: Argument 'na.rm' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(sp)) stop("plotQ: Argument 'sp' set incorrectly. Set as TRUE or FALSE.")
@@ -1982,6 +2112,23 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
   if(!is.numeric(legendkeysize)) stop("plotQ: Argument 'legendkeysize' must be a numeric datatype.")
   if(!is.numeric(legendtextsize)) stop("plotQ: Argument 'legendtextsize' must be a numeric datatype.")
   if(!is.character(font)) stop("plotQ: Argument 'font' must be a character datatype.")
+  if(imgtype=="pdf" && font=="") font <- "Helvetica"
+  if(imgtype=="pdf") dpi <- 300
+
+  if(!is.na(linethick))
+  {
+    linesize <- linethick
+    warning("plotQ: Argument 'linethick' is deprecated. Use 'linesize' instead.")
+  }
+    
+  if(!is.na(divthick)) 
+  {
+    divsize <- divthick
+    warning("plotQ: Argument 'divthick' is deprecated. Use 'divsize' instead.")
+  }
+  
+  if(!is.numeric(barsize)) stop("plotQ: Argument 'barsize' must be a numeric datatype.")
+  if(barsize<0 | barsize>1) stop("plotQ: Argument 'barsize' must be a value between 0 and 1.")
   
   #ggplot version
   ggv <- as.numeric(gsub("\\.","",packageDescription("ggplot2", fields="Version")))
@@ -2010,7 +2157,7 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
   #if(is.na(labspacer)) labspacer <- 0
   #if(is.na(divcol)) divcol <- "white"
   #if(is.na(divtype)) divtype <- "21"
-  #if(is.na(divthick)) divthick <- 0.25
+  #if(is.na(divsize)) divsize <- 0.25
   #if(is.na(divalpha)) divalpha <- 1
   
   if(labpos > 1 | labpos < 0) stop("plotQ: Argument 'labpos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'labpanelheight'.")
@@ -2086,6 +2233,11 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
         labelpos$count <- factor(labelpos$count,levels=names(grplab))
       }
       
+      #add rownames
+      if(!useindlab) row.names(df1) <- sprintf(paste0("%",paste0(rep(0,nchar(nrow(df1))),collapse=""),nchar(nrow(df1)),"d"),1:nrow(df1))
+      # concatenate grp labs to ind labs
+      if(grplabcheck) rownames(df1) <- apply(as.data.frame(list(list(rn=rownames(df1)),intlablist)),1,paste,collapse=labsep)
+
       #sorting individuals
       if(!is.na(sortind))
       {
@@ -2119,8 +2271,35 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
             df1$matchval <- NULL
           }
           
-        }else{
-          if(!(sortind %in% colnames(df1))) stop("plotQ: Ordering cluster not found in file header.")
+        }
+
+        if(sortind=="label")
+        {
+          if(!grplabcheck) df1 <- df1[order(rownames(df1)),]
+          if(grplabcheck)
+          {
+            if(any(!is.na(sortind)) && grplablen>1) stop("plotQ: Argument 'sortind' cannot be used when more than one list of grplab is provided.")
+            dftemp <- df1
+            dftemp$grp <- intlablist[[1]]
+            grplabnames <- rle(as.character(intlablist[[1]]))$values
+            tovec <- cumsum(rle(dftemp$grp)$lengths)
+            fromvec <- (tovec - rle(dftemp$grp)$lengths)+1
+            dftemplist <- vector("list",length=length(grplabnames))
+            for(k in 1:length(tovec))
+            {
+              dftemp1 <- dftemp[fromvec[k]:tovec[k],]
+              dftemp1$grp <- NULL
+              dftemplist[[k]] <- dftemp1[order(rownames(dftemp1)),]
+            }
+            
+            df1 <- do.call("rbind",dftemplist)
+          }
+        }
+
+
+        if(sortind!="all" && sortind!="label")
+        {
+          if(!(sortind %in% colnames(df1))) stop("plotQ: 'sortind' value not found in file header. If not using 'all', use like 'Cluster1','Cluster2' etc.")
           if(!grplabcheck) df1 <- df1[order(df1[[sortind]]), ,drop=FALSE]
           if(grplabcheck)
           {
@@ -2178,7 +2357,7 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       if(length(coll) < k) stop(paste0("plotQ: Number of colours (",length(coll),") less than number of clusters (",k,")."))
       
       #getDim
-      dimtemp <- pophelper:::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, imgtype=imgtype, 
+      dimtemp <- pophelper:::getDim(ind=Ind, height=height, width=width, dpi=dpi, units=units, imgtype=imgtype, 
                                     labpanelheight=labpanelheight, labs=length(grplab), plotnum=1)
       height1 <- as.numeric(dimtemp[1])
       width1 <- as.numeric(dimtemp[2])
@@ -2188,25 +2367,31 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       if(!grplabcheck)
       {
         #plot
-        p <- ggplot2::ggplot(data=df2, aes(x=Ind, y=value, fill=variable))+
-          geom_bar(width=1, stat="identity", position="fill", na.rm=na.rm)+
-          scale_x_discrete(expand=c(0, 0))+
-          scale_y_continuous(expand=c(0, 0))+
-          scale_fill_manual(values=coll, labels=legendlab1)+
-          facet_grid(Num~., labeller=labeller(Num=facetnames), switch=sppos)+
-          theme_grey(base_family=font)
+        p <- ggplot2::ggplot(data=df2,aes(x=Ind,y=value,fill=variable))+
+                              geom_bar(width=barsize, stat="identity",position="fill",na.rm=na.rm)+
+                              scale_x_discrete(expand=c(0,0))+
+                              scale_y_continuous(expand=c(0,0))+
+                              scale_fill_manual(values=coll,labels=legendlab1)+
+                              facet_grid(Num~., labeller=labeller(Num=facetnames),switch=sppos)+
+                              get(theme)(base_family=font)
         
         p <- p + labs(x=NULL, y=NULL)+
-          theme(legend.position="top", legend.direction="horizontal", legend.title=element_blank(),
-                legend.key.size=grid::unit(legendkeysize,"points"), legend.text=element_text(size=legendtextsize),
-                legend.spacing=grid::unit(0,"points"), legend.justification=legendpos,
-                legend.margin=margin(0.2,0.2,0.2,0,"points"), legend.box.spacing=grid::unit(1.5,"points"),
-                panel.grid=element_blank(), panel.background=element_blank(), 
-                axis.ticks=element_blank(), axis.text=element_blank(), axis.line=element_blank(), 
-                axis.title=element_blank(), strip.text=element_text(size=splabsize, colour=splabcol, face=splabface), 
-                strip.background=element_rect(colour=spbgcol, fill=spbgcol), 
-                plot.margin=grid::unit(c(0.1,0.05,0,0), "cm"),
-                panel.spacing=grid::unit(panelspacer,"cm"))
+                  theme(legend.position="top",
+                        legend.direction="horizontal",
+                        legend.title=element_blank(),
+                        legend.key.size=grid::unit(legendkeysize,"points"),
+                        legend.text=element_text(size=legendtextsize),
+                        legend.spacing=grid::unit(0,"points"),
+                        legend.justification=legendpos,
+                        legend.margin=margin(0.2,0.2,0.2,0,"points"),
+                        legend.box.spacing=grid::unit(1.5,"points"),
+                        panel.grid=element_blank(),
+                        panel.background=element_blank(), 
+                        axis.ticks=element_blank(),axis.text=element_blank(),axis.line=element_blank(), 
+                        axis.title=element_blank(),strip.text=element_text(size=splabsize,colour=splabcol,face=splabface), 
+                        strip.background=element_rect(colour=spbgcol,fill=spbgcol), 
+                        plot.margin=grid::unit(c(0.1,0.05,0,0),"cm"),
+                        panel.spacing=grid::unit(panelspacer,"cm"))
         
         #remove strip panels on right
         if(!sp) p <- p + theme(strip.text=element_blank())
@@ -2214,11 +2399,13 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
         #remove legend
         if(!legend) p <- p + theme(legend.position="none") 
         
-        if(imgtype=="png") png(paste0(fname, ".png"), height=height1, width=width1, res=dpi, units=units1, type="cairo")
-        if(imgtype=="jpeg") jpeg(paste0(fname, ".jpg"), height=height1, width=width1, res=dpi, units=units1, quality=100)
-        if(imgtype=="pdf") pdf(paste0(fname, ".pdf"), height=height1, width=width1)
+        if(imgtype=="tiff") tiff(paste0(fname, ".tiff"), height=height1, width=width1, res=dpi, units=units1, type="cairo", compression="lzw", family=font)
+        if(imgtype=="png") png(paste0(fname, ".png"), height=height1, width=width1, res=dpi, units=units1, type="cairo",family=font)
+        if(imgtype=="jpeg") jpeg(paste0(fname, ".jpg"), height=height1, width=width1, res=dpi, units=units1, quality=100,family=font)
+        if(imgtype=="pdf") pdf(paste0(fname, ".pdf"), height=height1, width=width1,family=font)
         print(p)
         dev.off()
+        if(imgtype=="tiff") cat(paste0(fname, ".tiff exported.\n"))
         if(imgtype=="png") cat(paste0(fname, ".png exported.\n"))
         if(imgtype=="jpeg") cat(paste0(fname, ".jpg exported.\n"))
         if(imgtype=="pdf") cat(paste0(fname, ".pdf exported.\n"))
@@ -2226,31 +2413,39 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       
       if(grplabcheck)
       {
-        p1 <- ggplot2::ggplot(data=df2, aes(x=Ind, y=value, fill=variable))+
-          geom_bar(width=1, stat="identity", position="fill", na.rm=na.rm)+
-          scale_x_discrete(expand=c(0, 0))+
-          scale_y_continuous(expand=c(0, 0))+
-          scale_fill_manual(values=coll, labels=legendlab1)+
-          facet_grid(Num~., labeller=labeller(Num=facetnames), switch=sppos)+
-          theme_grey(base_family=font)
+        p1 <- ggplot2::ggplot(data=df2, aes(x=Ind,y=value,fill=variable))+
+                              geom_bar(width=barsize,stat="identity",position="fill",na.rm=na.rm)+
+                              scale_x_discrete(expand=c(0,0))+
+                              scale_y_continuous(expand=c(0,0))+
+                              scale_fill_manual(values=coll,labels=legendlab1)+
+                              facet_grid(Num~.,labeller=labeller(Num=facetnames),switch=sppos)+
+                              get(theme)(base_family=font)
         
         p1 <- p1 + labs(x=NULL, y=NULL)+
-          theme(legend.position="top", legend.direction="horizontal", legend.title=element_blank(),
-                legend.key.size=grid::unit(legendkeysize,"points"), legend.text=element_text(size=legendtextsize),
-                legend.spacing=grid::unit(0,"points"), legend.justification=legendpos,
-                legend.margin=margin(0.2,0.2,0.2,0,"points"), legend.box.spacing=grid::unit(1.5,"points"),
-                panel.grid=element_blank(), panel.background=element_blank(), 
-                axis.ticks=element_blank(), axis.text=element_blank(), axis.line=element_blank(), 
-                axis.title=element_blank(), strip.text=element_text(size=splabsize, colour=splabcol, face=splabface), 
-                strip.background=element_rect(colour=spbgcol, fill=spbgcol), 
-                plot.margin=grid::unit(c(0.1,0.05,0,0), "cm"),
-                panel.spacing=grid::unit(panelspacer,"cm"))
+                    theme(legend.position="top", legend.direction="horizontal",
+                          legend.title=element_blank(),
+                          legend.key.size=grid::unit(legendkeysize,"points"),
+                          legend.text=element_text(size=legendtextsize),
+                          legend.spacing=grid::unit(0,"points"),
+                          legend.justification=legendpos,
+                          legend.margin=margin(0.2,0.2,0.2,0,"points"),
+                          legend.box.spacing=grid::unit(1.5,"points"),
+                          panel.grid=element_blank(),
+                          panel.background=element_blank(), 
+                          axis.ticks=element_blank(),
+                          axis.text=element_blank(),
+                          axis.line=element_blank(), 
+                          axis.title=element_blank(),
+                          strip.text=element_text(size=splabsize,colour=splabcol,face=splabface), 
+                          strip.background=element_rect(colour=spbgcol,fill=spbgcol), 
+                          plot.margin=grid::unit(c(0.1,0.05,0,0),"cm"),
+                          panel.spacing=grid::unit(panelspacer,"cm"))
         
         #add grp divider lines only if 2 grps or more
         if(div)
         {
           markerpos1 <- markerpos[c(markerpos$count %in% divgrp),]
-          if(nrow(markerpos1) > 2) p1 <- p1+geom_vline(xintercept=markerpos1$divxpos[-c(1,length(markerpos1$divxpos))],colour=divcol,linetype=divtype, size=divthick, alpha=divalpha)
+          if(nrow(markerpos1) > 2) p1 <- p1+geom_vline(xintercept=markerpos1$divxpos[-c(1,length(markerpos1$divxpos))],colour=divcol,linetype=divtype, size=divsize, alpha=divalpha)
         }
         
         #remove strip panels on right
@@ -2260,26 +2455,30 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
         if(!legend) p1 <- p1 + theme(legend.position="none") 
         
         ppar <- pophelper:::getPlotParams(grplab=grplab[[1]], plotnum=1, labsize=labsize, labangle=labangle, 
-                                          labjust=labjust,pointsize=pointsize, linethick=linethick)
-        
+                                          labjust=labjust,pointsize=pointsize, linesize=linesize)
+
         #create bottom plot with labels
         p2 <- ggplot2::ggplot()+
-          geom_blank(data=labelpos, aes(x=labxpos, y=labypos))+
-          geom_text(data=labelpos, aes(x=labxpos, y=labypos), label=labelpos$label, angle=ppar$labangle, hjust=ppar$labjust, size=ppar$labsize, colour=labcol, alpha=labalpha, family=font)+
-          geom_line(data=markerpos, aes(x=markerxpos, y=markerypos), colour=linecol, size=ppar$linethick, linetype=linetype, alpha=linealpha)+
-          geom_point(data=markerpos, aes(x=markerxpos, y=markerypos), size=ppar$pointsize, colour=pointcol, shape=pointtype, fill=pointbgcol, alpha=pointalpha)+
-          scale_x_continuous(expand=c(0,0))+
-          scale_y_continuous(expand=c(0,0),limits=c(0,1))+
-          labs(x=NULL, y=NULL)+
-          facet_grid(count~.,switch=sppos)+
-          theme_grey(base_family=font)+
-          theme(legend.position="none",
-                panel.grid=element_blank(), panel.background=element_rect(fill="white"), 
-                axis.ticks=element_blank(), axis.text=element_blank(), axis.line=element_blank(), 
-                axis.title=element_blank(), strip.text=element_text(size=splabsize, colour=splabcol, face=splabface), 
-                strip.background=element_rect(colour=spbgcol, fill=spbgcol), 
-                plot.margin=grid::unit(c(labspacer,0.05,0,0), "cm"),
-                panel.spacing=grid::unit(panelspacer,"cm"))
+              geom_blank(data=labelpos,aes(x=labxpos,y=labypos))+
+              geom_text(data=labelpos,aes(x=labxpos,y=labypos),label=labelpos$label,angle=ppar$labangle,hjust=ppar$labjust,size=ppar$labsize,colour=labcol,alpha=labalpha,family=font)+
+              geom_line(data=markerpos,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+              geom_point(data=markerpos,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
+              scale_x_continuous(expand=c(0,0))+
+              scale_y_continuous(expand=c(0,0),limits=c(0,1))+
+              labs(x=NULL,y=NULL)+
+              facet_grid(count~.,switch=sppos)+
+              get(theme)(base_family=font)+
+              theme(legend.position="none",
+                    panel.grid=element_blank(),
+                    panel.background=element_rect(fill="white"), 
+                    axis.ticks=element_blank(),
+                    axis.text=element_blank(),
+                    axis.line=element_blank(), 
+                    axis.title=element_blank(),
+                    strip.text=element_text(size=splabsize,colour=splabcol,face=splabface), 
+                    strip.background=element_rect(colour=spbgcol, fill=spbgcol), 
+                    plot.margin=grid::unit(c(labspacer,0.05,0,0), "cm"),
+                    panel.spacing=grid::unit(panelspacer,"cm"))
         
         #remove strip panels on right
         if(!sp) p2 <- p2+theme(strip.text=element_blank())
@@ -2298,15 +2497,17 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
         
         #calculate size of panels
         height2 <- height1 + labpanelheight1
-        #if(imgtype=="pdf") height2 <- height1-(pophelper:::unitConverter(value=labpanelheight,fromunit="cm",tounit="in",res=res))
+        #if(imgtype=="pdf") height2 <- height1-(pophelper:::unitConverter(value=labpanelheight,fromunit="cm",tounit="in",dpi=dpi))
         
-        if(imgtype=="png") png(paste0(fname, ".png"), height=height2, width=width1, res=dpi, units=units1, type="cairo")
-        if(imgtype=="jpeg") jpeg(paste0(fname, ".jpg"), height=height2, width=width1, res=dpi, units=units1, quality=100)
-        if(imgtype=="pdf") pdf(paste0(fname, ".pdf"), height=height2, width=width1)
+        if(imgtype=="tiff") tiff(paste0(fname,".tiff"), height=height2, width=width1, res=dpi, units=units1, type="cairo", compression="lzw", family=font)
+        if(imgtype=="png") png(paste0(fname,".png"), height=height2, width=width1, res=dpi, units=units1, type="cairo",family=font)
+        if(imgtype=="jpeg") jpeg(paste0(fname,".jpg"), height=height2, width=width1, res=dpi, units=units1, quality=100,family=font)
+        if(imgtype=="pdf") pdf(paste0(fname,".pdf"), height=height2, width=width1,family=font)
         
         gridExtra::grid.arrange(gp1, gp2, heights=grid::unit(c(height1,labpanelheight1),units1))
         dev.off()
         
+        if(imgtype=="tiff") cat(paste0(fname, ".tiff exported.\n"))
         if(imgtype=="png") cat(paste0(fname, ".png exported.\n"))
         if(imgtype=="jpeg") cat(paste0(fname, ".jpg exported.\n"))
         if(imgtype=="pdf") cat(paste0(fname, ".pdf exported.\n"))
@@ -2371,6 +2572,11 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
         labelpos <- do.call("rbind",labellist)
         labelpos$count <- factor(labelpos$count,levels=names(grplab))
       }
+
+      #add rownames
+      if(!useindlab) row.names(df1) <- sprintf(paste0("%",paste0(rep(0,nchar(nrow(df1))),collapse=""),nchar(nrow(df1)),"d"),1:nrow(df1))
+      # concatenate grp labs to ind labs
+      if(grplabcheck) rownames(df1) <- apply(as.data.frame(list(list(rn=rownames(df1)),intlablist)),1,paste,collapse=labsep)
       
       #sorting individuals
       if(all(!is.na(sortind)))
@@ -2406,9 +2612,34 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
             df1$maxval <- NULL
             df1$matchval <- NULL
           }
-          
-        }else{
-          if(!(sortind %in% colnames(df1))) stop("plotQ: Ordering cluster not found in file header.")
+        }
+
+        if(sortind=="label")
+        {
+          if(!grplabcheck) df1 <- df1[order(rownames(df1)),]
+          if(grplabcheck)
+          {
+            if(any(!is.na(sortind)) && grplablen>1) stop("plotQ: Argument 'sortind' cannot be used when more than one list of grplab is provided.")
+            dftemp <- df1
+            dftemp$grp <- intlablist[[1]]
+            grplabnames <- rle(as.character(intlablist[[1]]))$values
+            tovec <- cumsum(rle(dftemp$grp)$lengths)
+            fromvec <- (tovec - rle(dftemp$grp)$lengths)+1
+            dftemplist <- vector("list",length=length(grplabnames))
+            for(k in 1:length(tovec))
+            {
+              dftemp1 <- dftemp[fromvec[k]:tovec[k],]
+              dftemp1$grp <- NULL
+              dftemplist[[k]] <- dftemp1[order(rownames(dftemp1)),]
+            }
+            
+            df1 <- do.call("rbind",dftemplist)
+          }
+        }
+
+        if(sortind!="all" && sortind!="label")
+        {
+          if(!(sortind %in% colnames(df1))) stop("plotQ: 'sortind' value not found in file header. If not using 'all', use like 'Cluster1','Cluster2' etc.")
           if(!grplabcheck) df1 <- df1[order(df1[[sortind]]), ,drop=FALSE]
           if(grplabcheck)
           {
@@ -2469,7 +2700,7 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
     if(length(legendlab1) != length(levels(factor(as.character(df3$variable))))) stop("plotQ: Length of 'legendlab' is not equal to max number of clusters.")
     
     #get Dim
-    dimtemp <- pophelper:::getDim(ind=Ind, height=height, width=width, res=dpi, units=units, imgtype=imgtype, 
+    dimtemp <- pophelper:::getDim(ind=Ind, height=height, width=width, dpi=dpi, units=units, imgtype=imgtype, 
                                   labpanelheight=labpanelheight, labs=length(grplab), plotnum=flen)
     height1 <- as.numeric(dimtemp[1])
     width1 <- as.numeric(dimtemp[2])
@@ -2489,12 +2720,12 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       
       #ggplot
       p <- ggplot2::ggplot(data=df3, aes(x=Ind, y=value, fill=variable))+
-        geom_bar(width=1, stat="identity", position="fill", na.rm=na.rm)+
+        geom_bar(width=barsize, stat="identity", position="fill", na.rm=na.rm)+
         scale_x_discrete(expand=c(0, 0))+
         scale_y_continuous(expand=c(0, 0))+
         scale_fill_manual(values=coll, labels=legendlab1)+
         facet_grid(Num~., labeller=labeller(Num=facetnames),switch=sppos)+
-        theme_grey(base_family=font)
+        get(theme)(base_family=font)
       
       
       p <- p + labs(x=NULL, y=NULL)+
@@ -2515,11 +2746,13 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       #remove legend
       if(!legend) p <- p + theme(legend.position="none")
       
-      if(imgtype=="png") png(paste0("Joined", flen, "Files-", dt, ".png"), height=height1, width=width1, res=dpi, units=units1, type="cairo")
-      if(imgtype=="jpeg") jpeg(paste0("Joined", flen, "Files-", dt, ".jpg"), height=height1, width=width1, res=dpi, units=units1, quality=100)
-      if(imgtype=="pdf") pdf(paste0("Joined", flen, "Files-", dt, ".pdf"), height=height1, width=width1)
+      if(imgtype=="tiff") tiff(paste0("Joined", flen, "Files-", dt, ".tiff"), height=height1,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
+      if(imgtype=="png") png(paste0("Joined", flen, "Files-", dt, ".png"), height=height1,width=width1,res=dpi,units=units1, type="cairo",family=font)
+      if(imgtype=="jpeg") jpeg(paste0("Joined", flen, "Files-", dt, ".jpg"), height=height1,width=width1,res=dpi,units=units1, quality=100,family=font)
+      if(imgtype=="pdf") pdf(paste0("Joined", flen, "Files-", dt, ".pdf"), height=height1,width=width1,family=font)
       print(p)
       dev.off()
+      if(imgtype=="tiff") cat(paste0("Joined", flen, "Files-", dt, ".tiff exported.\n"))
       if(imgtype=="png") cat(paste0("Joined", flen, "Files-", dt, ".png exported.\n"))
       if(imgtype=="jpeg") cat(paste0("Joined", flen, "Files-", dt, ".jpg exported.\n"))
       if(imgtype=="pdf") cat(paste0("Joined", flen, "Files-", dt, ".pdf exported.\n"))
@@ -2530,12 +2763,12 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       
       #create top plot with multiple barplots
       p1 <- ggplot2::ggplot(data=df3, aes(x=Ind, y=value, fill=variable))+
-        geom_bar(width=1, stat="identity", position="fill", na.rm=na.rm)+
+        geom_bar(width=barsize, stat="identity", position="fill", na.rm=na.rm)+
         scale_x_discrete(expand=c(0,0))+
         scale_y_continuous(expand=c(0,0))+
         scale_fill_manual(values=coll, labels=legendlab1)+
         facet_grid(Num~., labeller=labeller(Num=facetnames),switch=sppos)+
-        theme_grey(base_family=font)
+        get(theme)(base_family=font)
       
       p1 <- p1 + labs(x=NULL, y=NULL)+
         theme(legend.position="top", legend.direction="horizontal", legend.title=element_blank(),
@@ -2553,7 +2786,7 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       if(div)
       {
         markerpos1 <- markerpos[c(markerpos$count %in% divgrp),]
-        if(nrow(markerpos1) > 2) p1 <- p1+geom_vline(xintercept=markerpos1$divxpos[-c(1,length(markerpos1$divxpos))],colour=divcol,linetype=divtype, size=divthick, alpha=divalpha)
+        if(nrow(markerpos1) > 2) p1 <- p1+geom_vline(xintercept=markerpos1$divxpos[-c(1,length(markerpos1$divxpos))],colour=divcol,linetype=divtype, size=divsize, alpha=divalpha)
       }
       
       #remove strip panels on right
@@ -2566,26 +2799,30 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       #if(Ind!=length(as.character(grplab1))) stop(paste0("Length of labels (", length(as.character(grplab1)),") do not match number of individuals in input file (",Ind,")."))
       
       ppar <- pophelper:::getPlotParams(grplab=intlablist[[1]], plotnum=flen, labsize=labsize, labangle=labangle,labjust=labjust,
-                                        pointsize=pointsize, linethick=linethick)
+                                        pointsize=pointsize, linesize=linesize)
       
       
       #create bottom plot with labels
       p2 <- ggplot2::ggplot()+
-        geom_blank(data=labelpos, aes(x=labxpos, y=labypos))+
-        geom_text(data=labelpos, aes(x=labxpos, y=labypos), label=labelpos$label, angle=ppar$labangle, hjust=ppar$labjust, size=ppar$labsize, colour=labcol, alpha=labalpha, family=font)+
-        geom_line(data=markerpos, aes(x=markerxpos, y=markerypos), colour=linecol, size=ppar$linethick, linetype=linetype, alpha=linealpha)+
-        geom_point(data=markerpos, aes(x=markerxpos, y=markerypos), size=ppar$pointsize, colour=pointcol, shape=pointtype, fill=pointbgcol, alpha=pointalpha)+
+        geom_blank(data=labelpos,aes(x=labxpos,y=labypos))+
+        geom_text(data=labelpos,aes(x=labxpos,y=labypos),label=labelpos$label,angle=ppar$labangle,hjust=ppar$labjust,size=ppar$labsize,colour=labcol,alpha=labalpha,family=font)+
+        geom_line(data=markerpos,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+        geom_point(data=markerpos,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
         scale_x_continuous(expand=c(0,0))+
         scale_y_continuous(expand=c(0,0),limits=c(0,1))+
-        labs(x=NULL, y=NULL)+
+        labs(x=NULL,y=NULL)+
         facet_grid(count~.,switch=sppos)+
-        theme_grey(base_family=font)+
+        get(theme)(base_family=font)+
         theme(legend.position="none",
-              panel.grid=element_blank(), panel.background=element_blank(), 
-              axis.ticks=element_blank(), axis.text=element_blank(), axis.line=element_blank(), 
-              axis.title=element_blank(), strip.text=element_text(size=splabsize, colour=splabcol, face=splabface), 
-              strip.background=element_rect(colour=spbgcol, fill=spbgcol), 
-              plot.margin=grid::unit(c(labspacer,0.05,0,0), "cm"),
+              panel.grid=element_blank(),
+              panel.background=element_blank(),
+              axis.ticks=element_blank(),
+              axis.text=element_blank(),
+              axis.line=element_blank(),
+              axis.title=element_blank(),
+              strip.text=element_text(size=splabsize,colour=splabcol,face=splabface),
+              strip.background=element_rect(colour=spbgcol,fill=spbgcol),
+              plot.margin=grid::unit(c(labspacer,0.05,0,0),"cm"),
               panel.spacing=grid::unit(panelspacer,"cm"))
       
       #remove strip panels on right
@@ -2608,13 +2845,15 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
       #calculate size of panels
       height2 <- height1+labpanelheight1
       
-      if(imgtype=="png") png(paste0("Joined", flen, "Files-", dt, ".png"), height=height2, width=width1, res=dpi, units=units1, type="cairo")
-      if(imgtype=="jpeg") jpeg(paste0("Joined", flen, "Files-", dt, ".jpg"), height=height2, width=width1, res=dpi, units=units1, quality=100)
-      if(imgtype=="pdf") pdf(paste0("Joined", flen, "Files-", dt, ".pdf"), height=height2, width=width1)
+      if(imgtype=="tiff") tiff(paste0("Joined", flen, "Files-", dt, ".tiff"), height=height2,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
+      if(imgtype=="png") png(paste0("Joined", flen, "Files-", dt, ".png"), height=height2, width=width1, res=dpi, units=units1, type="cairo",family=font)
+      if(imgtype=="jpeg") jpeg(paste0("Joined", flen, "Files-", dt, ".jpg"), height=height2, width=width1, res=dpi, units=units1, quality=100,family=font)
+      if(imgtype=="pdf") pdf(paste0("Joined", flen, "Files-", dt, ".pdf"), height=height2, width=width1,family=font)
       
       gridExtra::grid.arrange(gp1, gp2, heights=grid::unit(c(height1,labpanelheight1),units1))
       dev.off()
       
+      if(imgtype=="tiff") cat(paste0("Joined", flen, "Files-", dt, ".tiff exported.\n"))
       if(imgtype=="png") cat(paste0("Joined", flen, "Files-", dt, ".png exported.\n"))
       if(imgtype=="jpeg") cat(paste0("Joined", flen, "Files-", dt, ".jpg exported.\n"))
       if(imgtype=="pdf") cat(paste0("Joined", flen, "Files-", dt, ".pdf exported.\n"))
@@ -2630,23 +2869,82 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
 #' @param spl An integer indicating samples per line. Defaults to 60.
 #' @param lpp An integer indicating lines per page. Defaults to 11.
 #' @param clustercol A character vector of colours for clusters.
-#' @param indlab A logical indicating if individual labels must be shown below the bars. To hide labels, set \code{indlab=FALSE}.
+#' @param grplab A named list of group labels equal to the length of individuals. See details.
+#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.
+#' @param subsetgrp A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA (no group labels). See details.
+#' @param grpmean A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and only one set of group labels are used.
+#' @param indlab A logical indicating if individual labels must be shown below the bars. To hide labels, set \code{indlab=FALSE}. See details.
 #' @param useindlab A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as labels.
-#' @param sortind A character indicating how individuals are sorted. Default is NA. Other options are 'all' or any one cluster (eg. 'Cluster1').
-#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
-#' @param barwidth A numeric indicating the width of the bars. Defaults to 0.9.
-#' @param ticks A logical indicating if ticks on axis should be displayed or not.
-#' @param yaxislabs A logical indicating if y-axis labels should be displayed or not.
+#' @param labsep A character used as separator when concatenating individual labels and group labels. Defaults to space \code{labsep=" "}.
 #' @param labsize A numeric denoting size of the labels. Defaults to 5.
 #' @param labangle A numeric denoting the angle of the labels. Defaults to 90.
 #' @param labvjust A numeric denoting vertical justification of the labels. Defaults to 0.5.
 #' @param labhjust A numeric denoting the horizontal justification of the labels. Defaults to 1.
-#' @param imgtype A character denoting figure output format. Options are 'png', 'jpeg' or 'pdf'. If pdf, height and width must be in inches and res argument is ignored.
+#' @param barwidth Deprecated. Use argument 'barsize' instead.
+#' @param barsize A numeric indicating the width of the bars. Defaults to 0.9.
+#' @param ticks A logical indicating if ticks on axis should be displayed or not.
+#' @param yaxislabs A logical indicating if y-axis labels should be displayed or not.
+#' @param imgtype A character denoting figure output format. Options are 'png', 'jpeg', 'tiff' or 'pdf'.
 #' @param height A numeric denoting height of the full figure. If NA, height is set to 29.7cm (A4 height).
 #' @param width A numeric denoting width of the full figure. If NA, width is set to 21cm (A4 width).
-#' @param res A numeric denoting resolution of the figure. Default is 300.
-#' @param units A character denoting the units of dimension of the figure. Default is "cm". Other options can be "in", "mm" or "px".
-#' @details Figures are always created to A4 size. Any plotted row will span the width of the figure. Note that this function is slow and may take several minutes when plotting mutiple runs.
+#' @param dpi A numeric denoting resolution of the figure. Default is 300. If \code{imgtype="pdf"}, dpi is fixed at 300 and does not have any effect..
+#' @param units A character denoting the units of dimension of the figure. Default is "cm". Other options are 'px', 'in' or 'mm'. 
+#' @param mar A four number vector denoting distance of top, right, bottom and left margins in \code{units}.
+#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
+#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
+#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
+
+#' @details Figures are always created to A4 size. Any plotted row will span the width of the figure. 
+#' Note that this function is slow and may take several minutes when plotting mutiple runs.
+#' 
+#' \strong{Labels}
+#' \code{plotQMultiline()} labels each individual separately. When \code{indlab=T}, 
+#' individual labels are shown/displayed. When \code{indlab=F}, individual labels are
+#' not shown/displayed on the graph, although they are present in the underlying data.
+#' Therefore, \code{indlab} only control display of labels on the plot and nothing to 
+#' do with label control in the data.\cr
+#' The default \code{useindlab=F}, creates labels numerically in the 
+#' original order of data but with zero padding. For example, if there are 10 individuals,
+#' labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up
+#' to 100. Zero padding to ensure optimal sorting. When \code{useindlab=T}, labels
+#' are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if
+#' read in using \code{readQ()}. This can be an issue with sorting by labels \code{sortind="label"}.
+#' For STRUCTURE files with individual labels, they can be read
+#' in automatically using \code{readQ(indlabfromfile=T)}.\cr
+#' When group labels are in use, \code{grplab}, they are added to the individual
+#' labels in both cases \code{useindlab=T} and \code{useindlab=F} separated by \code{labsep}. 
+#' Default \code{labsep=" "} adds a space between individual label and grplab. For example,
+#' group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when \code{useindlab=F}
+#' and usually '1 popA', '2 popA'... when \code{useindlab=T}. When multiple group labels
+#' are in use, the are similarly concatenated one after the other to individual names
+#' in the order in which the group labels were provided.
+#' 
+#' \strong{sortind}\cr
+#' This argument takes one character as input.  Default NA means individuals are 
+#' plotted in the same order as input. Individuals can be ordered by any one cluster. 
+#' For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+#' To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
+#' use \code{sortind="all"}. To order by individual labels, use \code{sortind="label"}.
+#' When using \code{sortind} with \code{grplab}, individuals
+#' are sorted within the groups.\cr
+#' 
+#' \strong{grplab}\cr
+#' \code{grplab} must be a list. One or more label sets can be provided. Each 
+#' label set must be a character vector equal to the number of individuals 
+#' present in the qlist. 
+#' For example, we can provide one set of grp labels as such:\cr
+#' \code{labs1 <- c("Pop A","Pop A","Pop B","Pop B")}\cr
+#' \code{grplab=list("grp"=labs1)}\cr
+#' 
+#' A second set of grp labels can be provided as such:
+#' \code{labs2 <- c("Loc 1","Loc 1","Loc 2","Loc 3")}\cr
+#' \code{grplab=list("population"=labs1,"location"=labs2)}\cr
+#' 
+#' \strong{subsetgrp}\cr
+#' This argument takes one or more characters as input. Use only group labels 
+#' exactly as used in the \code{grplab} vector. For ex. In case of two grps in 
+#' order 'Pop A' and 'Pop B', use \code{subsetgrp=c("Pop B","Pop A")} to change 
+#' order of groups. Use \code{subsetgrp="Pop B"} to subset only Pop B.\cr
 #' 
 #' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 #' 
@@ -2677,49 +2975,87 @@ plotQ <- function(qlist=NULL, imgoutput="sep", clustercol=NA, grplab=NA, sortind
 #' plotQMultiline(slist[1],clustercol=c("steelblue","coral"))
 #' 
 #' # change bar width and height
-#' plotQMultiline(slist[1],barwidth=1,spl=149,labsize=3,height=5)
+#' plotQMultiline(slist[1],barsize=1,spl=149,labsize=3,height=5)
+#' 
+#' # read group labels
+#' grps1 <- read.delim(system.file("files/structuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+#' 
+#' # plot with group labels
+#' plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1))
+#' plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),useindlab=T)
+#' 
+#' #sort ind within groups
+#' plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),sortind="Cluster1")
+#' 
+#' #subset or reorder groups
+#' plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),subsetgrp=c("Pop B"))
+#' plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),subsetgrp=c("Pop B","Pop A"))
 #' 
 #' }
 #' @import tidyr
 #' @import gridExtra
 #' @export
 #'
-plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRUE, useindlab=FALSE, sortind=NA, na.rm=FALSE, 
-                          barwidth=0.9, ticks=FALSE, yaxislabs=FALSE,
-                          labsize=5, labangle=90, labvjust=0.5, labhjust=1,
-                          imgtype="png", height=NA, width=NA, res=NA, units=NA)
+plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, grplab=NA, sortind=NA, subsetgrp=NA, grpmean=FALSE, 
+                            indlab=TRUE, useindlab=FALSE, labsep=" ",
+                            labsize=5, labangle=90, labvjust=0.5, labhjust=1,
+                            barwidth=NA, barsize=0.9, ticks=FALSE, yaxislabs=FALSE,
+                            imgtype="png", height=NA, width=NA, dpi=300, units="cm", mar=c(0.1,0.1,0.1,0),
+                            theme="theme_grey", font="", na.rm=FALSE)
 {
-  if(is.null(qlist) | (length(qlist)==0)) stop("plotQMultiline: No input qlist.")
-  if((class(qlist) != "list")) stop("plotQMultiline: Argument 'qlist' must be a list datatype.")
-  if(!all(sapply(qlist,is.data.frame))) stop("plotQMultiline: One or more list elements are not data.frame datatype.")
+  #check input
+  if(!is.qlist(qlist,warn=T)) stop("plotQMultiline: Input is not a valid qlist.")
   
   #check
   if(!is.logical(indlab)) stop("plotQMultiline: Argument 'indlab' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(useindlab)) stop("plotQMultiline: Argument 'useindlab' set incorrectly. Set as TRUE or FALSE.")
+  if(!is.character(labsep)) stop("plotQMultiline: Argument 'labsep' must be a character datatype.")
   if(!is.logical(na.rm)) stop("plotQMultiline: Argument 'na.rm' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(ticks)) stop("plotQMultiline: Argument 'ticks' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(yaxislabs)) stop("plotQMultiline: Argument 'yaxislabs' set incorrectly. Set as TRUE or FALSE.")
   if(all(!is.na(sortind)))
   {
-    if(length(sortind) > 1) stop("plotQMultiline: Argument 'sortind' must be of length 1. Use 'all' or a cluster like 'Cluster1'.")
-    if(sortind != "all" && !grepl("Cluster[0-9+]",sortind)) stop("plotQMultiline: Argument 'sortind' must be set to 'all' or a cluster like 'Cluster1'.")
+    if(length(sortind) > 1) stop("plotQMultiline: Argument 'sortind' must be of length 1. Use 'all', 'label' or a cluster like 'Cluster1'.")
+    if(sortind != "all" && sortind != "label" && !grepl("Cluster[0-9+]",sortind)) stop("plotQMultiline: Argument 'sortind' must be set to 'all','label' or a cluster like 'Cluster1'.")
   }
-  if(imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg" ) stop("plotQMultiline: Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg' or 'pdf'.")
+  if(imgtype != "png" && imgtype != "pdf" && imgtype != "jpeg" && imgtype != "tiff") stop("plotQMultiline: Argument 'imgtype' set incorrectly. Set as 'png', 'jpeg', 'tiff' or 'pdf'.")
+  if(!is.character(font)) stop("plotQ: Argument 'font' must be a character datatype.")
+  if(imgtype=="pdf" && font=="") font <- "Helvetica"
+  if(!is.na(barwidth))
+  {
+    barsize <- barwidth
+    warning("plotQMultiline: Argument 'barwidth' is deprecated. Use 'barsize' instead.")
+  }
+  if(!is.numeric(barsize)) stop("plotQMultiline: Argument 'barsize' must be a numeric datatype.")
+  if(barsize<0 | barsize>1) stop("plotQMultiline: Argument 'barsize' must be a value between 0 and 1.")
+
+  #grplabels
+  if(!all(is.na(grplab)))
+  {
+    if(!is.list(grplab)) stop("plotQMultiline: Argument 'grplab' must be a list datatype.")
+    if(is.null(names(grplab))) stop("plotQMultiline: 'grplab' list is not named.")
+    if(any(duplicated(names(grplab)))) stop("plotQMultiline: Duplicate label titles found in 'grplab'.")
+    #if(!any(is.na(divgrp))) {if(!any(divgrp %in% names(grplab))) stop("plotQ: Argument 'divgrp' contains one or more elements not in label titles of 'grplab'.")}
+    grplablen <- length(grplab)
+    if(!any(sapply(grplab,is.character))) stop("plotQMultiline: Argument 'grplab' contains one or more elements that are not character datatype.")
+    if(length(unique(sapply(grplab,length)))>1) stop("plotQMultiline: Argument 'grplab' contains labels that are of unequal length.")
+    if(!any(sapply(grplab,length)>1)) stop("plotQMultiline: Argument 'grplab' contains labels of length < 2.")
+    if(any(sapply(grplab,is.na))) stop("plotQMultiline: Argument 'grplab' contains one or more NAs.")
+    grplabcheck <- TRUE
+    #if(div) {if(any(is.na(divgrp))) divgrp <- names(grplab)[1]}
+    if((length(grplab)>1) && (grpmean==T)) stop("plotQMultiline: Argument 'grpmean' cannot be used when more than one set of grp labels is in use.")
+  }else{
+    grplabcheck <- FALSE
+  }
   
   #set NA values
-  if(is.na (height)) 
-  {
-    height <- 29.7 
-    if(imgtype=="pdf") height <- round(height*0.3937,2)
-  }
-  if(is.na (width)) 
-  {
-    width <- 21 
-    if(imgtype=="pdf") width <- round(width*0.3937,2)
-  }
-  
-  if(is.na (res)) res <- 300
-  if(is.na (units)) units <- "cm"
+  #if(is.na (dpi)) dpi <- 300
+  if(imgtype=="pdf") dpi <- 300
+  #if(is.na (units)) units <- "cm"
+  if(is.na (height)) height <- 29.7 
+  if(is.na (width)) width <- 21 
+  if(imgtype=="pdf") height <- pophelper:::unitConverter(height,units,"in",dpi)
+  if(imgtype=="pdf") width <- pophelper:::unitConverter(width,units,"in",dpi)
   
   len1 <- length(qlist)
   for (i in 1:len1)
@@ -2734,17 +3070,35 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
     if(!any(sapply(df1,is.numeric))) stop(paste0("plotQMultiline: List item ",fname," has non-numeric columns."))
     
     #determine if df1 is list or dataframe
-    if(as.character(class(df1))=="data.frame") flen <- 1
-    if(as.character(class(df1))=="list") flen <- length(df1)
+    #if(as.character(class(df1))=="data.frame") flen <- 1
+    #if(as.character(class(df1))=="list") flen <- length(df1)
     
-    for (j in 1:flen)
+    #ordering grps
+    if(grplabcheck)
     {
+      if(any(!is.na(subsetgrp)) && grplablen>1) stop("plotQMultiline: Argument 'subsetgrp' cannot be used when more than one list of grplab is provided.")
+      if(all(!is.na(subsetgrp))) {if(!all(subsetgrp %in% levels(factor(grplab[[1]])))) stop("plotQMultiline: One or more elements in 'subsetgrp' not found in ",names(grplab)[1],".")}
+      
+      #order/subset grp labels
+      intlablist <- vector("list",length=grplablen)
+      for(pp in 1:grplablen)
+      {
+        if(grplablen>1) lablist <- pophelper:::grpLabels(df=df1, grplab=grplab[[pp]], labpos=0, linepos=0)
+        if(grplablen==1) lablist <- pophelper:::grpLabels(df=df1, grplab=grplab[[pp]], subsetgrp=subsetgrp, grpmean=grpmean, labpos=0, linepos=0)
+        
+        df1 <- lablist$df
+        intlablist[[pp]] <- lablist$grplab
+      }
+      names(intlablist) <- names(grplab)
+    }
+    
       #move to dff
-      if(as.character(class(df1))=="data.frame") dff <- df1
-      if(as.character(class(df1))=="list") dff <- df1[[j]]
+      dff <- df1
       
       #add rownames
-      if(!useindlab) row.names(dff) <- 1:nrow(dff)
+      if(!useindlab) row.names(dff) <- sprintf(paste0("%",paste0(rep(0,nchar(nrow(dff))),collapse=""),nchar(nrow(dff)),"d"),1:nrow(dff))
+      # concatenate grp labs to ind labs
+      if(grplabcheck) rownames(dff) <- apply(as.data.frame(list(list(rn=rownames(dff)),intlablist)),1,paste,collapse=labsep)
       
       #ordering individuals
       if(all(!is.na(sortind)))
@@ -2757,10 +3111,75 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
           dftemp <- dff
           dftemp$maxval <- maxval
           dftemp$matchval <- matchval
-          dff <- dff[with(dftemp, order(matchval,-maxval)), ,drop=FALSE]
-        }else{
-          if(!(sortind %in% colnames(dff))) stop("plotQMultiline: Ordering cluster not found in file header.")
-          dff <- dff[order(dff[[sortind]]), ,drop=FALSE]
+          
+          if(!grplabcheck) dff <- dff[with(dftemp, order(matchval,-maxval)), ,drop=FALSE]
+          if(grplabcheck)
+          {
+            if(any(!is.na(sortind)) && grplablen>1) stop("plotQMultiline: Argument 'sortind' cannot be used when more than one list of grplab is provided.")
+            dftemp$grp <- intlablist[[1]]
+            grplabnames <- rle(as.character(intlablist[[1]]))$values
+            tovec <- cumsum(rle(dftemp$grp)$lengths)
+            fromvec <- (tovec - rle(dftemp$grp)$lengths)+1
+            dftemplist <- vector("list",length=length(grplabnames))
+            for(k in 1:length(tovec))
+            {
+              dftemp1 <- dftemp[fromvec[k]:tovec[k],]
+              dftemp1$grp <- NULL
+              dftemplist[[k]] <- dftemp1[with(dftemp1, order(matchval,-maxval)), ,drop=FALSE]
+            }
+            
+            dff <- do.call("rbind",dftemplist)
+            dff$maxval <- NULL
+            dff$matchval <- NULL
+          }
+        }
+        
+        if(sortind=="label")
+        {
+          if(!grplabcheck) dff <- dff[order(rownames(dff)),]
+          if(grplabcheck)
+          {
+            if(any(!is.na(sortind)) && grplablen>1) stop("plotQMultiline: Argument 'sortind' cannot be used when more than one list of grplab is provided.")
+            dftemp <- dff
+            dftemp$grp <- intlablist[[1]]
+            grplabnames <- rle(as.character(intlablist[[1]]))$values
+            tovec <- cumsum(rle(dftemp$grp)$lengths)
+            fromvec <- (tovec - rle(dftemp$grp)$lengths)+1
+            dftemplist <- vector("list",length=length(grplabnames))
+            for(k in 1:length(tovec))
+            {
+              dftemp1 <- dftemp[fromvec[k]:tovec[k],]
+              dftemp1$grp <- NULL
+              dftemplist[[k]] <- dftemp1[order(rownames(dftemp1)),]
+            }
+            
+            dff <- do.call("rbind",dftemplist)
+          }
+        }
+        
+        if(sortind!="all" && sortind!="label")
+        {
+          if(!(sortind %in% colnames(dff))) stop("plotQMultiline: 'sortind' value not found in file header. If not using 'all' or 'label', use like 'Cluster1','Cluster2' etc.")
+          if(!grplabcheck) dff <- dff[order(dff[[sortind]]), ,drop=FALSE]
+          if(grplabcheck)
+          {
+            if(any(!is.na(sortind)) && grplablen>1) stop("plotQMultiline: Argument 'sortind' cannot be used when more than one list of grplab is provided.")
+            clnum <- which(sortind==colnames(dff))
+            dftemp <- dff
+            dftemp$grp <- intlablist[[1]]
+            grplabnames <- rle(as.character(intlablist[[1]]))$values
+            tovec <- cumsum(rle(dftemp$grp)$lengths)
+            fromvec <- (tovec - rle(dftemp$grp)$lengths)+1
+            dftemplist <- vector("list",length=length(grplabnames))
+            for(k in 1:length(tovec))
+            {
+              dftemp1 <- dftemp[fromvec[k]:tovec[k],]
+              dftemp1$grp <- NULL
+              dftemplist[[k]] <- dftemp1[order(dftemp1[[sortind]]), ,drop=FALSE]
+            }
+            
+            dff <- do.call("rbind",dftemplist)
+          }
         }
       }
       
@@ -2819,19 +3238,25 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
       #widthsvec <- vector(length=nr2)
       for (i in 1: nr2)
       {
-        #df2 <- reshape::melt(dlist[[i]], id.var=c("ind"))
         df2 <- tidyr::gather(dlist[[i]],"variable","value",-ind)
         df2 <- df2[rev(1:nrow(df2)),]
         plist[[i]] <- ggplot2::ggplot(data=df2, aes(x=ind, y=value, fill=variable))+
-          geom_bar(width=barwidth, stat="identity", position="fill", na.rm=na.rm)+
+          geom_bar(width=barsize, stat="identity", position="fill", na.rm=na.rm)+
           scale_x_discrete(expand=c(0, 0))+
           scale_y_continuous(expand=c(0, 0),limits=c(0,1))+
           scale_fill_manual(values=coll)+
           labs(x=NULL, y=NULL)+
-          theme(legend.position="none", panel.grid=element_blank(), panel.background=element_blank(), 
-                axis.ticks=element_line(size=0.25), axis.text.y=element_text(size=labsize), axis.line=element_blank(), 
-                axis.title=element_blank(), axis.text.x=element_text(size=labsize, angle=labangle, 
-                                                                         vjust=labvjust, hjust=labhjust), plot.margin=grid::unit(c(0.1, 0.1, 0.1, 0), "cm"))
+          get(theme)(base_family=font)+
+          #theme_grey(base_family=font)+
+          theme(legend.position="none",
+                panel.grid=element_blank(),
+                panel.background=element_blank(), 
+                axis.ticks=element_line(size=0.25),
+                axis.text.y=element_text(size=labsize),
+                axis.line=element_blank(), 
+                axis.title=element_blank(),
+                axis.text.x=element_text(size=labsize,angle=labangle,vjust=labvjust,hjust=labhjust), 
+                plot.margin=grid::unit(mar,units))
         
         if(!yaxislabs) plist[[i]] <- plist[[i]] + theme(axis.ticks.y=element_blank(),axis.text.y=element_blank())
         if(!indlab) plist[[i]] <- plist[[i]] + theme(axis.ticks.x=element_blank(),axis.text.x=element_blank())
@@ -2864,9 +3289,10 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
         alist <- c(plist[start1:stop1], lpp1, 1)
         names(alist) <- c(as.character(start1:stop1), "nrow", "ncol")
         
-        if(imgtype=="png") png(paste0(fname, "-Multiline-", r, ".png"), height=height, width=width, res=res, units=units, type="cairo")
-        if(imgtype=="jpeg") jpeg(paste0(fname, "-Multiline-", r, ".jpg"), height=height, width=width, res=res, units=units, quality=100)
-        if(imgtype=="pdf") pdf(paste0(fname, "-Multiline-", r, ".pdf"), height=height, width=width)
+        if(imgtype=="tiff") tiff(paste0(fname, "-Multiline-", r, ".tiff"), height=height, width=width, res=dpi, units=units, type="cairo", compression="lzw", family=font)
+        if(imgtype=="png") png(paste0(fname, "-Multiline-", r, ".png"), height=height, width=width, res=dpi, units=units, type="cairo", family=font)
+        if(imgtype=="jpeg") jpeg(paste0(fname, "-Multiline-", r, ".jpg"), height=height, width=width, res=dpi, units=units, quality=100, family=font)
+        if(imgtype=="pdf") pdf(paste0(fname, "-Multiline-", r, ".pdf"), height=height, width=width, family=font)
         
         do.call(gridExtra::grid.arrange, alist)
         #grid.arrange(arrangeGrob(plist[start1:stop1]))
@@ -2874,6 +3300,7 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
         #do.call(fn1, plist[[1]])
         dev.off()
         
+        if(imgtype=="tiff") cat(paste0(fname, "-Multiline-", r, ".tiff exported.\n"))
         if(imgtype=="png") cat(paste0(fname, "-Multiline-", r, ".png exported.\n"))
         if(imgtype=="jpeg") cat(paste0(fname, "-Multiline-", r, ".jpg exported.\n"))
         if(imgtype=="pdf") cat(paste0(fname, "-Multiline-", r, ".pdf exported.\n"))
@@ -2882,7 +3309,6 @@ plotQMultiline <- function(qlist=NULL, spl=NA, lpp=NA, clustercol=NA, indlab=TRU
         r=r+1
       }
       rm(nr1,nr2,numrows,numextra,numpages,start1,stop1,e,r,dlist,plist,df2,dff)
-    }
   }
 }
 
@@ -2926,6 +3352,7 @@ analyseQ <- function(files=NULL, evannomethod=TRUE, clumppexport=TRUE, plotruns=
                         imgoutput="sep", grplab=NA, clustercol=NA, writetable=TRUE, sorttable=TRUE)
 {
   if(is.null(files) | (length(files)==0)) stop("analyseQ: No input files.")
+  if(!is.character(files)) stop("analyseQ: Input is not character dataype.")
   if(!is.logical(evannomethod)) stop("analyseQ: Argument 'evannoMethod' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(clumppexport)) stop("analyseQ: Argument 'clumppExport' set incorrectly. Set as TRUE or FALSE.")
   if(!is.logical(plotruns)) stop("analyseQ: Argument 'plotQ' set incorrectly. Set as TRUE or FALSE.")
@@ -3070,12 +3497,8 @@ distructExport <- function(qlist=NULL, grplabbottom=NA, grplabtop=NA, grpmean=FA
                            orientation=0, xorigin=NA, yorigin=NA, xscale=1, yscale=1, toplabangle=60, bottomlabangle=60,
                            echodata=TRUE, printdata=FALSE, quiet=FALSE, useexe=FALSE)
 {
-  #if no files chosen, stop excecution, give error message
-  if(is.null(qlist) || (length(qlist)==0)) stop("distructExport: No input qlist.")
-  if(any(qlist=="")) stop("distructExport: Input is empty.")
-  if((class(qlist) != "list")) stop("distructExport: Argument 'qlist' must be a list datatype.")
-  if(!all(sapply(qlist,is.data.frame))) stop("distructExport: One or more list elements are not data.frame datatype.")
-  
+  #check input
+  if(!is.qlist(qlist,warn=T)) stop("distructExport: Input is not a valid qlist.")
   grplabbottom <- as.character(grplabbottom)
   grplabtop <- as.character(grplabtop)
   if((length(grplabbottom) > 1) && any(is.na(grplabbottom))) stop("distructExport: Missing values (NA) in grplabbottom.")
@@ -3542,7 +3965,7 @@ getOS <- function() {
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.0.0 ready.")
+  packageStartupMessage("pophelper v2.1.0 ready.")
 }
 
 # End --------------------------------------------------------------------------

@@ -12,4 +12,3 @@ Returns a character in lowercase with OS name 'windows', 'mac' or 'linux'.
 \description{
 Find current OS
 }
-

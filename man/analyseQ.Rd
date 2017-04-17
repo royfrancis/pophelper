@@ -54,4 +54,3 @@ afiles <- list.files(path=system.file("files/admixture",package="pophelper"),ful
 analyseQ(afiles)
 }
 }
-

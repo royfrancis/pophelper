@@ -5,8 +5,11 @@
 \title{Perform the Evanno method for STRUCTURE runs.}
 \usage{
 evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
-  na.rm = TRUE, imgtype = "png", basesize = NA, height = NA,
-  width = NA, res = NA, units = NA)
+  pointsize = NA, pointtype = 20, pointcol = "steelblue", linesize = NA,
+  linecol = "steelblue", ebwidth = 0.2, ebcol = "grey30",
+  textcol = "grey30", basesize = 6, gridsize = NA, imgtype = "png",
+  height = NA, width = NA, dpi = 300, units = "cm",
+  theme = "theme_bw", font = "", na.rm = TRUE)
 }
 \arguments{
 \item{data}{A dataframe with summarised runs. An output from \code{summariseQ()} derived from STRUCTURE runs. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.}
@@ -15,26 +18,44 @@ evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
 
 \item{exportplot}{A logical indicating if the Evanno plots are to be exported as an image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.}
 
+\item{pointsize}{A numeric indicating size of points. Default for \code{basesize=6} is 1.8.}
+
+\item{pointcol}{A colour character for the colour of points. Defaults to "steelblue".}
+
+\item{linesize}{A numeric indicating the thickness of the line. Default for \code{basesize=6} is 0.24.}
+
+\item{linecol}{A colour character for the colour of line. Defaults to "steelblue".}
+
+\item{ebwidth}{A numeric indicating size od width of error abrs. Defaults to 0.2.}
+
+\item{ebcol}{A colour character for colour for errorbar. Defaults to "grey30".}
+
+\item{textcol}{A colour character for all text elements on the plot. Defaults to "grey30".}
+
+\item{basesize}{A numeric indicating the base size of various plot elements such as pointsize, linesize etc. Increase basesize with larger figure dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) override basesize.}
+
+\item{gridsize}{A numeric indicating thickness of background grid. Default for \code{basesize=6} is 0.18.}
+
+\item{imgtype}{A character indicating the type of exported image. Default set to 'png'. Other possible 
+options are 'jpeg', 'tiff' or 'pdf'.}
+
+\item{height}{A numeric denoting the height of exported image. Default units in 'cm'.}
+
+\item{width}{A numeric denoting the width of exported image. Default units in 'cm'.}
+
+\item{dpi}{A numeric denoting the resolution of exported image. Default set to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.}
+
+\item{units}{A character denoting the unit of measure of the export image. Default is 'cm'. Other options are 'px', 'in' or 'mm'.}
+
+\item{theme}{A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.}
+
+\item{font}{A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.}
+
 \item{na.rm}{Default set to FALSE. Does not remove NAs for plot and this 
 generates warnings from \code{ggplot}. If set to TRUE, NAs are removed before 
 plotting and warning messages from \code{ggplot} are avoided.}
 
-\item{imgtype}{A character indicating the type of exported image. Default set to 'png'. Other possible 
-options are 'jpeg' or 'pdf'.}
-
-\item{basesize}{A numeric indicating the base size of various plot elements such as point size, line thickness etc. Increase basesize with larger figure dimensions. Defaults to 5.}
-
-\item{height}{A numeric denoting the height of exported image. Default units in 'cm'. If imgtype is 
-pdf, height must be in inches.}
-
-\item{width}{A numeric denoting the width of exported image. Default units in 'cm'. If imgtype is 
-pdf, height must be in inches.}
-
-\item{res}{A numeric denoting the resolution of exported image. Default set to 200. If imgtype is 
-pdf, this option does not apply.}
-
-\item{units}{A character denoting the unit of measure of the export image. By default, units is set to 'cm' for png and jpeg and to 'in' if imgtype is 'pdf'. 
-Other options include 'px', 'in' and 'mm' etc.}
+\item{pointype}{A character or number for the type of points. Defaults to 20. Same as pch in standard R.}
 }
 \value{
 Returns a dataframe with all values sorted by K. The table has 16 
@@ -70,4 +91,3 @@ evannoMethodStructure(data=sr1,exportplot=T)
 }
 
 }
-

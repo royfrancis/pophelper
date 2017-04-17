@@ -5,10 +5,12 @@
 \title{Plot a qlist as individual-level multiline barplot}
 \usage{
 plotQMultiline(qlist = NULL, spl = NA, lpp = NA, clustercol = NA,
-  indlab = TRUE, useindlab = FALSE, sortind = NA, na.rm = FALSE,
-  barwidth = 0.9, ticks = FALSE, yaxislabs = FALSE, labsize = 5,
-  labangle = 90, labvjust = 0.5, labhjust = 1, imgtype = "png",
-  height = NA, width = NA, res = NA, units = NA)
+  grplab = NA, sortind = NA, subsetgrp = NA, grpmean = FALSE,
+  indlab = TRUE, useindlab = FALSE, labsep = " ", labsize = 5,
+  labangle = 90, labvjust = 0.5, labhjust = 1, barwidth = NA,
+  barsize = 0.9, ticks = FALSE, yaxislabs = FALSE, imgtype = "png",
+  height = NA, width = NA, dpi = 300, units = "cm", mar = c(0.1, 0.1,
+  0.1, 0), theme = "theme_grey", font = "", na.rm = FALSE)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
@@ -19,19 +21,19 @@ plotQMultiline(qlist = NULL, spl = NA, lpp = NA, clustercol = NA,
 
 \item{clustercol}{A character vector of colours for clusters.}
 
-\item{indlab}{A logical indicating if individual labels must be shown below the bars. To hide labels, set \code{indlab=FALSE}.}
+\item{grplab}{A named list of group labels equal to the length of individuals. See details.}
+
+\item{sortind}{A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.}
+
+\item{subsetgrp}{A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA (no group labels). See details.}
+
+\item{grpmean}{A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and only one set of group labels are used.}
+
+\item{indlab}{A logical indicating if individual labels must be shown below the bars. To hide labels, set \code{indlab=FALSE}. See details.}
 
 \item{useindlab}{A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as labels.}
 
-\item{sortind}{A character indicating how individuals are sorted. Default is NA. Other options are 'all' or any one cluster (eg. 'Cluster1').}
-
-\item{na.rm}{Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.}
-
-\item{barwidth}{A numeric indicating the width of the bars. Defaults to 0.9.}
-
-\item{ticks}{A logical indicating if ticks on axis should be displayed or not.}
-
-\item{yaxislabs}{A logical indicating if y-axis labels should be displayed or not.}
+\item{labsep}{A character used as separator when concatenating individual labels and group labels. Defaults to space \code{labsep=" "}.}
 
 \item{labsize}{A numeric denoting size of the labels. Defaults to 5.}
 
@@ -41,21 +43,87 @@ plotQMultiline(qlist = NULL, spl = NA, lpp = NA, clustercol = NA,
 
 \item{labhjust}{A numeric denoting the horizontal justification of the labels. Defaults to 1.}
 
-\item{imgtype}{A character denoting figure output format. Options are 'png', 'jpeg' or 'pdf'. If pdf, height and width must be in inches and res argument is ignored.}
+\item{barwidth}{Deprecated. Use argument 'barsize' instead.}
+
+\item{barsize}{A numeric indicating the width of the bars. Defaults to 0.9.}
+
+\item{ticks}{A logical indicating if ticks on axis should be displayed or not.}
+
+\item{yaxislabs}{A logical indicating if y-axis labels should be displayed or not.}
+
+\item{imgtype}{A character denoting figure output format. Options are 'png', 'jpeg', 'tiff' or 'pdf'.}
 
 \item{height}{A numeric denoting height of the full figure. If NA, height is set to 29.7cm (A4 height).}
 
 \item{width}{A numeric denoting width of the full figure. If NA, width is set to 21cm (A4 width).}
 
-\item{res}{A numeric denoting resolution of the figure. Default is 300.}
+\item{dpi}{A numeric denoting resolution of the figure. Default is 300. If \code{imgtype="pdf"}, dpi is fixed at 300 and does not have any effect..}
 
-\item{units}{A character denoting the units of dimension of the figure. Default is "cm". Other options can be "in", "mm" or "px".}
+\item{units}{A character denoting the units of dimension of the figure. Default is "cm". Other options are 'px', 'in' or 'mm'.}
+
+\item{mar}{A four number vector denoting distance of top, right, bottom and left margins in \code{units}.}
+
+\item{theme}{A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.}
+
+\item{font}{A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.}
+
+\item{na.rm}{Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.}
 }
 \description{
 Plot a qlist as individual-level barplot with multiple lines.
 }
 \details{
-Figures are always created to A4 size. Any plotted row will span the width of the figure. Note that this function is slow and may take several minutes when plotting mutiple runs.
+Figures are always created to A4 size. Any plotted row will span the width of the figure. 
+Note that this function is slow and may take several minutes when plotting mutiple runs.
+
+\strong{Labels}
+\code{plotQMultiline()} labels each individual separately. When \code{indlab=T}, 
+individual labels are shown/displayed. When \code{indlab=F}, individual labels are
+not shown/displayed on the graph, although they are present in the underlying data.
+Therefore, \code{indlab} only control display of labels on the plot and nothing to 
+do with label control in the data.\cr
+The default \code{useindlab=F}, creates labels numerically in the 
+original order of data but with zero padding. For example, if there are 10 individuals,
+labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up
+to 100. Zero padding to ensure optimal sorting. When \code{useindlab=T}, labels
+are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if
+read in using \code{readQ()}. This can be an issue with sorting by labels \code{sortind="label"}.
+For STRUCTURE files with individual labels, they can be read
+in automatically using \code{readQ(indlabfromfile=T)}.\cr
+When group labels are in use, \code{grplab}, they are added to the individual
+labels in both cases \code{useindlab=T} and \code{useindlab=F} separated by \code{labsep}. 
+Default \code{labsep=" "} adds a space between individual label and grplab. For example,
+group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when \code{useindlab=F}
+and usually '1 popA', '2 popA'... when \code{useindlab=T}. When multiple group labels
+are in use, the are similarly concatenated one after the other to individual names
+in the order in which the group labels were provided.
+
+\strong{sortind}\cr
+This argument takes one character as input.  Default NA means individuals are 
+plotted in the same order as input. Individuals can be ordered by any one cluster. 
+For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
+use \code{sortind="all"}. To order by individual labels, use \code{sortind="label"}.
+When using \code{sortind} with \code{grplab}, individuals
+are sorted within the groups.\cr
+
+\strong{grplab}\cr
+\code{grplab} must be a list. One or more label sets can be provided. Each 
+label set must be a character vector equal to the number of individuals 
+present in the qlist. 
+For example, we can provide one set of grp labels as such:\cr
+\code{labs1 <- c("Pop A","Pop A","Pop B","Pop B")}\cr
+\code{grplab=list("grp"=labs1)}\cr
+
+A second set of grp labels can be provided as such:
+\code{labs2 <- c("Loc 1","Loc 1","Loc 2","Loc 3")}\cr
+\code{grplab=list("population"=labs1,"location"=labs2)}\cr
+
+\strong{subsetgrp}\cr
+This argument takes one or more characters as input. Use only group labels 
+exactly as used in the \code{grplab} vector. For ex. In case of two grps in 
+order 'Pop A' and 'Pop B', use \code{subsetgrp=c("Pop B","Pop A")} to change 
+order of groups. Use \code{subsetgrp="Pop B"} to subset only Pop B.\cr
 
 See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 }
@@ -86,8 +154,21 @@ plotQMultiline(slist[1],useindlab=T)
 plotQMultiline(slist[1],clustercol=c("steelblue","coral"))
 
 # change bar width and height
-plotQMultiline(slist[1],barwidth=1,spl=149,labsize=3,height=5)
+plotQMultiline(slist[1],barsize=1,spl=149,labsize=3,height=5)
+
+# read group labels
+grps1 <- read.delim(system.file("files/structuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+
+# plot with group labels
+plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1))
+plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),useindlab=T)
+
+#sort ind within groups
+plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),sortind="Cluster1")
+
+#subset or reorder groups
+plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),subsetgrp=c("Pop B"))
+plotQMultiline(qlist=slist[1],grplab=list("grps"=grps1$V1),subsetgrp=c("Pop B","Pop A"))
 
 }
 }
-

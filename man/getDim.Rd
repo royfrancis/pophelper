@@ -4,7 +4,7 @@
 \alias{getDim}
 \title{Internal: Get dimensions for figures.}
 \usage{
-getDim(ind = NA, units = NA, height = NA, width = NA, res = NA,
+getDim(ind = NA, units = NA, height = NA, width = NA, dpi = NA,
   imgtype = NA, labpanelheight = NA, labs = NA, plotnum = NA)
 }
 \arguments{
@@ -16,7 +16,7 @@ getDim(ind = NA, units = NA, height = NA, width = NA, res = NA,
 
 \item{width}{A numeric indicating the width of each plot.}
 
-\item{res}{A numeric indicating the resolution of the figure.}
+\item{dpi}{A numeric indicating the resolution of the figure.}
 
 \item{imgtype}{A character denoting image format. "png", "jpeg" or "pdf".}
 
@@ -32,4 +32,3 @@ a vector with height and width.
 \description{
 Internal: Generate height and width of figure based on number of individuals.
 }
-

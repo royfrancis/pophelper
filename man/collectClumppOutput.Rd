@@ -35,4 +35,3 @@ collectClumppOutput(runsdir="path")
 collectClumppOutput(prefix="pop",runsdir="path")
 }
 }
-

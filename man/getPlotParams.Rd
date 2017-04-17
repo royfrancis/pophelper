@@ -5,7 +5,7 @@
 \title{Internal: Generate parameters for plots with labels}
 \usage{
 getPlotParams(grplab = NA, plotnum = 1, labsize = NA, labangle = NA,
-  labjust = NA, pointsize = NA, linethick = NA)
+  labjust = NA, pointsize = NA, linesize = NA)
 }
 \arguments{
 \item{grplab}{A character vector of labels same length as number of individuals.}
@@ -21,13 +21,12 @@ labangle between 20 and 135.}
 
 \item{pointsize}{A numeric indicating the size of points on label marker line.}
 
-\item{linethick}{A numeric indicating the thickness of the label marker line.}
+\item{linesize}{A numeric indicating the thickness of the label marker line.}
 }
 \value{
 A list with following plot parameters: grplab, plotnum, labsize, 
-labangle, labjust, pointsize, linethick.
+labangle, labjust, pointsize, linesize.
 }
 \description{
 Internal: Generates various parameters required for plotting with labels.
 }
-

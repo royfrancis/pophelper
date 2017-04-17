@@ -1,5 +1,5 @@
 ---
-title: "Pophelper 2.0.0"
+title: "Pophelper 2.1.0"
 output: 
   html_document: 
     code_folding: "hide"
@@ -17,7 +17,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-__Roy M Francis__ | 22-Dec-2016
+__Roy M Francis__ | 17-Apr-2017
 
 ```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
 options(rpubs.upload.method="internal")
@@ -30,7 +30,7 @@ library(pophelper)
 
 This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, FASTSTRUCTURE^6^, STRUCTURE^5^, TESS^3^ and any q-matrix output as a numeric tabular delimited file.
 
-Softwares such as ADMIXTURE, FASTSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal the genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a pre-defined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file, cluster file or q-matrix file. `pophelper` has a set of functions that include tabulating, summarising and plotting that can be applied to these run files. 
+Softwares such as ADMIXTURE, FASTSTRUCTURE, STRUCTURE and TESS are popular programs used to discriminate populations, to determine population structure and to reveal the genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a pre-defined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file, cluster file or q-matrix file. `pophelper` has a set of functions that include reading into R, tabulating, summarising and plotting these run files. 
 
 This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. Input and output codes are printed in a font different from body text like `this`.  
 
@@ -94,48 +94,29 @@ For functions where one or more files need to be selected, the selection can be 
 All user functions in the `pophelper` package are listed below.  
  
 ```{r, eval=FALSE,echo=TRUE}
-readQ()                   # convert q-matrix run files to qlist
-tabulateQ()               # tabulate a qlist
-summariseQ()              # summarise an output from tabulateQ()
-clumppExport()            # generate CLUMPP input/output files
-collectClumppOutput()     # collect CLUMPP output into a common directory
-plotQ()                   # create barplots from qlist
-PlotQMultiline()          # create multi-line barplots from qlist
-distructExport()          # export files for DISTRUCT from qlist
+# convert q-matrix run files (structure, tess etc) to R qlist object
+readQ() 
+# tabulate a qlist
+tabulateQ() 
+# summarise an output from tabulateQ()  
+summariseQ()  
+# generate CLUMPP input/output files  
+clumppExport()  
+# collect CLUMPP output into a common directory  
+collectClumppOutput()   
+# create single-line barplots from qlist
+plotQ()  
+# create multi-line barplots from qlist
+PlotQMultiline()  
+# export files for DISTRUCT from qlist
+distructExport()          
+# Run and plot the Evanno method for STRUCTURE data
+evannoMethodStructure()  
+# collect TESS output from multiple directories into one
+collectRunsTess()  
 
-evannoMethodStructure()   # perform the Evanno method for STRUCTURE data
-collectRunsTess()         # collect TESS output from multiple directories into one
-
-analyseQ()                # wrapper function to quickly tabulate, summarise, 
-                          # perform evanno method, clumpp output and generate
-                          # barplots from filenames/paths.
-
-# Deprecated Functions
-# functions from previous version of pophelper absent in current version
-tabulateRunsStructure()   # renamed to tabulateQ
-tabulateRunsTess()        # renamed to tabulateQ
-tabulateRunsMatrix()      # renamed to tabulateQ
-
-summariseRunsStructure()  # renamed to summariseQ
-summariseRunsTess()       # renamed to summariseQ
-summariseRunsMatrix()     # renamed to summariseQ
-
-runsToDfStructure()       # renamed to readQ
-runsToDfTess()            # renamed to readQ
-runsToDfMatrix()          # renamed to readQ
-
-clumppExportStructure()   # renamed to clumppExport
-clumppExportTess()        # renamed to clumppExport
-clumppExportMatrix()      # renamed to clumppExport
-
-plotRuns()                # renamed to plotQ
-plotMultiline()           # renamed to plotQMultiline
-analyseRuns()             # renamed to analyseQ
-
-plotRunsInterpolate()     # renamed to plotQInterpolate
-                          # moved to package pophelperSpatial
-plotRunsSpatial()         # renamed to plotQSpatial
-                          # moved to package pophelperSpatial
+# wrapper function to tabulate, summarise, perform evanno method, clumpp output and generate barplots from filenames/paths.
+analyseQ()                
 ```
 
 ----
@@ -144,6 +125,14 @@ plotRunsSpatial()         # renamed to plotQSpatial
 Generally speaking, there are four input file formats that can be defined. All are text formats. These are STRUCTURE run files, TESS run files (-TR files in folders), BASIC (simple delimited files) or a CLUMPP associated file. 
 
 STRUCTURE and TESS run files have specific format as shown below in __Fig. 1__. BASIC files are numeric delimited tabular file like ADMIXTURE run files and FASTSTRUCTURE meanQ files. They can also be a generic numeric tabular tab, space or comma-delimited files without headers. CLUMPP associated files are COMBINED, ALIGNED or MERGED files for use with CLUMPP. The COMBINED file is generated using the function `clumppExport()`. The ALIGNED and MERGED files are generated by CLUMPP. A sample CLUMPP format is shown in __Fig. 2__.
+
+![input-preview](input-preview.png) 
+__Fig. 1:__ *A preview of the input files. STRUCTURE file (Left), TESS file (centre) and BASIC file (right).*  
+
+![clumpp-format](clumpp-format.png)  
+__Fig. 2:__ *A preview of the CLUMPP format file.* 
+
+Sample files for inspection can be downloaded here. [STRUCTURE](https://github.com/royfrancis/pophelper/tree/master/inst/files/structure), [TESS](https://github.com/royfrancis/pophelper/tree/master/inst/files/tess), [ADMIXTURE](https://github.com/royfrancis/pophelper/tree/master/inst/files/admixture), [fastSTRUCTURE](https://github.com/royfrancis/pophelper/tree/master/inst/files/faststructure), [TAB delimited](https://github.com/royfrancis/pophelper/tree/master/inst/files/basic/tab), [COMMA delimited](https://github.com/royfrancis/pophelper/tree/master/inst/files/basic/comma), [SPACE delimited](https://github.com/royfrancis/pophelper/tree/master/inst/files/basic/space), [COMBINED CLUMPP file](https://github.com/royfrancis/pophelper/blob/master/inst/files/STRUCTUREpop_K4-combined.txt), [ALIGNED CLUMPP file](https://github.com/royfrancis/pophelper/blob/master/inst/files/STRUCTUREpop_K4-combined-aligned.txt) and [MERGED CLUMPP file](https://github.com/royfrancis/pophelper/blob/master/inst/files/STRUCTUREpop_K4-combined-merged.txt).
 
 The `readQ()` function in `pophelper` is used to read in these different input file types and convert them into an R list object. This list is referred to as a `qlist`. For those familiar with R, a `qlist` is just a regular list datatype in R. Each table/file is converted to a data.frame object which is stored in a list. Multiple runs would be a list of lists.
 
@@ -165,6 +154,12 @@ sf <- readQ(files=sfiles[1:2])
 str(sf)
 ```
 
+The function `is.qlist()` can be used to verify if a qlist meets the basic structure to work with `pophelper` functions. `is.qlist()` returns `TRUE` if yes else `FALSE` with warnings. 
+
+```{r, eval=FALSE,echo=TRUE}
+is.qlist(sf)
+```
+
 `qlist`s can also be create manually or generated in R just like any other list without using the `readQ` function in `pophelper`. But, note that `evannoMethodStructure()` needs the attributes associated with the data.frame. Other functions currently do not use the attributes.
 
 Here is a toy qlist object
@@ -181,15 +176,10 @@ str(q1)
 # two-element qlist
 q2 <- list("sample1"=df1,"sample2"=df2)
 str(q2)
+
+is.qlist(q1)
+is.qlist(q2)
 ```
-
-![input-preview](input-preview.png)  
-__Fig. 1:__ *A preview of the input files. STRUCTURE file (Left), TESS file (centre) and BASIC file (right).*  
-
-COMBINED, ALIGNED and MERGED files used with CLUMPP are referred to as CLUMPP files. They can also be used for plotting.
-
-![clumpp-format](clumpp-format.png)  
-__Fig. 2:__ *A preview of the CLUMPP format file.* 
 
 ----
 
@@ -197,15 +187,15 @@ __Fig. 2:__ *A preview of the CLUMPP format file.*
 
 In this section, we will look at how these functions are used, their syntax and typical order of workflow. The workflow is similar for all input filetypes. A few specific functions are specific to certain filetypes.
 
+![Workflow](workflow.png)  
+__Fig. 3:__ *Workflow for all filetypes. Files/objects are indicated in black text and functions are indicated in blue. External executables are indicated in green. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T` for automatic execution. The `analyseQ()` function is a wrapper function which can be used to run several functions together. This is indicated by the orange path. Functions indicated with superscripts 1 and 2 are only applicable to specific filetypes. `collectRunsTess()` is used to consolidate and rename TESS runs. evannoMethodStructure() is used to perform the Evanno method for STRUCTURE runs.*
+
 The `pophelper` library must be loaded and a working directory must be set.
 
 ```{r, eval=FALSE,echo=TRUE}
 library(pophelper)
 setwd("path-to-wd")
 ```
-
-![Workflow](workflow.png)  
-__Fig. 3:__ *Workflow for all filetypes. Files/objects are indicated in black text and functions are indicated in blue. External executables are indicated in green. For CLUMPP and DISTRUCT results, the executables must be run manually or set argument `useexe=T` for automatic execution. The `analyseQ()` function is a wrapper function which can be used to run several functions together. This is indicated by the orange path. Functions indicated with superscripts 1 and 2 are only applicable to specific filetypes. `collectRunsTess()` is used to consolidate and rename TESS runs. evannoMethodStructure() is used to perform the Evanno method for STRUCTURE runs.*
 
 ## collectRunsTess  
 
@@ -242,10 +232,22 @@ readQ(filetype="basic")     # Convert delimited numeric text files to qlist
 readQ(filetype="clumpp")    # Convert CLUMPP format files to qlist
 ```
 
-For this tutorial, we will use the sample files accompanied with this package.
+When specifying location to a file locally, use one of below:
+
+```{r, eval=FALSE,echo=TRUE}
+# file is located in the current working directory. use full filename.
+sfiles <- "file.structure"
+sfiles <- "file.txt"
+# file is located in a directory relative to the current working directory.
+sfiles <- "./path/path/file.txt"
+# absolute path.
+sfiles <- "C:/path/path/path/file.txt"
+```
+
+For this tutorial, we will use the sample files accompanied with this package. Therefore we read file from within the R package. 
 
 ```{r, echo=TRUE, eval=TRUE, results='hide'}
-# STRUCTURE files
+# STRUCTURE files (do not use this command to read local files)
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
 # basic usage
 slist <- readQ(files=sfiles)
@@ -257,29 +259,29 @@ class(slist)
 # view head of first converted file
 head(slist[[1]])
 
-# TESS files
+# TESS files (do not use this command to read local files)
 tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
 tlist <- readQ(files=tfiles)
 # select files interactively
 # readQ(files=choose.files(multi=TRUE))
 
-# use ADMIXTURE files
+# use ADMIXTURE files (do not use this command to read local files)
 afiles<- list.files(path=system.file("files/admixture",package="pophelper"),full.names=T)
 alist <- readQ(files=afiles)
 
-# use FASTSTRUCTURE files
+# use FASTSTRUCTURE files (do not use this command to read local files)
 ffiles <- list.files(path=system.file("files/faststructure",package="pophelper"),full.names=T)
 flist <- readQ(files=ffiles)
 
-# use space-delimited text files
+# use space-delimited text files (do not use this command to read local files)
 msfiles <- list.files(path=system.file("files/basic/space",package="pophelper"),full.names=T)
 mslist <- readQ(files=msfiles)
 
-# use tab-delimited text files
+# use tab-delimited text files (do not use this command to read local files)
 mtfiles <- list.files(path=system.file("files/basic/tab",package="pophelper"),full.names=T)
 mtlist <- readQ(files=mtfiles)
 
-# use comma-separated text files
+# use comma-separated text files (do not use this command to read local files)
 mcfiles <- list.files(path=system.file("files/basic/comma",package="pophelper"),full.names=T)
 mclist <- readQ(files=mcfiles)
 ```
@@ -342,14 +344,22 @@ tabulateQ(qlist=NULL, writetable=FALSE, sorttable=TRUE)
 
 For all filetypes, the `tabulateQ()` function returns a table with three columns namely filename, *K* and number of individuals. The table is sorted by ind and *K*.
 
-```{r, echo=TRUE, eval=TRUE, results="asis"}
+```{r, echo=TRUE, eval=FALSE, results="asis"}
+head(tabulateQ(tlist))
+```
+
+```{r, echo=FALSE, eval=TRUE, results="asis"}
 library(knitr)
 kable(head(tabulateQ(tlist)),caption="Table 1: A tabulated table of TESS runs.")
 ```
 
 For STRUCTURE runs, the `tabulateQ()` function produces additional columns namely number of loci, number of burn-ins, number of replicates (reps), estimated ln probability of data (elpd), mean value of ln likelihood (mvll) and variance of ln likelihood (vll). The table is sorted by loci, ind and *K*. 
 
-```{r, echo=TRUE, eval=TRUE, results="asis"}
+```{r, echo=TRUE, eval=FALSE, results="asis"}
+head(tabulateQ(slist))
+```
+
+```{r, echo=FALSE, eval=TRUE, results="asis"}
 library(knitr)
 kable(head(tabulateQ(slist)),caption="Table 2: A tabulated table of STRUCTURE runs.")
 ```
@@ -372,16 +382,20 @@ summariseQ(tr1,writetable=TRUE)
 head(sr1)
 ```
 
-For all filetypes the `summariseQ()` function returns 3 columns namely individuals, *K* and the number of runs.
-
-```{r, echo=TRUE, eval=TRUE, results="asis"}
+```{r, echo=FALSE, eval=TRUE, results="asis"}
 library(knitr)
 kable(head(summariseQ(tabulateQ(tlist))),caption="Table 3: A summarised table of TESS runs.")
 ```
 
+For all filetypes the `summariseQ()` function returns 3 columns namely individuals, *K* and the number of runs.
+
 For STRUCTURE runs, the `summariseQ()` function returns additional 5 columns namely loci, Mean estimated ln probability of data, standard deviation of estimated ln probability of data, estimated ln probability of data minus standard deviation and estimated ln probability of data plus standard deviation.
 
-```{r, echo=TRUE, eval=TRUE, results="asis"}
+```{r, echo=TRUE, eval=FALSE, results="asis"}
+head(summariseQ(tabulateQ(slist)))
+```
+
+```{r, echo=FALSE, eval=TRUE, results="asis"}
 library(knitr)
 kable(head(summariseQ(tabulateQ(slist))),caption="Table 4: A summarised table of STRUCTURE runs.")
 ```
@@ -425,7 +439,11 @@ __Fig. 4:__ *Plots produced from the Evanno method.*
 
 The Evanno method results table has 15 columns namely number of loci (loci), number of individuals (ind), *K* value (k), number of runs (runs), Mean estimated ln probability of data (elpdmean), Standard deviation (elpdsd), Estimated ln probability of data minus standard deviation (elpdmin), Estimated ln probability of data plus standard deviation (elpdmax), First derivative (lnk1), Max error of first derivative (lnk1max), Min error of first derivative (lnk1min), Second derivative (lnk2), Max error of second derivative (lnk2max), Min error of second derivative (lnk2min) and deltaK.  
 
-```{r, echo=TRUE, eval=TRUE, results="asis"}
+```{r, echo=TRUE, eval=FALSE, results="asis"}
+evannoMethodStructure(summariseQ(tabulateQ(slist)))
+```
+
+```{r, echo=FALSE, eval=TRUE, results="asis"}
 library(knitr)
 kable(evannoMethodStructure(summariseQ(tabulateQ(slist))),caption="Table 5: Results of the Evanno method.")
 ```
@@ -506,10 +524,10 @@ Collecting the aligned and merged files into a single folder can be helpful in p
 
 ## plotQ  
 
-The function `plotQ()` is used to create population-level barplots from a qlist. A schematic of the plot parts is shown below.  
+The function `plotQ()` is used to create barplots from a qlist. All individuals are shown on a single row. The focus is on groups and not individuals. A schematic of the plot parts is shown below.  
 
 ![plotq-overview](plotq-overview.png) 
-__Fig. 7:__ *An overview of the components of a `plotQ()` figure and the arguments used to modify them.*
+__Fig. 7:__ *An overview of the components of a `plotQ()` figure and some of the arguments used to modify them.*
 
 ### Separate and Joined plots
 
@@ -598,6 +616,13 @@ plotQ(qlist=slist[3:4], imgoutput="join",
 plotQ(qlist=slist[16:17], imgoutput="join", 
     clustercol=c("#A6CEE3", "#3F8EAA", "#79C360", "#E52829", "#FDB762","#ED8F47","#9471B4"))
 
+#colour palette used in the pophelper web app
+col1 <- c("#1D72F5","#DF0101","#77CE61","#FF9326","#A945FF","#0089B2",
+          "#FDF060","#FFA6B2","#BFF217","#60D5FD","#CC1577","#F2B950",
+          "#7FB21D","#EC496F","#326397","#B26314","#027368","#A4A4A4",
+          "#610B5E")
+
+plotQ(qlist=slist[16:17], imgoutput="join", clustercol=col1)
 ```
 
 ### Legend
@@ -629,7 +654,7 @@ __Fig. 10:__ *(A) Left: Default legend when `legend=T`. (B) Right: Joined plot w
 
 ### Sort individuals
 
-Individuals in a plot are by default plotted in the order as in the input data. The individuals can be sorted based on the value of any one of the clusters or 'all'. The 'all' option produces a sort similar to that in the software STRUCTURE. Use the name of a cluster in the argument `sortind` like `sortind="Cluster1"` or `sortind="all"`.
+Individuals in a plot are by default plotted in the order as in the input data. The individuals can be sorted based on the value of any one of the clusters ('Cluster1'), 'all' or 'label'. The 'all' option produces a sort similar to that in the software STRUCTURE. All clusters are taken into account to sort individuals. When using the name of a cluster, like 'Cluster1', 'Cluster2' etc, all individuals are sorted by value of the specified cluster.  
 
 ```{r,echo=TRUE, eval=FALSE}
 # sorted by cluster 1
@@ -649,6 +674,10 @@ plotQ(slist[c(1,3)],sortind="all",imgoutput="join")
 
 ![plotq-nolab-sort](structure-nolab-sort.png)  
 __Fig. 11:__ *(A) Left: Joined plot sorted by cluster 1. (B) Right: Joined plot sorted by 'all'.*
+
+When using `sortind="label"`, individuals are sorted by individual labels. Individual labels although not displayed on the plots, are present in the underlying data. Individual labels depend on the row labels of the input data, `useindlab` and `grplab`. 
+
+The default `useindlab=F`, creates labels numerically in the original order of data but with zero padding. For example, if there are 10 individuals, labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up to 100. Zero padding to ensure optimal sorting. When `useindlab=T`, labels are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if read in using `readQ()`. This can be an issue with sorting by labels `sortind="label"`. For STRUCTURE files with individual labels, they can be read in automatically using `readQ(indlabfromfile=T)`. The rownames of qlist can also be modified by the user. When group labels are in use, `grplab`, they are concatenated to the individual labels in both cases `useindlab=T` and `useindlab=F` separated by `labsep`.  Default `labsep=" "` adds a space between individual label and grplab. For example, group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when `useindlab=F` and usually '1 popA', '2 popA'... when `useindlab=T`. When multiple group labels are in use, the are similarly concatenated one after the other to individual names in the order in which the group labels were provided. The full concatenated string will determine the final sort order of the individuals. The option `sortind="label"` is not particularly useful or intended for use with `plotQ()`, since individual labels are not visible. It is more useful with `plotQMultiline()`. This is only provided here to recreate an order produced in `plotQMultiline()`.
 
 ### Group labels
 
@@ -677,7 +706,6 @@ head(agrp$V1)
 # group labels for FASTSTRUCTURE runs
 fgrp <- read.delim(system.file("files/faststructuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
 head(fgrp$V1)
-
 ```
 
 Now we provide the group labels as a list. The 'lab1' is the title of the group labels.  
@@ -734,8 +762,8 @@ plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), pointtype=21, pointcol="green", p
 plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), pointtype="$", pointcol="green", pointsize=2)
 
 # adjust marker line
-plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linethick=0.5, linecol="steelblue")
-plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linecol="steelblue", linetype=3, linethick=0.2)
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linesize=0.5, linecol="steelblue")
+plotQ(slist[1], grplab=list("lab1\n"=grp1$V1), linecol="steelblue", linetype=3, linesize=0.2)
 
 # 2 line label and adjust label text position
 lab1 <- paste(grp1$V1,c(rep("Group 1",107), rep("Group 2",42)),sep="\n")
@@ -762,7 +790,7 @@ __Fig. 15:__ *(A) Left: Single run plotted with two sets of group labels. (B) Ri
 Multiple plot argument adjustments to obtain a new label style.
 
 ```{r, echo=TRUE, eval=FALSE}
-plotQ(slist[1] ,grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1), linethick=2.8, linealpha=0.2, pointcol="white", pointsize=2, labpos=0.5, linepos=0.5, labpanelheight=0.75)
+plotQ(slist[1] ,grplab=list("lab1\n"=grp1$V1,"lab2\n"=grp2$V1), linesize=3, linealpha=0.2, pointcol="white", pointsize=2, labpos=0.5, linepos=0.5, labpanelheight=0.75)
 ```
 
 ![plotq-newlook](structure-newlook.png)  
@@ -786,7 +814,7 @@ The divider liness can also be modified and adjusted.
 
 ```{r, echo=TRUE, eval=FALSE}
 # change div colour, type and thickness
-plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),divcol="black",divtype=1,divthick=1)
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),divcol="black",divtype=1,divsize=1)
 ```
 
 ### Sorting with group labels
@@ -797,14 +825,17 @@ Individuals can be sorted while using group labels. The individuals are sorted w
 # with grp labels, sort individuals
 plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),sortind="Cluster1")
 plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),sortind="all")
+plotQ(slist[1],grplab=list("lab1\n"=grp1$V1),sortind="label")
 
 # with grp labels, sort individuals, multiple files single
 plotQ(slist[1:3],grplab=list("lab1\n"=grp1$V1),sortind="Cluster1")
 plotQ(slist[1:3],grplab=list("lab1\n"=grp1$V1),sortind="all")
+plotQ(slist[1:3],grplab=list("lab1\n"=grp1$V1),sortind="label")
 
 # with grp labels, sort individuals, multiple files joined
 plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),sortind="Cluster2",imgoutput="join")
 plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),sortind="all",imgoutput="join")
+plotQ(slist[c(1,3)],grplab=list("lab1\n"=grp1$V1),sortind="label",imgoutput="join")
 ```
 
 ![plotq-lab-sort](structure-lab-sort.png)  
@@ -881,19 +912,43 @@ plotQ(qlist=slist[1:3], imgoutput="join", height=1.5, width=8)
 # change resolution
 plotQ(qlist=slist[1],dpi=600)
 # change export figure format
-plotQ(qlist=slist[1], imgtype="jpeg")
+plotQ(qlist=slist[1], imgtype="tiff")
 plotQ(qlist=slist[1], imgtype="pdf")
 ```
+
+### Custom font
+Custom fonts can be used for the text in the plot using package `extrafont`. Fonts are rendered well only by pdf imagetype. I have only tried this on Windows OS. Refer to the `extrafont` package for more information.
+
+```{r,echo=TRUE, eval=FALSE}
+library(extrafont)
+font_import(pattern="^PT Mono",prompt=F)
+loadfonts()
+fonts()
+
+plotQ(slist[1],grplab=list("lab\n"=grps1$V1),font="PT Mono")
+plotQ(slist[1],grplab=list("lab\n"=grps1$V1),font="PT Mono",imgtype="pdf")
+```
+
+![plotq-structure-lab-grpmean](plotq-font.png)  
+__Fig. 22:__ *Plot with custom font.*
 
 `plotQ()` function has numerous arguments to tweak the plot as required. See `?plotQ` for more arguments and descriptions.
 
 ## plotQMultiline  
 
-The `plotQMultiline` function is also used to plot barplots from a qlist. The barplots are plotted in multiple rows to enable easier identification of individuals. The figure is produced as A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` is automatically calculated but it can also be specified manually.
+The `plotQMultiline` function is also used to plot barplots from a qlist. The barplots can be plotted in multiple rows with individual labels to enable easier identification of individuals. The figure is produced as A4 size by default. The number of samples per line `spl` and the number of lines per page `lpp` is automatically calculated but it can also be specified manually. A schematic of the plot parts is shown below.  
+
+![plotqmultiline-overview](plotqmultiline-overview.png) 
+__Fig. 23:__ *An overview of the components of a `plotQMultiline()` figure and some of the arguments used to modify them.*
+
+One run is generally plotted per page. And multiple pages are exported for multiple runs. The output filename is the qlist name followed by a number. Eg: filename-1.png. In case the number of individuals do not fit on a page, extra pages are exported per run. Then extra pages are named filename-2, filename-3 etc. But, the number of samples on a page can be manually controlled using `spl` and `lpp`.
+
+### Basic usage
 
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 plotQMultiline(slist[1])
+plotQMultiline(slist[1:3])
 plotQMultiline(tlist[1])
 plotQMultiline(alist[1])
 plotQMultiline(flist[1])
@@ -902,7 +957,8 @@ plotQMultiline(mslist[1])
 plotQMultiline(mtlist[1])
 
 # manually modifying samples per line and lines per page
-plotQMultiline(slist[1],spl=75,lpp=10)
+plotQMultiline(slist[1],lpp=10)
+plotQMultiline(slist[1],spl=75,lpp=9)
 plotQMultiline(slist[1],spl=149,lpp=9)
 # with TESS runs
 plotQMultiline(tlist[1],spl=75,lpp=10)
@@ -913,14 +969,62 @@ plotQMultiline(alist[1],spl=168,lpp=10)
 plotQMultiline(readQ(co),spl=75,lpp=10)
 
 # change bar width and turn off labels
-plotQMultiline(readQ(al), barwidth=1, indlabs=F)
+plotQMultiline(readQ(al), barsize=1, indlab=F)
 # yaxis labels and ticks and modified height and width
-plotQMultiline(readQ(al),spl=75,lpp=2,indlabs=T,yaxislabs=T,ticks=T,height=5,width=20)
+plotQMultiline(readQ(al),spl=75,lpp=2,indlab=T,yaxislabs=T,ticks=T,height=5,width=20)
 # modified spl
 plotQMultiline(readQ(me),spl=38,height=8,width=14)
 ```
 
-Similar to `plotQ()`, individuals can be sorted by any one cluster or 'all'. The 'all' option takes all clusters into account while sorting and produces a result similar to that produced in the STRUCTURE software 'Sort by Q' option.  
+![plotqmultiline](plotqmultiline.png)  
+__Fig. 24:__ *Left: Default output from `plotQMultiline`. Right: Modified output with custom `spl` and `lpp`.*
+
+Individual labels are displayed on the plot when `indlab=T`. They can be turned off by `indlab=F`. Note that this only controls the display of individual labels on the plot. The labels are still present in the underlying data and are still in use for sorting etc.
+
+```{r,echo=TRUE, eval=FALSE}
+# display ind labels
+plotQMultiline(slist[1],indlab=T)
+# do not display ind labels
+plotQMultiline(slist[1],indlab=F)
+```
+
+### Individual labels
+
+`plotMultiline()` labels individuals numerically with padded zeros (01,02,03..). The number of padded zeros depend on the total number of individuals. Less than 100 individuals start with 01, 02... while hundreds of individuals start with 001, 002.. etc. Labels with padded zeros are better suited for sorting. This is default behaviour `useindlab=F`. Instead of automatically creating the labels, predefined labels can be used from the rownames of input data by specifying `useindlab=T`. Custom labels can be manually added as rownames anytime.
+
+```{r,echo=TRUE, eval=FALSE}
+# get a qlist
+list1 <- slist[1]
+# show rownames
+rownames(list1[[1]])
+
+# default labels
+plotQMultiline(list1,useindlab=F)
+
+#read some individual labels
+inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
+
+# add labels as rownames to qlist
+rownames(list1[[1]]) <- inds$V1
+
+# show custom labels.
+plotQMultiline(list1,useindlab=T)
+
+# long ind name
+longlabs <- paste0("this_is_a_real_long_label_",inds$V1)
+rownames(list1[[1]]) <- longlabs
+plotQMultiline(list1,useindlab=T)
+plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
+plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
+```
+
+Note that qlists read in using `readQ()` have rownames 1,2,3.. etc which may not be optimal for sorting by individual labels. For STRUCTURE files with individual labels in them, using `readQ(indlabfromfile=T)` will read them in as rownames. See section `readQ()`.
+
+### Sort individuals
+
+Similar to `plotQ()`, the individuals can be sorted based on the value of any one of the clusters ('Cluster1'), 'all' or 'label'. The 'all' option produces a sort similar to that in the software STRUCTURE. All clusters are taken into account to sort individuals. When using the name of a cluster, like 'Cluster1', 'Cluster2' etc, all individuals are sorted by value of the specified cluster.  
+
+Using `sortind="label"` sorts individuals by individual labels. The default `useindlab=F`, creates labels numerically in the original order of data but with zero padding. For example, if there are 10 individuals, labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up to 100. Zero padding to ensure optimal sorting. When `useindlab=T`, labels are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if read in using `readQ()`. This can be an issue with sorting by labels `sortind="label"`. For STRUCTURE files with individual labels, they can be read in automatically using `readQ(indlabfromfile=T)`. The rownames of qlist can also be modified by the user. 
 
 ```{r,echo=TRUE, eval=FALSE}
 plotQMultiline(slist[1],sortind="Cluster1")
@@ -929,45 +1033,94 @@ plotQMultiline(slist[1],spl=75,lpp=10,sortind="Cluster1")
 plotQMultiline(slist[1],spl=75,lpp=10,sortind="all")
 ```
 
-![plotqmultiline](plotqmultiline.png)  
-__Fig. 21:__ *Left: Default output from `plotQMultiline`. Middle Left: Modified output with custom `spl` and `lpp`. Middle Right: Sorted by Cluster1. Right: Sorted by 'all'.*
+![plotqmultiline-sort](plotqmultiline-sort.png)  
+__Fig. 25:__ *Various sorting options in plotQMultiline(). Original order, ordered by Cluster1, ordered by all clusters and ordered by individual labels*
 
-By default, the individuals are labelled numerically (1,2,3..). Individual labels from the rownames of input data can be used by specifying `useindlab=T`. The individual labels can be turned off by using `indlab=F`.
+### Group labels
+
+One or more sets of group labels can be added by providing a character vector of labels. The length of each vector must be equal to the number of individuals. 
+
+When group labels are in use, `grplab`, they are concatenated to the individual labels in both cases `useindlab=T` and `useindlab=F` separated by `labsep`.  Default `labsep=" "` adds a space between individual label and grplab. For example, group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when `useindlab=F` and usually '1 popA', '2 popA'... when `useindlab=T`. When multiple group labels are in use, the are similarly concatenated one after the other to individual names in the order in which the group labels were provided. The full concatenated string will determine the final sort order of the individuals. 
+
+The vectors must be constructed as a named list. In this demonstration, we will use the labels in the `pophelper` library. Make sure that the labels are character datatype. When reading from a text file, use `stringsAsFactors=F` to ensure that each column in the dataframe is a character and not a factor.  
+
+```{r, echo=TRUE, eval=FALSE}
+# read labels for STRUCTURE runs
+grp1 <- read.delim(system.file("files/structuregrplabels.txt", package="pophelper"), header=F,stringsAsFactors=F)
+head(grp1$V1)
+# length of labels equal to number of individuals?
+length(grp1$V1)
+# check if labels are a character data type
+is.character(grp1$V1)
+```
+
+Labels are added as named lists. One or more label sets can be added.
 
 ```{r,echo=TRUE, eval=FALSE}
-# get a qlist
-list1 <- slist[1]
+# add one set of group labels
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1))
 
-#read some individual labels
-inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
+# read another grp label set
+grp2 <- read.delim(system.file("files/structuregrplabels2.txt", package="pophelper"), header=F,stringsAsFactors=F)
+# add second set of group labels
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1,"lab2"=grp2$V1))
+```
 
-# add labels as rownames to qlist
-rownames(list1[[1]]) <- inds$V1
+Group labels are concatenated to the individual labels using separator 'labsep'. The default label separator is space. For example, individuals 1 and 2 with group labels popA and popB produces labels '1 popA' and '2 popB'. Any number of provided group labels are concatenated one after the other.
 
-# add ind labels.
-plotQMultiline(list1,useindlab=T)
-# turn off ind labels
-plotQMultiline(list1,indlab=F)
+When sorting individuals, all individuals are sorted by full individual names when using `sortind="labels"`. But when using `sortind="Cluster1"` or `sortind="all"`, individuals are sorted within groups.
 
-#sort
-plotQMultiline(list1,useindlab=T,sortind="all")
-plotQMultiline(list1,useindlab=T,sortind="Cluster1")
+![plotqmultiline](plotqmultiline-grplab.png)  
+__Fig. 26:__ *plotQMultiline() with group labels. Original order, ordered by Cluster1, ordered by all clusters and ordered by individual labels*
 
-# long ind name
-longlabs <- paste0("this_is_a_real_long_label_",inds$V1)
-rownames(list1[[1]]) <- longlabs
-plotQMultiline(list1,useindlab=T)
-plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
-plotQMultiline(list1,useindlab=T,spl=75,lpp=4)
 
+```{r,echo=TRUE, eval=FALSE}
+#using ind labs from file
+#sort all
+plotQMultiline(list1,useindlab=T,grplab=list("lab1"=grp1$V1),sortind="all")
+# sort by cluster 1
+plotQMultiline(list1,useindlab=T,grplab=list("lab1"=grp1$V1),sortind="Cluster1")
+# sort by label
+plotQMultiline(list1,useindlab=T,grplab=list("lab1"=grp1$V1),sortind="label")
+
+#ind labs from file not used
+#sort all
+plotQMultiline(list1,useindlab=F,grplab=list("lab1"=grp1$V1),sortind="all")
+# sort by cluster 1
+plotQMultiline(list1,useindlab=F,grplab=list("lab1"=grp1$V1),sortind="Cluster1")
+# sort by label
+plotQMultiline(list1,useindlab=F,grplab=list("lab1"=grp1$V1),sortind="label")
+```
+
+### Subset/reorder groups
+
+When using group labels, the plot can be subsetted or reordered based on group labels. This applies only when one group label set is in use.
+
+```{r, echo=TRUE, eval=FALSE}
+# subsetting groups
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1),subsetgrp="Pop A")
+# change order of groups
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1),subsetgrp=c("Pop B","Pop A"))
+
+# subsetting group and sorting individuals
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1),subsetgrp="Pop A",sortind="Cluster1")
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1),subsetgrp="Pop A",sortind="all")
+
+# change order of groups and sorting individuals
+plotQMultiline(list1,grplab=list("lab1"=grp1$V1),subsetgrp=c("Pop B","Pop A"),sortind="Cluster1")
+```
+
+### Finer settings
+
+```{r,echo=TRUE, eval=FALSE}
 # change cluster colours
 plotQMultiline(list1,useindlab=T,clustercol=c("steelblue","coral"))
 # change bar width
-plotQMultiline(list1,useindlab=T,barwidth=1,spl=149,lpp=1,labsize=3,height=5)
+plotQMultiline(list1,useindlab=T,barsize=1,spl=149,lpp=1,labsize=3,height=5)
 ```
 
 ![plotqmultiline-colours](plotqmultiline-colours.png)  
-__Fig. 22:__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
+__Fig. 27:__ *Multiline plots with (left) standard colours, (middle) `rich.colors()` from `gplots` package and (right) `brewer.pal(8,"Spectral")` from `RColorBrewer` package.*
 
 Note that this function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
 
@@ -999,7 +1152,7 @@ distructExport(readQ(me))
 ```
 
 ![distructexport](destruct-structure.png)  
-__Fig. 23:__ *Left: DISTRUCT plot with `grpmean=F`. Middle: DISTRUCT plot with `grpmean=T`. Right: DISTRUCT plot with `grayscale=T`.*  
+__Fig. 28:__ *Left: DISTRUCT plot with `grpmean=F`. Middle: DISTRUCT plot with `grpmean=T`. Right: DISTRUCT plot with `grayscale=T`.*  
 
 The `useexe=T` argument may not work on all OS and systems.  
 
@@ -1010,8 +1163,12 @@ This is a wrapper function for easily performing several `pophelper` functions i
 ```{r,echo=TRUE, eval=FALSE}
 # basic usage
 analyseQ(choose.files())
-analyseQ(files=slist)
+
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
+analyseQ(files=sfiles)
+tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=T)
 analyseQ(files=tlist)
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
 analyseQ(files=alist)
 ```
 
@@ -1143,68 +1300,12 @@ Many of the functionalities in this package have been implented in the online to
 
 `pophelper 2.0.0` has been tested on the following systems:
 
-+ Windows 10 64bit, R 3.3.2
++ Windows 10 64bit, R 3.3.3
 
 ```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.2 (2016-10-31)
+R version 3.3.3 (2017-03-06)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows >= 8 x64 (build 9200)
-
-locale:
-[1] LC_COLLATE=English_United Kingdom.1252 
-[2] LC_CTYPE=English_United Kingdom.1252   
-[3] LC_MONETARY=English_United Kingdom.1252
-[4] LC_NUMERIC=C                           
-[5] LC_TIME=English_United Kingdom.1252    
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
-
-other attached packages:
-[1] testthat_1.0.2  pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
-
-loaded via a namespace (and not attached):
- [1] Rcpp_0.12.8      tidyr_0.6.0      dplyr_0.5.0      crayon_1.3.2    
- [5] assertthat_0.1   R6_2.2.0         grid_3.3.2       plyr_1.8.4      
- [9] DBI_0.5-1        gtable_0.2.0     magrittr_1.5     scales_0.4.1    
-[13] stringi_1.1.2    reshape2_1.4.2   lazyeval_0.2.0   labeling_0.3    
-[17] tools_3.3.2      stringr_1.1.0    munsell_0.4.3    colorspace_1.3-1
-[21] gridExtra_2.2.1  tibble_1.2 
-```
-
-+ Windows 10 64bit, R 3.3.1
-
-```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.1 (2016-06-21)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows >= 8 x64 (build 9200)
-
-locale:
-[1] LC_COLLATE=English_United Kingdom.1252 
-[2] LC_CTYPE=English_United Kingdom.1252   
-[3] LC_MONETARY=English_United Kingdom.1252
-[4] LC_NUMERIC=C                           
-[5] LC_TIME=English_United Kingdom.1252    
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
-
-other attached packages:
-[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
-
-loaded via a namespace (and not attached):
- [1] colorspace_1.2-7 scales_0.4.1     magrittr_1.5     assertthat_0.1  
- [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.1      gtable_0.2.0    
- [9] tibble_1.2       gridExtra_2.2.1  Rcpp_0.12.7      grid_3.3.1      
-[13] tidyr_0.6.0      munsell_0.4.3   
-```
-
-+ Windows 7 64bit, R 3.3.0
-
-```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.0 (2016-05-03)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows 7 x64 (build 7601) Service Pack 1
 
 locale:
 [1] LC_COLLATE=English_United Kingdom.1252  LC_CTYPE=English_United Kingdom.1252   
@@ -1215,79 +1316,53 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] pophelper_2.0.0 Cairo_1.5-9     ggplot2_2.2.0  
+[1] extrafont_0.17  pophelper_2.1.0 ggplot2_2.2.1   Cairo_1.5-9     testthat_1.0.2  devtools_1.12.0
 
 loaded via a namespace (and not attached):
- [1] colorspace_1.2-7 scales_0.4.1     magrittr_1.5     assertthat_0.1  
- [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.0      gtable_0.2.0    
- [9] tibble_1.2       gridExtra_2.2.1  Rcpp_0.12.7      grid_3.3.0      
-[13] tidyr_0.6.0      munsell_0.4.3  
+ [1] Rcpp_0.12.10     Rttf2pt1_1.3.4   knitr_1.15.1     magrittr_1.5     munsell_0.4.3   
+ [6] colorspace_1.3-2 R6_2.2.0         stringr_1.2.0    dplyr_0.5.0      httr_1.2.1      
+[11] plyr_1.8.4       tools_3.3.3      grid_3.3.3       gtable_0.2.0     DBI_0.6-1       
+[16] extrafontdb_1.0  git2r_0.18.0     withr_1.0.2      assertthat_0.2.0 lazyeval_0.2.0  
+[21] digest_0.6.12    tibble_1.3.0     crayon_1.3.2     gridExtra_2.2.1  reshape2_1.4.2  
+[26] tidyr_0.6.1      curl_2.5         memoise_1.0.0    labeling_0.3     stringi_1.1.5   
+[31] scales_0.4.1 
 ```
 
-+ Windows 7 64bit, R 3.3.2
++ Windows 7 64bit, R 3.3.3
 
 DISTRUCT executable worked but unstable.
 
 ```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.2 (2016-10-31)
+R version 3.3.3 (2017-03-06)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows 7 x64 (build 7601) Service Pack 1
 
 locale:
-[1] LC_COLLATE=English_United Kingdom.1252  LC_CTYPE=English_United Kingdom.1252   
-[3] LC_MONETARY=English_United Kingdom.1252 LC_NUMERIC=C                           
+[1] LC_COLLATE=English_United Kingdom.1252 
+[2] LC_CTYPE=English_United Kingdom.1252   
+[3] LC_MONETARY=English_United Kingdom.1252
+[4] LC_NUMERIC=C                           
 [5] LC_TIME=English_United Kingdom.1252    
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9     devtools_1.12.0
+[1] extrafont_0.17  testthat_1.0.2  pophelper_2.1.0 ggplot2_2.2.1  
+[5] Cairo_1.5-9    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.8      tidyr_0.6.0      assertthat_0.1   digest_0.6.10   
- [5] withr_1.0.2      plyr_1.8.4       grid_3.3.2       R6_2.2.0        
- [9] gtable_0.2.0     magrittr_1.5     git2r_0.16.0     scales_0.4.1    
-[13] httr_1.2.1       lazyeval_0.2.0   curl_2.3         tools_3.3.2     
-[17] munsell_0.4.3    colorspace_1.3-1 memoise_1.0.0    knitr_1.15.1    
-[21] gridExtra_2.2.1  tibble_1.2 
+ [1] Rcpp_0.12.10     tidyr_0.6.1      crayon_1.3.2     grid_3.3.3      
+ [5] plyr_1.8.4       R6_2.2.0         Rttf2pt1_1.3.4   gtable_0.2.0    
+ [9] magrittr_1.5     scales_0.4.1     lazyeval_0.2.0   extrafontdb_1.0 
+[13] tools_3.3.3      munsell_0.4.3    colorspace_1.3-2 gridExtra_2.2.1 
+[17] tibble_1.3.0 
 ```
 
-+ Ubuntu Linux 16.04.1 LTS 64bit, R 3.3.2
-
-DISTRUCT executable does not work.
++ Scientific Linux 6.8 (Carbon) 64bit, R 3.3.2
 
 ```{coffee,echo=TRUE, eval=FALSE}
 R version 3.3.2 (2016-10-31)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 16.04.1 LTS
-
-locale:
- [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
- [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_US.UTF-8    
- [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_US.UTF-8   
- [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
- [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-[11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods  
-[7] base     
-
-other attached packages:
-[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9    
-
-loaded via a namespace (and not attached):
- [1] colorspace_1.2-6 scales_0.4.1     magrittr_1.5     assertthat_0.1  
- [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.2      gtable_0.2.0    
- [9] tibble_1.1       gridExtra_2.2.1  Rcpp_0.12.6      grid_3.3.2      
-[13] tidyr_0.5.1      munsell_0.4.3 
-```
-
-+ Scientific Linux 6.8 (Carbon) 64bit, R 3.3.1
-
-```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.1 (2016-06-21)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Scientific Linux release 6.8 (Carbon)
 
@@ -1303,13 +1378,13 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base
 
 other attached packages:
-[1] pophelper_2.0.0 ggplot2_2.2.0   Cairo_1.5-9
+[1] pophelper_2.1.0 ggplot2_2.2.1   Cairo_1.5-9
 
 loaded via a namespace (and not attached):
- [1] colorspace_1.2-6 scales_0.4.1     magrittr_1.5     assertthat_0.1
- [5] lazyeval_0.2.0   plyr_1.8.4       tools_3.3.1      gtable_0.2.0
- [9] tibble_1.1       gridExtra_2.2.1  Rcpp_0.12.6      grid_3.3.1
-[13] tidyr_0.6.0      munsell_0.4.3
+ [1] colorspace_1.3-2 scales_0.4.1     magrittr_1.5     lazyeval_0.2.0
+ [5] plyr_1.8.4       gtable_0.2.0     tibble_1.3.0     gridExtra_2.2.1
+ [9] Rcpp_0.12.10     grid_3.3.2       tidyr_0.6.1      munsell_0.4.3
+
 ```
 
 ---

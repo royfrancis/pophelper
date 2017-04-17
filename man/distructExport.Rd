@@ -134,4 +134,3 @@ distructExport(slist[1],grplabbottom=grps1$V1,grpmean=T)
 distructExport(slist[1],useexe=T)
 }
 }
-
