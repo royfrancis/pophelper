@@ -46,9 +46,9 @@ Note that `pophelper 1.2.0` and later includes binary executables for CLUMPP and
 
 ## Web App   
 An online interactive version of pophelper is available at [pophelper.com](http://www.pophelper.com). The web app is quite outdated and limited in terms of functionality and flexibility. The web app must not be used for major work or large datasets. The web app is also limited in computational power and working hours. If anyone interested has the resources or funding to host `pophelper` web app on a solid server, please get in touch.  
-The web app will be automatically restricted after 100 hours of use per month. The cycle starts on the 11th of every month and the app is available till 100 hours are used which is approximately till 4th of next month. Therefore the app will be unavailable from approximately 4th to 11th. This, of course, depends on the usage. I will update this info here.
+The web app will be automatically restricted after 100 hours of use per month. The cycle starts on the 11th of every month and the app is available until 100 hours are used, which is approximately (as of now) till 4th of next month. This, of course, varies and depends on the usage of the app. I will update info about unavailability here:
 
-__Web app is currently unavailable from 4th Jul till 11th July.__
+__Web app is currently unavailable from 4th July to 11th July.__
 
 ## List of Functions  
 
