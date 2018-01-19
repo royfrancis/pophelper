@@ -1,4 +1,4 @@
-pophelper 2.2.5a
+pophelper 2.2.5.1
 ===========
 * 19-Jan-2018
 * Added arguments 'xaxisbreaks' and 'xaxislabels' to evannoMethodStructure()

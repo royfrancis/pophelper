@@ -1,6 +1,6 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.5a
+# pophelper v2.2.5.1
 # Functions
 # 10-Jan-2018
 
@@ -4497,7 +4497,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.5a ready.")
+  packageStartupMessage("pophelper v2.2.5.1 ready.")
 }
 
 # End --------------------------------------------------------------------------
