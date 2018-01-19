@@ -1,6 +1,6 @@
 # Test Script
-# v2.2.5
-# 11-Jan-2018
+# v2.2.5a
+# 19-Jan-2018
 
 library(testthat)
 library(pophelper)
@@ -301,6 +301,9 @@ if(testfont)
   evannoMethodStructure(sr1,exportplot=TRUE,font="Verdana",theme="theme_grey")
   if(deleteoutput) file.remove("evannoMethodStructure.png")
 }
+
+# xaxisbreaks
+ev <- evannoMethodStructure(sr,exportplot=FALSE,returndata=F,returnplot=T,xaxisbreaks=c(2,8,10))
 
 #ERRORS
 #error only 2 values of k

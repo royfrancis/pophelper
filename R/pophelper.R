@@ -1,8 +1,8 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.5
+# pophelper v2.2.5a
 # Functions
-# 11-Jan-2018
+# 10-Jan-2018
 
 # check packages
 pkgs <- c("Cairo","grid","gridExtra","ggplot2","gtable","tidyr")
@@ -1136,6 +1136,8 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
 #' @param ebwidth A numeric indicating size od width of error abrs. Defaults to 0.2.
 #' @param ebcol A colour character for colour for errorbar. Defaults to "grey30".
 #' @param textcol A colour character for all text elements on the plot. Defaults to "grey30".
+#' @param xaxisbreaks A numeric vector indicating x-axis breaks. Automatically calculated by default.
+#' @param xaxislabels A character vector indicating x-axis labels. Automatically calculated by default.
 #' @param basesize A numeric indicating the base size of various plot elements such as pointsize, linesize etc. Increase basesize with larger figure dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) override basesize.
 #' @param gridsize A numeric indicating thickness of background grid. Default for \code{basesize=6} is 0.18.
 #' @param imgtype A character indicating the type of exported image. Default set to 'png'. Other possible 
@@ -1193,7 +1195,7 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
 evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,returnplot=FALSE,returndata=TRUE,
                                   pointsize=NA,pointtype=20,pointcol="steelblue",linesize=NA,linecol="steelblue",
                                   ebwidth=0.2,ebcol="grey30",
-                                  textcol="grey30",basesize=6,gridsize=NA,
+                                  textcol="grey30",xaxisbreaks=waiver(),xaxislabels=waiver(),basesize=6,gridsize=NA,
                                   imgtype="png",height=NA,width=NA,dpi=300,units="cm",
                                   theme="theme_bw",font="",na.rm=TRUE,quiet=TRUE,outputfilename="evannoMethodStructure")
 {
@@ -1274,6 +1276,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
         geom_path(colour=linecol,size=linesize,na.rm=na.rm)+
         geom_point(colour=pointcol,fill=pointcol,size=pointsize,shape=pointtype,na.rm=na.rm)+
         geom_errorbar(aes(x=k,ymax=elpdmax,ymin=elpdmin,width=ebwidth),size=linesize,colour=ebcol,na.rm=na.rm)+
+        scale_x_continuous(breaks=xaxisbreaks,labels=xaxislabels)+
         get(theme)(base_family=font)+
         labs(x=expression(paste(italic(K))),
              y=expression(paste("Mean L(",italic(K),") " %+-% " SD")))+
@@ -1383,6 +1386,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       geom_path(colour=linecol,size=linesize,na.rm=na.rm)+
       geom_point(colour=pointcol,fill=pointcol,size=pointsize,shape=pointtype,na.rm=na.rm)+
       geom_errorbar(aes(x=k,ymax=elpdmax,ymin=elpdmin,width=ebwidth),size=linesize,colour=ebcol,na.rm=na.rm)+
+      scale_x_continuous(breaks=xaxisbreaks,labels=xaxislabels)+
       get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))),y=expression(paste("Mean L(",italic(K),") " %+-% " SD")),title="A")
     
@@ -1392,6 +1396,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       geom_point(colour=pointcol,fill=pointcol,size=pointsize,shape=pointtype,na.rm=na.rm)+
       geom_errorbar(aes(x=k,ymax=lnk1max,ymin=lnk1min,width=ebwidth),
                     size=linesize,colour=ebcol,na.rm=na.rm)+
+      scale_x_continuous(breaks=xaxisbreaks,labels=xaxislabels)+
       get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))),y=expression(paste("L'(",italic(K),") " %+-% " SD")),title="B")
     
@@ -1401,6 +1406,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       geom_point(colour=pointcol,fill=pointcol,size=pointsize,shape=pointtype,na.rm=na.rm)+
       geom_errorbar(aes(x=k,ymax=lnk2max,ymin=lnk2min,width=0.2),
                     size=linesize,colour=ebcol,na.rm=na.rm)+
+      scale_x_continuous(breaks=xaxisbreaks,labels=xaxislabels)+
       get(theme)(base_family=font)+
       labs(x=expression(paste(italic(K))),y=expression(paste("|L\"(",italic(K),")| " %+-% " SD")),title="C")
     
@@ -1410,6 +1416,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       plist[[4]] <- ggplot2::ggplot(data,aes(x=k,y=deltaK))+
         geom_path(colour=linecol,size=linesize,na.rm=na.rm)+
         geom_point(colour=pointcol,fill=pointcol,size=pointsize,shape=pointtype,na.rm=na.rm)+
+        scale_x_continuous(breaks=xaxisbreaks,labels=xaxislabels)+
         get(theme)(base_family=font)+
         labs(x=expression(paste(italic(K))),y=expression(paste(Delta,italic(K))),title="D")
     }
@@ -4490,7 +4497,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.5 ready.")
+  packageStartupMessage("pophelper v2.2.5a ready.")
 }
 
 # End --------------------------------------------------------------------------

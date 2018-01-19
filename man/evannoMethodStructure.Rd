@@ -7,7 +7,8 @@
 evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
   returnplot = FALSE, returndata = TRUE, pointsize = NA, pointtype = 20,
   pointcol = "steelblue", linesize = NA, linecol = "steelblue",
-  ebwidth = 0.2, ebcol = "grey30", textcol = "grey30", basesize = 6,
+  ebwidth = 0.2, ebcol = "grey30", textcol = "grey30",
+  xaxisbreaks = waiver(), xaxislabels = waiver(), basesize = 6,
   gridsize = NA, imgtype = "png", height = NA, width = NA, dpi = 300,
   units = "cm", theme = "theme_bw", font = "", na.rm = TRUE,
   quiet = TRUE, outputfilename = "evannoMethodStructure")
@@ -36,6 +37,10 @@ evannoMethodStructure(data = NULL, writetable = FALSE, exportplot = FALSE,
 \item{ebcol}{A colour character for colour for errorbar. Defaults to "grey30".}
 
 \item{textcol}{A colour character for all text elements on the plot. Defaults to "grey30".}
+
+\item{xaxisbreaks}{A numeric vector indicating x-axis breaks. Automatically calculated by default.}
+
+\item{xaxislabels}{A character vector indicating x-axis labels. Automatically calculated by default.}
 
 \item{basesize}{A numeric indicating the base size of various plot elements such as pointsize, linesize etc. Increase basesize with larger figure dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) override basesize.}
 
