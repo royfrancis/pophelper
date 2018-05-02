@@ -1,3 +1,13 @@
+pophelper 2.2.6
+===========
+* 02-May-2018
+* getDim() adjusted better for shared and unshared individual labels.
+* Argument 'grplabface' added to plotQ() to adjust font face of group labels
+* plotQ(): Div lines are printed with joined plots, group labels and sorting
+* plotQ(): With joined plots and group labels with multiple label sets, when sorting, argument 'ordergrp' must be set to TRUE. Individuals and group labels were not correctly matched with joined output, group labels and sorting. This has been corrected. Group labels are sorted by all labels started with selgrp.
+* for-loops in all functions changed to seq_along()
+* sortInd() gets a new argument 'ordergrp' which orders group labels when sorting
+
 pophelper 2.2.5.1
 ===========
 * 19-Jan-2018

@@ -16,16 +16,16 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, sortind = NA,
   subtitlecol = "grey30", subtitleface = "plain", subtitlespacer = 1.5,
   subtitleangle = 0, grplabspacer = 0, grplabheight = NA,
   grplabpos = 0.25, grplabsize = NA, grplabangle = NA, grplabjust = NA,
-  grplabcol = "grey30", grplabalpha = 1, showindlab = FALSE,
-  sharedindlab = TRUE, useindlab = FALSE, indlabwithgrplab = FALSE,
-  indlabspacer = 1.5, indlabheight = 0.2, indlabsep = " ",
-  indlabsize = NULL, indlabangle = 90, indlabvjust = 0.5,
-  indlabhjust = 1, indlabcol = "grey30", pointsize = NA,
-  pointcol = "grey30", pointbgcol = "grey30", pointtype = "|",
-  pointalpha = 1, linepos = 0.75, linesize = NA, linecol = "grey30",
-  linetype = 1, linealpha = 1, showdiv = TRUE, divgrp = NA,
-  divcol = "white", divtype = "21", divsize = 0.25, divalpha = 1,
-  showlegend = FALSE, legendlab = NA, legendpos = "right",
+  grplabcol = "grey30", grplabalpha = 1, grplabface = "plain",
+  showindlab = FALSE, sharedindlab = TRUE, useindlab = FALSE,
+  indlabwithgrplab = FALSE, indlabspacer = 1.5, indlabheight = 0.2,
+  indlabsep = " ", indlabsize = NULL, indlabangle = 90,
+  indlabvjust = 0.5, indlabhjust = 1, indlabcol = "grey30",
+  pointsize = NA, pointcol = "grey30", pointbgcol = "grey30",
+  pointtype = "|", pointalpha = 1, linepos = 0.75, linesize = NA,
+  linecol = "grey30", linetype = 1, linealpha = 1, showdiv = TRUE,
+  divgrp = NA, divcol = "white", divtype = "21", divsize = 0.25,
+  divalpha = 1, showlegend = FALSE, legendlab = NA, legendpos = "right",
   legendkeysize = 4, legendtextsize = 3, legendmargin = c(0.5, 0.5, 0.5,
   0), barsize = 1, barbordersize = 0, barbordercolour = NA,
   showyaxis = FALSE, showticks = FALSE, ticksize = 0.1,
@@ -123,6 +123,8 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA, sortind = NA,
 \item{grplabcol}{A colour character for the colour of group labels. Defaults to "grey30".}
 
 \item{grplabalpha}{A numeric between 0 and 1 denoting transparency of group labels. Defaults to 1.}
+
+\item{grplabface}{A character specifying font face. Either 'plain', 'italic', 'bold' or 'bold.italic'.}
 
 \item{showindlab}{A logical indicating if individual labels must be shown. See details.}
 

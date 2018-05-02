@@ -6,7 +6,7 @@
 \usage{
 grpLabels(dframe = NULL, grplab = NA, selgrp = NA, subsetgrp = NA,
   ordergrp = FALSE, grpmean = FALSE, grplabpos = NA, linepos = NA,
-  indlabwithgrplab = TRUE, indlabsep = "_")
+  indlabwithgrplab = TRUE, indlabsep = "_", runid = NULL)
 }
 \arguments{
 \item{grplab}{A dataframe with group labels}
@@ -17,11 +17,17 @@ grpLabels(dframe = NULL, grplab = NA, selgrp = NA, subsetgrp = NA,
 
 \item{ordergrp}{A logical indicating if individuals must be ordered by group labels}
 
-\item{grpmean}{A logical indicating if q-matrix must be converted from individual to group mean.}
+\item{grpmean}{A logical indicating if q-matrix must be converted from individual to group mean}
 
 \item{grplabpos}{A numeric indicating y-axis position of labels}
 
 \item{linepos}{A numeric indicating y-axis position of label line}
+
+\item{indlabwithgrplab}{A logical indicating if grp labels are added to indlab}
+
+\item{indlabsep}{A character specifying seperation in indlab}
+
+\item{runid}{A numeric indicating run ID}
 
 \item{df}{A q-matrix dataframe}
 }
@@ -31,5 +37,5 @@ of original/subsetted/reordered grplab dataframe, grplabpos and linepos.
 }
 \description{
 Internal: Takes a q-matrix dataframe along with grp labels. Pop labels
-can be reordered or subsetted. The function also creates labelpos and markerpos dfs.
+can be reordered or subsetted. The function also creates label_position and marker_position dfs.
 }

@@ -1,8 +1,8 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.5.1
+# pophelper v2.2.6
 # Functions
-# 10-Jan-2018
+# 02-May-2018
 
 # check packages
 pkgs <- c("Cairo","grid","gridExtra","ggplot2","gtable","tidyr")
@@ -70,7 +70,7 @@ checkQ <- function(files=NULL,warn=FALSE)
   
   checkvec <- rep("UNIDENTIFIED",length=len1)
   subtype <- rep(NA,length=len1)
-  for(i in 1:len1)
+  for(i in seq_along(files))
   {
     chk <- FALSE
     
@@ -385,7 +385,7 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
   
   len <- length(files)
   dlist <- vector("list")
-  for (i in 1:len)
+  for (i in seq_along(files))
   {
     # check file
     if(filetype=="auto") 
@@ -453,7 +453,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
   i <- 1
   dlist <- vector("list",length=flen)
   len1 <- length(files)
-  for (i in 1:len1)
+  for (i in seq_along(files))
   {
     fname <- basename(files[i]) 
     file1 <- readLines(as.character(files[i]),warn=FALSE)
@@ -600,7 +600,7 @@ readQTess <- function(files=NULL)
   i <- 1
   dlist <- vector("list",length=flen)
   len1 <- length(files)
-  for (i in 1:len1)
+  for (i in seq_along(files))
   {
     # read whole file in
     file1 <- readLines(files[i],warn=FALSE)
@@ -678,7 +678,7 @@ readQBasic <- function(files=NULL)
   i <- 1
   dlist <- vector("list",length=flen)
   len1 <- length(files)
-  for (i in 1:len1)
+  for (i in seq_along(files))
   {
     # read in delimited files
     if(chk$subtype[i]=="SPACE") dframe <- read.delim(files[i],header=F,sep="",dec=".",stringsAsFactors=FALSE)
@@ -746,8 +746,7 @@ readQClumpp <- function(files=NULL)
   k <- 1
   dlist <- vector("list")
   snames <- vector()
-  len1 <- length(files)
-  for (i in 1:len1)
+  for (i in seq_along(files))
   {
     fname <- base::gsub(".txt","",basename(files[i]))
     
@@ -823,7 +822,7 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
   if(progressbar) pb <- txtProgressBar(min=0,max=len,style=3)
   
   # loop to read in data
-  for(i in 1:len)
+  for(i in seq_along(t3list))
   {
     if(progressbar) setTxtProgressBar(pb,i)
     if(!"tess3.run" %in% names(t3list[[i]])) stop("readQTess3: 'tess3.run' slot not found in list item ",i,".")
@@ -875,8 +874,7 @@ readQBaps <- function(files=NULL)
   
   i <- 1
   dlist <- vector("list",length=flen)
-  len1 <- length(files)
-  for (i in 1:len1)
+  for (i in seq_along(files))
   {
     # read in all lines from file
     file1 <- readLines(files[i],warn=FALSE)
@@ -995,8 +993,7 @@ tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
   tq_crossentropy <- vector(length=flen,mode="numeric")
   tq_ploidy <- vector(length=flen,mode="numeric")
   
-  i <- 1
-  for (i in i:flen)
+  for (i in seq_along(qlist))
   {
     # read file & error check
     df1 <- qlist[[i]]
@@ -1422,7 +1419,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
     }
     
     plen <- length(plist)
-    for (r in 1:plen)
+    for (r in seq_along(plist))
     {
       plist[[r]] <- plist[[r]] + theme(legend.position="none",
                                        axis.text.y=element_text(angle=90,hjust=0.5,size=base_size-0.5,colour=textcol),
@@ -1571,7 +1568,6 @@ clumppExport <- function(qlist=NULL,prefix=NA,parammode=NA,paramrep=NA,useexe=FA
     runs <- df2l$runs[e]
     
     ldata <- vector("list",length=runs)
-    f <- 1
     for (f in 1:runs)
     {
       sel <- which(names(qlist)==as.character(df1l$file[p]))
@@ -1603,7 +1599,6 @@ clumppExport <- function(qlist=NULL,prefix=NA,parammode=NA,paramrep=NA,useexe=FA
       
       # write file
       write(t(format(ldata[[1]],nsmall=15)),paste(out),ncolumns=k+2)
-      i=2
       for (i in 2:length(ldata))
       {
         write(t(spacer),paste(out),ncolumns=k+2,append=TRUE)
@@ -1731,7 +1726,7 @@ collectRunsTess <- function(runsdir=NA,newdir=NA,quiet=FALSE)
   k <- 0
   l <- 0
   len1 <- length(dirs)
-  for (i in 1:len1)
+  for (i in seq_along(dirs))
   {
     setwd(dirs[i])
     files <- list.files()
@@ -1794,7 +1789,7 @@ collectClumppOutput <- function(prefix="pop",filetype="aligned",runsdir=NA,newdi
   l <- 0
   i <- 1
   len1 <- length(dirs1)
-  for (i in 1:len1)
+  for (i in seq_along(dirs1))
   {
     setwd(dirs1[i])
     files <- list.files()
@@ -1852,12 +1847,16 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
   {
     if(plotnum==1) height <- 1.8
     if(plotnum > 1) height <- 1.2
-    if(!showindlab)
+    if(showindlab)
     {
-      height <- height+0.5
-      if(!sharedindlab) height <- height+(0.5*plotnum)
+      if(sharedindlab)
+      {
+        height <- height+0.5
+      }else{
+        height <- height+(0.5*plotnum)
+      }
     }
-    
+
     if(imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
   }else{
     if(units=="mm" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height,fromunit="mm",tounit="cm",dpi=dpi)
@@ -1970,19 +1969,22 @@ getPlotParams <- function(grplab=NA,plotnum=1,grplabsize=NA,grplabangle=NA,grpla
 
 #' @title Internal: Handles grp subset/order
 #' @description Internal: Takes a q-matrix dataframe along with grp labels. Pop labels
-#' can be reordered or subsetted. The function also creates labelpos and markerpos dfs.
+#' can be reordered or subsetted. The function also creates label_position and marker_position dfs.
 #' @param df A q-matrix dataframe
 #' @param grplab A dataframe with group labels
 #' @param selgrp A character denoting selected group label set
 #' @param ordergrp A logical indicating if individuals must be ordered by group labels
 #' @param subsetgrp A character or character vector of grp name(s) to subset/reorder
-#' @param grpmean A logical indicating if q-matrix must be converted from individual to group mean.
+#' @param grpmean A logical indicating if q-matrix must be converted from individual to group mean
 #' @param grplabpos A numeric indicating y-axis position of labels
 #' @param linepos A numeric indicating y-axis position of label line
+#' @param indlabwithgrplab A logical indicating if grp labels are added to indlab
+#' @param indlabsep A character specifying seperation in indlab
+#' @param runid A numeric indicating run ID
 #' @return Returns a list with subsetted/reordered q-matrix, a character vector 
 #' of original/subsetted/reordered grplab dataframe, grplabpos and linepos.
 # @export
-grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALSE,grpmean=FALSE,grplabpos=NA,linepos=NA,indlabwithgrplab=TRUE,indlabsep="_")
+grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALSE,grpmean=FALSE,grplabpos=NA,linepos=NA,indlabwithgrplab=TRUE,indlabsep="_",runid=NULL)
 {
   if(is.null(dframe)) stop("grpLabels: Argument 'dframe' is empty.")
   if(!is.data.frame(dframe)) stop("grpLabels: Argument 'dframe' is not a data.frame datatype.")
@@ -2003,7 +2005,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   if(indlabwithgrplab) rownames(dframe) <- apply(as.data.frame(list(list(rn=rownames(dframe)),as.list(grplab))),1,paste,collapse=indlabsep)
   
   gnames <- names(grplab)
-  onames <- gnames[!gnames %in% selgrp]
+  onames <- setdiff(gnames,selgrp)
   
   # order groups
   # orders dframe and all labels by selgrp
@@ -2054,38 +2056,41 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
     grplab1 <- dfwork2[,gnames,drop=FALSE]
   }
   
-  # create labelpos and markerpos
-  markerlist <- vector("list",length=length(gnames))
-  labellist <- vector("list",length=length(gnames))
+  # create label_position and marker_position
+  marker_position_list <- vector("list",length=length(gnames))
+  label_position_list <- vector("list",length=length(gnames))
   intlablist <- vector("list",length=length(gnames))
-  for(k in 1:length(gnames))
+  for(k in seq_along(gnames))
   {
     rlegrp <- rle(unlist(grplab1[gnames[k]]))
-    labelpos <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
-    markerpos <- data.frame(markerxpos=c(0,cumsum(labelpos$freq)),stringsAsFactors=F)
-    labelpos$labxpos <- round((diff(markerpos$markerxpos)/2)+markerpos$markerxpos[1:length(markerpos$markerxpos)-1],1)
-    labelpos$labypos <- rep(grplabpos,nrow(labelpos))
-    markerpos$temp <- factor(rep(1,nrow(markerpos)))
-    markerpos$markerypos <- rep(linepos,nrow(markerpos))
+    label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
+    marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=F)
+    label_position_df$labxpos <- round((diff(marker_position_df$markerxpos)/2)+marker_position_df$markerxpos[1:length(marker_position_df$markerxpos)-1],1)
+    label_position_df$labypos <- rep(grplabpos,nrow(label_position_df))
+    #marker_position_df$temp <- factor(rep(1,nrow(marker_position_df)))
+    marker_position_df$markerypos <- rep(linepos,nrow(marker_position_df))
     
-    markerpos$count <- gnames[k]
-    markerlist[[k]] <- markerpos
-    labelpos$count <- gnames[k]
-    labellist[[k]] <- labelpos
+    marker_position_df$count <- gnames[k]
+    marker_position_list[[k]] <- marker_position_df
+    label_position_df$count <- gnames[k]
+    label_position_list[[k]] <- label_position_df
   }
   
-  markerposbind <- do.call("rbind",markerlist)
-  markerposbind$count <- factor(markerposbind$count,levels=gnames)
-  labelposbind <- do.call("rbind",labellist)
-  labelposbind$count <- factor(labelposbind$count,levels=gnames)
+  marker_position <- do.call("rbind",marker_position_list)
+  marker_position$count <- factor(marker_position$count,levels=gnames)
+  label_position <- do.call("rbind",label_position_list)
+  label_position$count <- factor(label_position$count,levels=gnames)
   
-  rownames(markerposbind) <- 1:nrow(markerposbind)
-  rownames(labelposbind) <- 1:nrow(labelposbind)
+  rownames(marker_position) <- 1:nrow(marker_position)
+  rownames(label_position) <- 1:nrow(label_position)
   
   # adjust divider position
-  markerposbind$divxpos <- markerposbind$markerxpos+0.5
+  marker_position$divxpos <- marker_position$markerxpos+0.5
+  # add runid
+  marker_position$run <- runid
   
-  return(list(dframe=dfwork1,grplab=grplab1,labelpos=labelposbind,markerpos=markerposbind))
+  return(list(dframe=dfwork1,grplab=grplab1,label_position=label_position,
+              marker_position=marker_position))
 }
 
 # sortInd ----------------------------------------------------------------------
@@ -2095,6 +2100,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
 #' @param dframe A q-matrix dataframe
 #' @param grplab A dataframe with group labels
 #' @param selgrp A single character denoting selected group label set. See details.
+#' @param ordergrp A logical indicating if individuals must be ordered by all group labels
 #' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels).
 #' @param grplabpos A numeric indicating y-axis position of labels
 #' @param linepos A numeric indicating y-axis position of label line
@@ -2105,7 +2111,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
 #' lines and and sorting (\code{sortind}). If \code{selgrp} is not specified, the 
 #' first group label set is used by default.
 # @export
-sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,sortind=NA,grplabpos=NA,linepos=NA)
+sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,grplabpos=NA,linepos=NA)
 {
   if(is.null(dframe)) stop("sortInd: Argument 'dframe' is empty.")
   if(!all(is.na(grplab))) 
@@ -2120,6 +2126,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,sortind=NA,grplabpos=NA,line
     if(length(sortind) > 1) stop("sortInd: Argument 'sortind' must be of length 1. Use 'all','label' or a cluster name like 'Cluster1'.")
     #if(sortind != "all" && sortind != "label" && !grepl("Cluster[0-9+]",sortind)) stop("sortInd: Argument 'sortind' must be set to 'all', 'label' or a cluster like 'Cluster1'.")
   }
+  if(is.na(grplabpos)) grplabpos <- 0.25
+  if(is.na(linepos)) linepos <- 0.75
   
   # sorting without grplab
   if(any(is.na(grplab)))
@@ -2128,14 +2136,11 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,sortind=NA,grplabpos=NA,line
     {
       if(sortind=="all")
       {
-        maxval <- apply(dframe,1,max)
-        matchval <- vector(length=nrow(dframe))
-        for(j in 1:nrow(dframe)) matchval[j] <- match(maxval[j],dframe[j,])
         dftemp <- dframe
-        dftemp$maxval <- maxval
-        dftemp$matchval <- matchval
-        
+        dftemp$maxval <- as.numeric(apply(dframe,1,max))
+        dftemp$matchval <- as.numeric(apply(dframe,1,FUN=function(x) match(max(x),x)))
         dframe <- dframe[with(dftemp,order(matchval,-maxval)),,drop=FALSE]
+        rm(dftemp)
       }
       
       if(sortind=="label") dframe <- dframe[order(rownames(dframe)),,drop=FALSE]
@@ -2146,134 +2151,155 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,sortind=NA,grplabpos=NA,line
         dframe <- dframe[order(dframe[[sortind]]),,drop=FALSE]
       }
     }
-    labelposbind <- NA
-    markerposbind <- NA
+    label_position <- NA
+    marker_position <- NA
   }
   
   # sorting with grplab
   if(!all(is.na(grplab)))
   {
     gnames <- names(grplab)
+    onames <- setdiff(gnames,selgrp)
     
     if(!is.na(sortind))
     {
+      # sort by all
       if(sortind=="all")
       {
-        maxval <- apply(dframe,1,max)
-        matchval <- vector(length=nrow(dframe))
-        for(j in 1:nrow(dframe)) matchval[j] <- match(maxval[j],dframe[j,])
         dftemp <- dframe
-        dftemp$maxval <- maxval
-        dftemp$matchval <- matchval
+        # find the max value for each individual
+        dftemp$maxval <- as.numeric(apply(dframe,1,max))
+        # pick cluster with max value
+        dftemp$matchval <- as.numeric(apply(dframe,1,FUN=function(x) match(max(x),x)))
         
         if(length(intersect(colnames(dftemp),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dftemp),colnames(grplab)),collapse=", "),")."))
         dftemp <- cbind(dftemp,grplab)
         
-        rle1 <- rle(as.character(unlist(grplab[selgrp])))
-        grplabnames <- rle1$values
-        tovec <- cumsum(rle1$lengths)
-        fromvec <- (tovec - rle1$lengths)+1
-        dftemplist <- vector("list",length=length(grplabnames))
-        for(k in 1:length(tovec))
+        if(ordergrp)
         {
-          dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
-          dftemp1$grp <- NULL
-          dftemplist[[k]] <- dftemp1[with(dftemp1,order(matchval,-maxval)),,drop=FALSE]
+          sort_asc <- c(selgrp,onames,"matchval")
+          sort_desc <- "maxval"
+          dframe <- dftemp[do.call(order,c(as.list(dftemp[sort_asc]),lapply(dftemp[sort_desc],function(x) -xtfrm(x)))),]
+        }else{
+          rle1 <- rle(as.character(unlist(grplab[selgrp])))
+          grplabnames <- rle1$values
+          tovec <- cumsum(rle1$lengths)
+          fromvec <- (tovec - rle1$lengths)+1
+          dftemplist <- vector("list",length=length(grplabnames))
+          for(k in 1:length(tovec))
+          {
+            dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
+            dftemp1$grp <- NULL
+            dftemplist[[k]] <- dftemp1[with(dftemp1,order(matchval,-maxval)),,drop=FALSE]
+          }
+          dframe <- do.call("rbind",dftemplist)
         }
         
-        dframe <- do.call("rbind",dftemplist)
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
         dframe$maxval <- NULL
         dframe$matchval <- NULL
       }
       
+      # sort by label
       if(sortind=="label")
       {
-        dftemp <- dframe
-        if(length(intersect(colnames(dftemp),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dftemp),colnames(grplab)),collapse=", "),")."))
-        dftemp <- cbind(dftemp,grplab)
-        
-        rle1 <- rle(as.character(unlist(grplab[selgrp])))
-        grplabnames <- rle1$values
-        tovec <- cumsum(rle1$lengths)
-        fromvec <- (tovec - rle1$lengths)+1
-        dftemplist <- vector("list",length=length(grplabnames))
-        for(k in 1:length(tovec))
+        if(length(intersect(colnames(dframe),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dframe),colnames(grplab)),collapse=", "),")."))
+        dftemp <- cbind(dframe,grplab)
+
+        if(ordergrp)
         {
-          dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
-          dftemp1$grp <- NULL
-          dftemplist[[k]] <- dftemp1[order(rownames(dftemp1)),,drop=FALSE]
+          dftemp$label <- rownames(dftemp)
+          sort_asc <- c(selgrp,onames,"label")
+          dframe <- dftemp[do.call(order,dftemp[,sort_asc]),]
+          dframe$label <- NULL
+        }else{
+          rle1 <- rle(as.character(unlist(grplab[selgrp])))
+          grplabnames <- rle1$values
+          tovec <- cumsum(rle1$lengths)
+          fromvec <- (tovec - rle1$lengths)+1
+          dftemplist <- vector("list",length=length(grplabnames))
+          for(k in 1:length(tovec))
+          {
+            dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
+            dftemp1$grp <- NULL
+            dftemplist[[k]] <- dftemp1[order(rownames(dftemp1)),,drop=FALSE]
+          }
+          dframe <- do.call("rbind",dftemplist)
         }
         
-        dframe <- do.call("rbind",dftemplist)
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
       }
       
-      
+      # sort by cluster
       if(sortind!="all" && sortind!="label")
       {
         if(!(sortind %in% colnames(dframe))) stop(paste0("sortInd: 'sortind' value (",sortind,") not found in file header (",paste0(colnames(dframe),collapse=", "),")."))
-        clnum <- which(sortind==colnames(dframe))
-        dftemp <- dframe
-        if(length(intersect(colnames(dftemp),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dftemp),colnames(grplab)),collapse=", "),")."))
-        dftemp <- cbind(dftemp,grplab)
-        
-        rle1 <- rle(as.character(unlist(grplab[selgrp])))
-        grplabnames <- rle1$values
-        tovec <- cumsum(rle1$lengths)
-        fromvec <- (tovec - rle1$lengths)+1
-        dftemplist <- vector("list",length=length(grplabnames))
-        for(k in 1:length(tovec))
+        # checks if sortind variable is a column in dframe
+        if(length(intersect(colnames(dframe),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dframe),colnames(grplab)),collapse=", "),")."))
+        dftemp <- cbind(dframe,grplab)
+  
+        if(ordergrp)
         {
-          dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
-          dftemp1$grp <- NULL
-          dftemplist[[k]] <- dftemp1[order(dftemp1[[sortind]]),,drop=FALSE]
+          sort_asc <- c(selgrp,onames,sortind)
+          dframe <- dftemp[do.call(order,dftemp[,sort_asc]),]
+        }else{
+          rle1 <- rle(as.character(unlist(grplab[selgrp])))
+          grplabnames <- rle1$values
+          tovec <- cumsum(rle1$lengths)
+          fromvec <- (tovec - rle1$lengths)+1
+          dftemplist <- vector("list",length=length(grplabnames))
+          for(k in 1:length(tovec))
+          {
+            dftemp1 <- dftemp[fromvec[k]:tovec[k],,drop=FALSE]
+            dftemp1$grp <- NULL
+            dftemplist[[k]] <- dftemp1[order(dftemp1[[sortind]]),,drop=FALSE]
+          }
+          dframe <- do.call("rbind",dftemplist)
         }
-        
-        dframe <- do.call("rbind",dftemplist)
+
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
       }
     }
     
-    # create labelpos and markerpos
+    # create label_position and marker_position
     gnames <- names(grplab)
-    markerlist <- vector("list",length=length(gnames))
-    labellist <- vector("list",length=length(gnames))
+    marker_position_list <- vector("list",length=length(gnames))
+    label_position_list <- vector("list",length=length(gnames))
     intlablist <- vector("list",length=length(gnames))
-    for(k in 1:length(gnames))
+    for(k in seq_along(gnames))
     {
       rlegrp <- rle(unlist(grplab[gnames[k]]))
-      labelpos <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
-      markerpos <- data.frame(markerxpos=c(0,cumsum(labelpos$freq)),stringsAsFactors=F)
-      labelpos$labxpos <- round((diff(markerpos$markerxpos)/2)+markerpos$markerxpos[1:length(markerpos$markerxpos)-1],1)
-      labelpos$labypos <- rep(grplabpos,nrow(labelpos))
-      markerpos$temp <- factor(rep(1,nrow(markerpos)))
-      markerpos$markerypos <- rep(linepos,nrow(markerpos))
+      label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
+      marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=F)
+      label_position_df$labxpos <- round((diff(marker_position_df$markerxpos)/2)+marker_position_df$markerxpos[1:length(marker_position_df$markerxpos)-1],1)
+      label_position_df$labypos <- rep(grplabpos,nrow(label_position_df))
+      #marker_position_df$temp <- factor(rep(1,nrow(marker_position_df)))
+      marker_position_df$markerypos <- rep(linepos,nrow(marker_position_df))
       
-      markerpos$count <- gnames[k]
-      markerlist[[k]] <- markerpos
-      labelpos$count <- gnames[k]
-      labellist[[k]] <- labelpos
+      marker_position_df$count <- gnames[k]
+      marker_position_list[[k]] <- marker_position_df
+      label_position_df$count <- gnames[k]
+      label_position_list[[k]] <- label_position_df
     }
     
-    markerposbind <- do.call("rbind",markerlist)
-    markerposbind$count <- factor(markerposbind$count,levels=gnames)
-    labelposbind <- do.call("rbind",labellist)
-    labelposbind$count <- factor(labelposbind$count,levels=gnames)
+    marker_position <- do.call("rbind",marker_position_list)
+    marker_position$count <- factor(marker_position$count,levels=gnames)
+    label_position <- do.call("rbind",label_position_list)
+    label_position$count <- factor(label_position$count,levels=gnames)
     
-    rownames(markerposbind) <- 1:nrow(markerposbind)
-    rownames(labelposbind) <- 1:nrow(labelposbind)
+    rownames(marker_position) <- 1:nrow(marker_position)
+    rownames(label_position) <- 1:nrow(label_position)
     
     #adjust divider position
-    markerposbind$divxpos <- markerposbind$markerxpos+0.5
+    marker_position$divxpos <- marker_position$markerxpos+0.5
   }
   
 
   
-  return(list(dframe=dframe,grplab=grplab,labelpos=labelposbind,markerpos=markerposbind))
+  return(list(dframe=dframe,grplab=grplab,label_position=label_position,marker_position=marker_position))
 }
 
 # plotQ ---------------------------------------------------------------------
@@ -2324,6 +2350,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,sortind=NA,grplabpos=NA,line
 #' @param grplabjust A numeric indicating the justification of group labels. Defaults to 0.5 if grplabangle=0  or 1 if grplabangle between 20 and 135.
 #' @param grplabcol A colour character for the colour of group labels. Defaults to "grey30".
 #' @param grplabalpha A numeric between 0 and 1 denoting transparency of group labels. Defaults to 1.
+#' @param grplabface A character specifying font face. Either 'plain', 'italic', 'bold' or 'bold.italic'.
 #' @param showindlab A logical indicating if individual labels must be shown. See details.
 #' @param sharedindlab A logical indicating if only one set of shared individual labels must be shown below all plots. Applicable only when \code{imgoutput="join"}. Individual labels are visible only when \code{showindlab=TRUE}.
 #' @param useindlab A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as individual labels. See details.
@@ -2531,7 +2558,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
                     showsp=TRUE,sppos="right",splab=NA,splabsize=NULL,splabangle=NULL,splabcol="grey30",splabface="plain",spbgcol=NA,
                     showtitle=FALSE,titlelab=NA,titlehjust=0,titlevjust=0.5,titlesize=NULL,titlecol="grey30",titleface="plain",titlespacer=1.4,titleangle=0,
                     showsubtitle=FALSE,subtitlelab=NA,subtitlehjust=0,subtitlevjust=0.5,subtitlesize=NULL,subtitlecol="grey30",subtitleface="plain",subtitlespacer=1.5,subtitleangle=0,
-                    grplabspacer=0,grplabheight=NA,grplabpos=0.25,grplabsize=NA,grplabangle=NA,grplabjust=NA,grplabcol="grey30",grplabalpha=1,
+                    grplabspacer=0,grplabheight=NA,grplabpos=0.25,grplabsize=NA,grplabangle=NA,grplabjust=NA,grplabcol="grey30",grplabalpha=1,grplabface="plain",
                     showindlab=FALSE,sharedindlab=TRUE,useindlab=FALSE,indlabwithgrplab=FALSE,indlabspacer=1.5,indlabheight=0.2,indlabsep=" ",indlabsize=NULL,indlabangle=90,indlabvjust=0.5,indlabhjust=1,indlabcol="grey30",
                     pointsize=NA,pointcol="grey30",pointbgcol="grey30",pointtype="|",pointalpha=1,
                     linepos=0.75,linesize=NA,linecol="grey30",linetype=1,linealpha=1,
@@ -2558,7 +2585,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   if(length(sortind) > 1) stop("plotQ: Argument 'sortind' must be of length 1. Use 'all','label' or a cluster name like 'Cluster1'.")
   if(is.na(sortind)) {sortindcheck <- "empty"}else{sortindcheck <- sortind}
   # if sort not label, set sharedindlab in use, error
-  if(imgoutput=="join" && sortindcheck != "label" && sortindcheck != "empty" && sharedindlab) stop("plotQ: When 'sortind' is 'all' or a cluster, 'sharedindlab' must be set to FALSE.")
+  if(imgoutput=="join" && sortindcheck != "label" && sortindcheck != "empty" && sharedindlab) stop("plotQ: With 'joined' plots, when 'sortind' is 'all' or a cluster, 'sharedindlab' must be set to FALSE.")
   
   if(!any(is.na(clustercol))) {if(!is.character(clustercol)) stop("plotQ: Argument 'clustercol' must be a character datatype.")}
   if(!is.logical(useindlab)) stop("plotQ: Argument 'useindlab' set incorrectly. Set as TRUE or FALSE.")
@@ -2584,6 +2611,8 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   if(is.na(basesize)) stop("plotQ: Argument 'basesize' is NA.")
   if(length(panelratio)!=2) stop("plotQ: Argument 'panelratio' must be an integer vector of length 2.")
   panelratio <- as.integer(panelratio)
+  if(grplabpos > 1 || grplabpos < 0) stop("plotQ: Argument 'grplabpos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'grplabheight'.")
+  if(grplabpos > 1 || grplabpos < 0) stop("plotQ: Argument 'linepos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'grplabheight'.")
   
   # ggplot version
   ggv <- as.numeric(gsub("\\.","",packageDescription("ggplot2", fields="Version")))
@@ -2591,10 +2620,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   
   # defaults
   col3 <- "grey30"
-  
-  if(grplabpos > 1 || grplabpos < 0) stop("plotQ: Argument 'grplabpos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'grplabheight'.")
-  if(grplabpos > 1 || grplabpos < 0) stop("plotQ: Argument 'linepos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'grplabheight'.")
-  
+
   # check grplabels
   if(!all(is.na(grplab)))
   {
@@ -2646,7 +2672,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       list_grplab <- vector("list",length=flen)
     }
     if(returnplot) list_plot <- vector("list",length=flen)
-    for (i in 1:flen)
+    for (i in seq_along(qlist))
     {
       #output name
       fname <- names(qlist)[i]
@@ -2690,23 +2716,23 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
                                           subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
                                           grplabpos=grplabpos,linepos=linepos,
                                           indlabwithgrplab=indlabwithgrplab,
-                                          indlabsep=indlabsep)
+                                          indlabsep=indlabsep,runid=i)
         df1 <- templist$dframe
         grplabloop <- templist$grplab
-        markerpos <- templist$markerpos
-        labelpos <- templist$labelpos
+        marker_position <- templist$marker_position
+        label_position <- templist$label_position
         rm(templist)
       }
       
       # sorting individuals
       if(!is.na(sortind))
       {
-        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,
+        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
                                         sortind=sortind,grplabpos=grplabpos,linepos=linepos)
         df1 <- templist$dframe
         grplabloop <- templist$grplab
-        markerpos <- templist$markerpos
-        labelpos <- templist$labelpos
+        marker_position <- templist$marker_position
+        label_position <- templist$label_position
         rm(templist)
       }
 
@@ -2852,8 +2878,8 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         # add grp divider lines only if 2 grps or more
         if(showdiv)
         {
-          markerpos1 <- markerpos[c(markerpos$count %in% divgrp),]
-          if(nrow(markerpos1) > 2) gg_plot_panel <- gg_plot_panel+geom_vline(xintercept=markerpos1$divxpos[-c(1,length(markerpos1$divxpos))],colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
+          div_position <- marker_position[c(marker_position$count %in% divgrp),]
+          if(nrow(div_position) > 2) gg_plot_panel <- gg_plot_panel+geom_vline(xintercept=div_position$divxpos[-c(1,length(div_position$divxpos))],colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
         }
         
         ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=1,grplabsize=grplabsize,grplabangle=grplabangle,
@@ -2876,15 +2902,15 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 
         # create bottom plot with labels
         gg_plot_grplab <- ggplot2::ggplot()+
-              geom_blank(data=labelpos,aes(x=labxpos,y=labypos))+
-              geom_text(data=labelpos,aes(x=labxpos,y=labypos),label=labelpos$label,size=ppar$grplabsize,angle=ppar$grplabangle,hjust=ppar$grplabjust,colour=grplabcol,alpha=grplabalpha,family=font)+
-              geom_line(data=markerpos,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
-              geom_point(data=markerpos,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
+              geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
+              geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,size=ppar$grplabsize,angle=ppar$grplabangle,hjust=ppar$grplabjust,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
+              geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+              geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
               scale_x_continuous(expand=c(0,0))+
               scale_y_continuous(expand=c(0,0),limits=c(0,1))+
               labs(x=NULL,y=NULL)+
               #facet_grid(count~.,switch=sppos,labeller=labeller(count=glabfacetnames))+
-              facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(labelpos$count)))+
+              facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
               get(theme)(base_family=font,base_size=basesize)+
               theme(legend.position="none",
                     panel.grid=element_blank(),
@@ -2950,6 +2976,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   {
     # checks
     if(flen < 2) stop("plotQ: Joined plot cannot be created. Number of selected files less than 2.")
+    if(grplabcheck && grplablen>1 && sortindcheck!="empty" && !ordergrp) stop("plotQ: With Joined plot, when using grplab with multiple label groups and sorting by cluster or 'all', set 'ordergrp=TRUE'.")
 
     tempdf <- tabulateQ(qlist,sorttable=FALSE)
     
@@ -2984,13 +3011,13 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     facetnames <- vector(length=flen)
     kvec <- vector(length=flen)
     strt <- 1
-    oclist <- vector("list",length=flen)
+    div_position_list <- vector("list",length=flen)
     if(returndata)
     {
       list_qlist <- vector("list",length=flen)
       list_grplab <- vector("list",length=flen)
     }
-    for (i in seq(from=1,to=flen))
+    for (i in seq_along(qlist))
     {
       fname <- names(qlist)[i]
       fname <- gsub(".txt$|.csv$|.tsv$|.meanq$|.meanQ$|.structure$","",fname)
@@ -3009,23 +3036,24 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
                   subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
                   grplabpos=grplabpos,linepos=linepos,
                   indlabwithgrplab=indlabwithgrplab,
-                  indlabsep=indlabsep)
+                  indlabsep=indlabsep,runid=i)
         
         df1 <- templist$dframe
         grplabloop <- templist$grplab
-        markerpos <- templist$markerpos
-        labelpos <- templist$labelpos
+        marker_position <- templist$marker_position
+        label_position <- templist$label_position
         rm(templist)
       }
 
       # sorting individuals
       if(!is.na(sortind))
       {
-        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,sortind=sortind,grplabpos=grplabpos,linepos=linepos)
+        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
+                                        sortind=sortind,grplabpos=grplabpos,linepos=linepos)
         df1 <- templist$dframe
         grplabloop <- templist$grplab
-        markerpos <- templist$markerpos
-        labelpos <- templist$labelpos
+        marker_position <- templist$marker_position
+        label_position <- templist$label_position
         rm(templist)
       }
       
@@ -3048,14 +3076,6 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       df1$order_cumulative <- order_cumulative
       strt <- (i*Ind)+1
       
-      #modified markerpos when cum ordering in use (for sortind != "label")
-      if(sortindcheck!="label" && sortindcheck!="empty" && grplabcheck)
-      {
-      #  oclist[[i]] <- data.frame(markerxpos=c(0,order_cumulative[markerpos$markerxpos]),
-      #                            temp=markerpos$temp,markerypos=markerpos$markerypos,
-      #                            count=markerpos$count,stringsAsFactors=F)
-      }
-      
       # strip panel labelling
       if(any(is.na(splab)))
       {
@@ -3074,11 +3094,30 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       df2 <- tidyr::gather(df1,"variable","value",-c(ind,run,order_ind,order_cumulative))
       #plist[[i]] <- df2[rev(1:nrow(df2)),]
       plist[[i]] <- df2
+      
+      # div position
+      # positions of div lines are selected from group label marker positions. 
+      # top and bottom marker positions are removed since ends do not need div lines
+      # for joined plots with runs>1, the div positions are readjusted
+      if(grplabcheck)
+      {
+        div_position <- marker_position[c(marker_position$count %in% divgrp),]
+        div_position <- div_position[seq(from=2,to=(nrow(div_position)-1)),,drop=F]
+        div_position$run <- i
+        if(i>1 && sortindcheck!="label" && sortindcheck!="empty") 
+        {
+          div_position$divxpos <- div_position$divxpos+Ind
+          div_position$markerxpos <- div_position$markerxpos+Ind
+        }
+        div_position_list[[i]] <- div_position
+      }
+      
       rm(df2)
     }
     
     # combine list to one dataframe 
     df3 <- do.call("rbind",plist)
+    if(grplabcheck) div_position <- do.call("rbind",div_position_list)
     #names(facetnames) <- levels(factor(as.character(df3$run)))
 
     # legendlab
@@ -3106,24 +3145,29 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 
     ## COMMON PLOT TOP PANEL ----------------------------------------------------
     # create plot
-    if(sortindcheck!="label" && sortindcheck!="empty")
+    # when unsorted or sorting is by label, x-axis is by individual order
+    # when sorting is by cluster or all, x-axis is set to cumulative order
+    # in both cases, x-axis text is overridden by actual individual labels
+    if(sortindcheck=="label" || sortindcheck=="empty")
     {
-      gg_plot_panel <- ggplot2::ggplot(data=df3,aes(x=order_cumulative,y=value,fill=variable))+
-        geom_bar(width=barsize,size=barbordersize,colour=barbordercolour,stat="identity",position="fill",na.rm=na.rm)+
-        scale_x_continuous(breaks=df3$order_cumulative,labels=df3$ind,expand=c(0,0))+
-        scale_y_continuous(expand=c(0,0))+
-        scale_fill_manual(values=coll,labels=legendlab1)+
-        get(theme)(base_family=font,base_size=basesize)
-    }else{
       gg_plot_panel <- ggplot2::ggplot(data=df3,aes(x=order_ind,y=value,fill=variable))+
         geom_bar(width=barsize,size=barbordersize,colour=barbordercolour,stat="identity",position="fill",na.rm=na.rm)+
         scale_x_continuous(breaks=df3$order_ind,labels=df3$ind,expand=c(0,0))+
         scale_y_continuous(expand=c(0,0))+
         scale_fill_manual(values=coll,labels=legendlab1)+
         get(theme)(base_family=font,base_size=basesize)
+    }else{
+      gg_plot_panel <- ggplot2::ggplot(data=df3,aes(x=order_cumulative,y=value,fill=variable))+
+        geom_bar(width=barsize,size=barbordersize,colour=barbordercolour,stat="identity",position="fill",na.rm=na.rm)+
+        scale_x_continuous(breaks=df3$order_cumulative,labels=df3$ind,expand=c(0,0))+
+        scale_y_continuous(expand=c(0,0))+
+        scale_fill_manual(values=coll,labels=legendlab1)+
+        get(theme)(base_family=font,base_size=basesize)
     }
-
+    
     # shared indlab
+    # when ind labs are shared, x-axis is fixed
+    # when ind labels are not shared, x-axis is free
     if(sharedindlab) gg_plot_panel <- gg_plot_panel+facet_wrap(~run,labeller=labeller(run=facetnames),strip.position=sppos,scales="fixed",nrow=flen,drop=TRUE)
     if(!sharedindlab) gg_plot_panel <- gg_plot_panel+facet_wrap(~run,labeller=labeller(run=facetnames),strip.position=sppos,scales="free_x",nrow=flen,drop=TRUE)
 
@@ -3208,26 +3252,10 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     
     if(grplabcheck)
     {
-      # modify markerpos when sortind != 'label'
-      #if(sortindcheck!="label" && sortindcheck!="empty")
-      #{
-      #  markerpos <- do.call("rbind",oclist)
-      #  markerpos$divxpos <- markerpos$markerxpos+0.5
-      #}
-      
       # add grp divider lines only if 2 grps or more
       if(showdiv) 
       {
-      markerpos1 <- markerpos[c(markerpos$count %in% divgrp),]
-      markerpos1 <- markerpos1[seq(from=2,to=(nrow(markerpos1)-1)),,drop=F]
-      #  print(markerpos1)
-      #  if(nrow(markerpos1) > 2) gg_plot_panel <- gg_plot_panel+geom_segment(data=markerpos1,aes(x=divxpos,xend=divxpos,y=0,yend=1),colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
-      if(grplabcheck && sortindcheck!="label" && sortindcheck!="empty" && !sharedindlab)
-      {
-        warning("Divider lines are currently not printed on 'join' plots with group labels and sorting other than 'label'.\n")
-      }else{
-        if(nrow(markerpos1) > 0) gg_plot_panel <- gg_plot_panel+geom_vline(data=markerpos1,aes(xintercept=divxpos),colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
-      }
+        if(nrow(div_position) > 0) gg_plot_panel <- gg_plot_panel+geom_vline(data=div_position,aes(xintercept=divxpos),colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
       }
       
       # plot with grp labels
@@ -3251,14 +3279,14 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       
       # create bottom plot with labels
       gg_plot_grplab <- ggplot2::ggplot()+
-        geom_blank(data=labelpos,aes(x=labxpos,y=labypos))+
-        geom_text(data=labelpos,aes(x=labxpos,y=labypos),label=labelpos$label,angle=ppar$grplabangle,hjust=ppar$grplabjust,size=ppar$grplabsize,colour=grplabcol,alpha=grplabalpha,family=font)+
-        geom_line(data=markerpos,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
-        geom_point(data=markerpos,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
+        geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
+        geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,angle=ppar$grplabangle,hjust=ppar$grplabjust,size=ppar$grplabsize,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
+        geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+        geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
         scale_x_continuous(expand=c(0,0))+
         scale_y_continuous(expand=c(0,0),limits=c(0,1))+
         labs(x=NULL,y=NULL)+
-        facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(labelpos$count)))+
+        facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
         get(theme)(base_family=font,base_size=basesize)+
         theme(legend.position="none",
               panel.grid=element_blank(),
@@ -3596,7 +3624,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     list_grplab <- vector("list",length=len1)
   }
   if(returnplot) list_plot <- vector("list",length=len1)
-  for (i in 1:len1)
+  for (i in seq_along(qlist))
   {
     # sample name
     fname <- names(qlist)[i]
@@ -3622,7 +3650,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     {
       templist <- pophelper:::grpLabels(dframe=dff,grplab=grplabloop,selgrp=selgrp,
                                         subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
-                                        indlabwithgrplab=indlabwithgrplab,indlabsep=indlabsep)
+                                        indlabwithgrplab=indlabwithgrplab,indlabsep=indlabsep,runid=i)
       dff <- templist$dframe
       grplabloop <- templist$grplab
       if(any(duplicated(rle(grplabloop[,selgrp])$values))) stop("plotQMultiline: Group labels cannot be used due to non-contiguous blocks of labels. Change grplab, selgrp or use 'ordergrp=TRUE'.")
@@ -3632,7 +3660,8 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
       # ordering individuals
       if(!is.na(sortind))
       {
-        templist <- pophelper:::sortInd(dframe=dff,grplab=grplabloop,selgrp=selgrp,sortind=sortind)
+        templist <- pophelper:::sortInd(dframe=dff,grplab=grplabloop,selgrp=selgrp,
+                                        ordergrp=ordergrp,sortind=sortind)
         dff <- templist$dframe
         grplabloop <- templist$grplab
         rm(templist)
@@ -4058,7 +4087,7 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
   currwd <- getwd()
   if(as.numeric(file.access(currwd,2))==-1) stop(paste0("distructExport: Directory ",currwd," has no write permission."))
   
-  for(i in 1:flen)
+  for(i in seq_along(qlist))
   {
     # sample name
     fname <- names(qlist)[i]
@@ -4497,7 +4526,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.5.1 ready.")
+  packageStartupMessage("pophelper v2.2.6 ready.")
 }
 
 # End --------------------------------------------------------------------------

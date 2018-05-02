@@ -1,6 +1,6 @@
 # Test Script
-# v2.2.5.1
-# 19-Jan-2018
+# v2.2.6
+# 02-May-2018
 
 library(testthat)
 library(pophelper)
@@ -61,7 +61,7 @@ context("Check runs")
 cat("checkQ ---------------------------------------------------------------\n")
 
 len <- length(ftype)
-for(i in 1:len)
+for(i in seq_along(ftype))
 {
   cat(paste0("Running ",i," of ",len,". "))
   files <- get(ftype[i])
@@ -526,7 +526,7 @@ grplabs <- read.delim(system.file("files/grplab.txt",package="pophelper"),string
 
 imgout <- c("sep","join")
 
-for(i in 1:length(imgout))
+for(i in seq_along(imgout))
 {
   
   imgo <- imgout[i]
@@ -625,7 +625,7 @@ for(i in 1:length(imgout))
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,selgrp="lab2",ordergrp=TRUE,sortind="all",sharedindlab=F)
   
   #multiple labels sortind Cluster1
-  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,sortind="Cluster1",sharedindlab=F)
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,sortind="Cluster1",sharedindlab=F,ordergrp=TRUE)
   
   #multiple labels ordergrp sortind label
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,ordergrp=TRUE,sortind="label")
@@ -673,13 +673,13 @@ for(i in 1:length(imgout))
   plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,grpmean=T)
   
   #check grpmean with rep labels sortind
-  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="all",sharedindlab=F)
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="all",sharedindlab=F,ordergrp=TRUE)
   
   #check grpmean with rep labels sortind
-  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="label")
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="label",ordergrp=TRUE)
   
   #check grpmean with rep labels sortind showindlab
-  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="label",showindlab=T,width=15)
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,sortind="label",showindlab=T,width=15,ordergrp=TRUE)
   
   expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grpsrep,subsetgrp="Pop A"))
   
@@ -715,6 +715,10 @@ for(i in 1:length(imgout))
     plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp="a",width=16)
     #sharedindlab with reorder
     plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp=c("b","a"),width=16)
+    #error sharedindlab error
+    expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,showindlab=T,sortind="Cluster1"))
+    #error ordergrp error
+    expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,showindlab=T,sortind="Cluster1",sharedindlab=F))
   }
   
   #showyaxis

@@ -1,11 +1,11 @@
-# pophelper 2.2.5.1
+# pophelper 2.2.6
 
 `pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output run files generated from population analysis programs such as STRUCTURE, TESS, TESS3, BAPS and numeric delimited formats such as ADMIXTURE or fastSTRUCTURE. The `pophelper` package can be used to read run files to R, tabulate runs, summarise runs, estimate *K* using the Evanno method, align clusters within K using CLUMPP, export files for DISTRUCT and generate barplot figures.  
 
 For a detailed demonstration and walkthrough, refer the online [vignette](http://royfrancis.github.io/pophelper/). For information about changes in the latest version, visit [this GitHub page](https://github.com/royfrancis/pophelper/releases).
 
 ## Installation  
-You need to have R (> 3.3.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the dependency packages. Then, you can install `pophelper` from `github` using the `devtools` package.  
+You need to have R (> 3.4.0) statistical package installed on your system. [R](https://www.r-project.org/) is open-source and freely available to download for Windows, Mac and other OS. Then, install the dependency packages. Then, you can install `pophelper` from `github` using the `devtools` package.  
 
 ```coffee
 # install dependencies and devtools
@@ -23,7 +23,7 @@ Note that `pophelper 1.2.0` and later includes binary executables for CLUMPP and
 `pophelper` has been tested on the following systems: 
 
 + Windows 10 64bit, R 3.4.3
-+ Windows 10 64bit, R 3.3.3
++ Windows 7 64bit, R 3.4.3 (DISTRUCT is unstable)
 + Windows 7 64bit, R 3.4.0 (DISTRUCT is unstable)
 + Scientific Linux 6.8 (Carbon) 64bit, R 3.4.0
 

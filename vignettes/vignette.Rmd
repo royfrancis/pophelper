@@ -1,5 +1,5 @@
 ---
-title: "Pophelper 2.2.5"
+title: "Pophelper 2.2.6"
 output: 
   bookdown::html_document2: 
     code_folding: "none"
@@ -12,6 +12,7 @@ output:
     self_contained: true
     highlight: tango 
     theme: flatly
+    df_print: paged
 vignette: >
   %\VignetteIndexEntry{pophelper tutorial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -152,7 +153,7 @@ In this section, we will look at how these functions are used, their syntax and 
 
 The `pophelper` library must be loaded and a working directory must be set.
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 library(pophelper)
 setwd("path-to-wd")
 ```
@@ -161,12 +162,12 @@ setwd("path-to-wd")
 
 This function is applicable only to TESS 2.3 runs. Unlike STRUCTURE runs which are exported into a single directory, TESS output files are exported into separate directories by run. This means that one needs to go into individual folders to obtain the run file. The function `collectRunsTess()` collects TESS cluster files from individual run folders into one new folder and rename each runfile by the folder name. Set working directory first and run basic usage.
 
-```{r,echo=FALSE, eval=FALSE, results='hide'}
+```{r,echo=FALSE,eval=FALSE,results='hide'}
 # basic usage
 collectRunsTess(runsdir="D://Data/Dropbox/Rwork/pophelperRpackage/tessoriginal")
 ```
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 collectRunsTess(runsdir="path-to-tess-runs-root-dir")
 
@@ -184,7 +185,7 @@ Within each TESS run folder, the function searches for filename ending with 'TR.
 
 All input filetypes (STRUCTURE, TESS 2.3, BASIC, CLUMPP) can be read into R and converted to a 'qlist' object using the function `readQ()`. The argument `filetype` is used to specify the input filetype. By default, `filetype` is set to 'auto' which automatically detects input filetype. If this does not work, `filetype` can also be manually set.
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 readQ()                     # automatically detects input filetype
 readQ(filetype="auto")      # automatically detects input filetype
 readQ(filetype="structure") # Convert STRUCTURE run files to qlist
@@ -195,7 +196,7 @@ readQ(filetype="clumpp")    # Convert CLUMPP format files to qlist
 
 When specifying location to a file locally, use one of below:
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 # file is located in the current working directory. use full filename.
 sfiles <- "file.structure"
 sfiles <- "file.txt"
@@ -209,7 +210,7 @@ readQ(files=sfiles)
 
 For this tutorial, we will use the sample files accompanied with this package. Therefore we read file from within the R package. 
 
-```{r, echo=TRUE, eval=TRUE, results='hide'}
+```{r,echo=TRUE,eval=TRUE,results='hide'}
 # STRUCTURE files (do not use this command to read local files)
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"), full.names=T)
 # basic usage
@@ -255,7 +256,7 @@ mclist <- readQ(files=mcfiles)
 
 TESS 3 when run within R produces a `tess3` object. This object can be converted to a pophelper qlist using the function `readQTess3()`. Runs are labelled sample1, sample2 etc.
 
-```{r,echo=TRUE, eval=FALSE, results='hide'}
+```{r,echo=TRUE,eval=FALSE,results='hide'}
 t3obj <- readRDS(system.file("files/tess3.rds",package="pophelper"))
 t3list <- readQTess3(t3obj)
 ```
@@ -268,7 +269,7 @@ TESS 3 attributes ind, k, loci, gif, rmse, crossentropy and ploidy are retained.
 
 The attributes of the run can be accessed as below.
 
-```{r,echo=TRUE, eval=FALSE, results='hide'}
+```{r,echo=TRUE,eval=TRUE}
 # qlist attributes
 attributes(slist)
 # dataframe attributes
@@ -277,7 +278,7 @@ attributes(slist[[1]])
 
 If individual labels are present in the STRUCTURE file, they can be imported as rownames by setting `indlabfromfile=T`. Space in labels may be replaced by underscore. Incorrect parsing with internal population flags may introduce underscores. If duplicate labels are found, the labels are not imported. This is applicable only for STRUCTURE files.
 
-```{r,echo=TRUE, eval=FALSE, results='hide'}
+```{r,echo=TRUE,eval=FALSE,results='hide'}
 # include individual names from STRUCTURE file as row names
 slist <- readQ(files=sfiles, indlabfromfile=T)
 
@@ -287,7 +288,7 @@ readQ(files=sfiles[1], indlabfromfile=T)
 
 CLUMPP files (COMBINED, ALIGNED and MERGED) files can also be converted to a 'qlist' using `readQ()`. We use some sample files from the package. To create CLUMPP files, see section on clumppExport.  
 
-```{r,echo=TRUE, eval=FALSE, results='hide'}
+```{r,echo=TRUE,eval=FALSE,results='hide'}
 co <- system.file("files/STRUCTUREpop_K4-combined.txt", package="pophelper")
 al <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt", package="pophelper")
 me <- system.file("files/STRUCTUREpop_K4-combined-merged.txt", package="pophelper")
@@ -306,7 +307,7 @@ For information on the 'qlist' object and advanced operations on 'qlist', see se
 ## tabulateQ 
 The function `tabulateQ()` takes a 'qlist' and produces a table of runs with various parameters. The results can be pointed to a variable for further use.
 
-```{r,echo=TRUE, eval=FALSE, results='hide'}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 tr1 <- tabulateQ(qlist=slist)
 tabulateQ(tlist)
@@ -326,21 +327,22 @@ For all filetypes, the `tabulateQ()` function returns a table with three columns
 
 `r tc(name="tc_tabulatedtess",caption="_A tabulated table of TESS runs._")`  
 
-```{r, echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 head(tabulateQ(tlist))
 ```
 
 To keep runs in the original order, use `sorttable=FALSE`.
 
 `r tc(name="tc_tabulatedtess_notsorted",caption="_A tabulated table of TESS runs unsorted._")`  
-```{r, echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 head(tabulateQ(tlist,sorttable=FALSE))
 ```
 
 For STRUCTURE runs, the `tabulateQ()` function produces additional columns namely number of loci, number of burn-ins, number of replicates (reps), estimated ln probability of data (elpd), mean value of ln likelihood (mvll) and variance of ln likelihood (vll). The table is sorted by loci, ind and *K*. 
 
-`r tc(name="tc_tabulatedstructure",caption="_A tabulated table of STRUCTURE runs._")`  
-```{r, echo=TRUE, eval=TRUE}
+`r tc(name="tc_tabulatedstructure",caption="_A tabulated table of STRUCTURE runs._")` 
+
+```{r,echo=TRUE,eval=TRUE}
 head(tabulateQ(slist))
 ```
 
@@ -350,7 +352,7 @@ Missing values are given NA. The tabulated output can be written to the working 
 
 The table produced using `tabulateQ()` can be further collapsed by *K* based on the number of runs. The output table from `tabulateQ()` can be passed as input to `summariseQ()`. 
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 sr1 <- summariseQ(tr1)
 summariseQ(tr1, writetable=TRUE)
@@ -369,7 +371,8 @@ For all filetypes the `summariseQ()` function returns 3 columns namely individua
 For STRUCTURE runs, the `summariseQ()` function returns additional 5 columns namely loci, Mean estimated ln probability of data, standard deviation of estimated ln probability of data, estimated ln probability of data minus standard deviation and estimated ln probability of data plus standard deviation.
 
 `r tc(name="tc_summarisedstructure",caption="_A summarised table of STRUCTURE runs._")`  
-```{r, echo=TRUE, eval=TRUE}
+
+```{r,echo=TRUE,eval=TRUE}
 head(summariseQ(tabulateQ(slist)))
 ```
 
@@ -381,7 +384,8 @@ This function is only applicable to STRUCTURE runs.
 
 The Evanno method^2^ is used to estimate the optimal number of *K*. The summarised runs table output from`summariseQ()` function can be input to `evannoMethodStructure()`. The `evannoMethodStructure()` function creates an Evanno derivative plot if suitable conditions are met. A resulting table is also returned. The plot can be written to file using argument `exportplot=T`. The table can be written to file using `writetable=T`.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
+
 # basic usage
 evannoMethodStructure(data=sr1)
 
@@ -404,7 +408,7 @@ p <- evannoMethodStructure(data=sr1,exportplot=F,returnplot=T)
 p <- evannoMethodStructure(data=sr1,exportplot=F,returnplot=T,returndata=F)
 ```
 
-```{r,echo=TRUE, eval=TRUE,fig.height=5,fig.width=5}
+```{r,echo=TRUE,eval=TRUE,fig.height=5,fig.width=5}
 sr1 <- summariseQ(tabulateQ(slist))
 p <- evannoMethodStructure(data=sr1,exportplot=F,returnplot=T,returndata=F,basesize=12,linesize=0.7)
 grid.arrange(p)
@@ -416,7 +420,7 @@ The Evanno method results table has 15 columns namely number of loci (loci), num
 
 `r tc(name="tc_evannoresults",caption="_Results of the Evanno method._")`  
 
-```{r, echo=FALSE, eval=TRUE}
+```{r,echo=FALSE,eval=TRUE}
 evannoMethodStructure(summariseQ(tabulateQ(slist)))
 ```
 
@@ -424,7 +428,7 @@ The peak of deltaK is usually used to estimate the best value of *K*.
 
 The Evanno method can be computed only if these criteria are met: At least 3 values of *K* must be available, values of *K* must be sequential (ie; there must not be missing values of *K*), number of individuals and loci must be same in all runs. If number of repeats for any *K* is less than 2, then results may not be reliable. In case the Evanno method cannot be computed, a plot of ELPD over *K* is produced referred to as the kPlot.  
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=3}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=3}
 p <- evannoMethodStructure(data=sr1[-3,],exportplot=F,returnplot=T,returndata=F,basesize=12,linesize=0.7)
 grid.arrange(p)
 ```
@@ -435,7 +439,7 @@ grid.arrange(p)
 
 When multiple repeats are run for each *K*, the order of clusters may be jumbled for each run. Therefore, when plotting multiple runs within each *K*, the colours cannot be assigned correctly as shown in figure below. 
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"), full.names=T)
 slist <- readQ(sfiles)
 
@@ -452,7 +456,7 @@ The software CLUMPP helps to overcome this issue by reordering the clusters corr
 
 The function `clumppExport()` takes a 'qlist', combines runs by *K* and generates a combined data file and a paramfile in separate directories. The combined file contains the tabular cluster data from all the repeats and runs. The paramfile contains information for the CLUMPP executable. The name for the folder can be changed optionally using the argument `prefix="something"`. When the argument `useexe=T` is used, the CLUMPP executable (included with `pophelper`) will be run automatically. This may not work on all OS and versions. Remember to cite CLUMPP^4^ if this option is used. 
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 clumppExport(qlist=slist, useexe=T)
 
@@ -481,7 +485,7 @@ The aligned file contains all the runs as in the combined file after realignment
 
 We run our example samples.  
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # generate clumpp files, run clumpp and produce aligned files
 clumppExport(slist[c(3,4,10)],useexe=T)
 ```
@@ -558,7 +562,7 @@ Run completed.
 
 The aligned file can be read in and plotted.  
 
-```{r, echo=TRUE,eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # read aligned file
 aligned <- readQ("./pop_K3/pop_K3-combined-aligned.txt")
 
@@ -575,7 +579,7 @@ Note that CLUMPP can only be used to align clusters with a given *K*. Clusters c
 
 The CLUMPP output files are now distributed in multiple folders. The aligned, merged or both files can be copied from multiple folders into a single folder for further analyses using the function `collectClumppOutput()`. The working directory is set suitably before running this function. This function need a `prefix` argument which denotes the prefix used in the previous function or the text before the underscore. For ex. a directory named `pop_K2` has the prefix `pop`.  
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # set working directory
 setwd(choose.dir())
 # collect aligned files. Default prefix is pop
@@ -604,7 +608,7 @@ Collecting the aligned and merged files into a single folder can be helpful in p
 
 This is a wrapper function for easily performing several `pophelper` functions in one function. Input files can be STRUCTURE, TESS or BASIC run files. The `analyseQ()` function performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 analyseQ(choose.files())
 
@@ -626,7 +630,7 @@ The function `plotQ()` is used to create stacked assignment barplots from a 'qli
 
 The full code used to create the above figure is shown below. Details are explained further on.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"), full.names=T)
 slist <- readQ(files=sfiles,indlabfromfile=T)
 
@@ -645,7 +649,7 @@ plotQ(slist[2:3],imgoutput="join",showindlab=T,grplab=twolabset,
 
 The `imgoutput` argument is used to indicate if multiple runs must be plotted as separate plots or as a joined plot. When `imgoutput="sep"`, each run file is plotted and exported as separate figures. When `imgoutput="join"`, all selected run files are plotted as a single figure and exported. Default is set as `imgoutput="sep"`.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # plot first run separately
 plotQ(qlist=slist[1])
 
@@ -686,7 +690,7 @@ The spacing between panels in a 'join' plot can be adjusted using `panelspacer`.
 
 The panel on the right side of the plot is the strip panel. The strip panel is displayed by default (`showsp=T`). The strip panel shows labels referred to as the strip labels or strip panel labels. The strip panel by default shows the filename and the *K* value. Strip panel label can be changed to show custom labels or the panel can be turned off altogether. If custom labels are provided, they must be equal to the number of runs.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # turn off strip panel
 plotQ(qlist=slist1[1], showsp=F)
 # move strip panel to the left
@@ -718,7 +722,6 @@ plotQ(qlist=slist1[1], spbgcol="coral")
 ```
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=8}
-
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
            sppos="left",splabcol="red",spbgcol="grey")
@@ -889,7 +892,7 @@ plotQ(qlist=slist1[3], showlegend=T, legendtextsize=5)
 
 The clusters in 'qlist' are by default named Cluster1, Cluster2 etc. The cluster names can be renamed by providing custom labels to argument `legendlab`. The length of `legendlab` must be equal to the max number of clusters in the selected runs. 
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 # number of columns or K value in selected runs
 sapply(slist1[c(1,3)],ncol)
 # joined plot with custom legend labels
@@ -947,7 +950,7 @@ Individual labels are row names of the 'qlist' dataframes. Individual labels alt
 
 The default `useindlab=F`, creates labels numerically in the original order of data but with zero padding. For example, if there are 10 individuals, labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up to 100. Zero padding to ensure optimal sorting. When `useindlab=T`, labels are used from the rownames of 'qlist' dataframes. They are usually labelled 1,2,3.. if read in using `readQ()`. 
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
 # without indlabfromfile
 slist <- readQ(files=sfiles)
@@ -956,7 +959,7 @@ head(slist[[1]])
 
 This is not optimal for sorting by labels `sortind="label"`. For STRUCTURE files with individual labels, they can be read in automatically using `readQ(indlabfromfile=T)`. `indlabfromfile` only works for STRUCTURE files and not for other run files.
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 # with useindlabfromfile
 slist <- readQ(files=sfiles, indlabfromfile=TRUE)
 head(slist[[1]])
@@ -964,7 +967,7 @@ head(slist[[1]])
 
 The rownames of 'qlist' can also be modified by the user by adding custom individual labels. 
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=F)
 # add indlab to one run
 rownames(slist[[1]]) <- inds$V1
@@ -1022,7 +1025,7 @@ The spacing between the panel and individual labels can be controlled using `ind
 
 Individuals in a plot are by default plotted in the order as in the input data. The individuals can be sorted based on the value of any one of the clusters ('Cluster1'), 'all' or 'label'. The 'all' option produces a sort similar to that in the software STRUCTURE. All clusters are taken into account to sort individuals. When using the name of a cluster, like 'Cluster1', 'Cluster2' etc, all individuals are sorted by value of the specified cluster.  
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # sorted by cluster 1
 plotQ(slist1[c(1,3)], sortind="Cluster1")
 # sorted by cluster 2
@@ -1034,17 +1037,17 @@ plotQ(slist1[c(1,3)], sortind="all")
 plotQ(slist1[1], sortind="Cluster3") # gives error because this file contains only 2 clusters
 
 # sorted by cluster 1, three files joined plot
-plotQ(slist1[c(1,3)], sortind="Cluster1", imgoutput="join")
-plotQ(slist1[c(1,3)], sortind="all", imgoutput="join")
+plotQ(slist1[c(1,3)], sortind="Cluster1", imgoutput="join",sharedindlab=F)
+plotQ(slist1[c(1,3)], sortind="all", imgoutput="join",sharedindlab=F)
 ```
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=8}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
-            sort="Cluster1")
+            sortind="Cluster1")
 
 p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
-            sort="Cluster1",sharedindlab=F)
+            sortind="Cluster1",sharedindlab=F)
 
 grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```
@@ -1054,10 +1057,10 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```{r,echo=TRUE,eval=TRUE,fig.height=2.5,fig.width=8}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
-            sort="all",showindlab=T,showyaxis=T,showticks=T)
+            sortind="all",showindlab=T,showyaxis=T,showticks=T)
 
 p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
-            sort="all",sharedindlab=F,showindlab=T,showyaxis=T,showticks=T)
+            sortind="all",sharedindlab=F,showindlab=T,showyaxis=T,showticks=T)
 
 grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```
@@ -1070,7 +1073,7 @@ When using `sortind="label"`, individuals are sorted by individual labels. Indiv
 
 One or more sets of group labels can be added to the bottom of barplots by providing a 'data.frame' object. The number of rows of the 'data.frame' must be equal to the number of individuals. The header of the 'data.frame' is the group label set title.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # group labels with one group label set
 data.frame(lab1=c("A","A","A","B","B"))
 # group labels with two group label sets
@@ -1079,7 +1082,7 @@ data.frame(type=c("A","A","A","B","B"),loc=c("Brazil","Brazil","Chile","Chile","
 
 In this demonstration, we will use group labels in the `pophelper` library. This is a 'data.frame' with three columns, ie; three group label sets.  
 
-```{r, echo=TRUE,eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 slist1 <- sapply(slist,function(x) x[c(1:5,20:25,50:55,100:105,130:135),])
 
 # read labels for STRUCTURE runs
@@ -1091,6 +1094,7 @@ nrow(threelabset)
 sapply(threelabset, is.character)
 
 # create short set to match slist1
+onelabset <- threelabset[,2,drop=FALSE]
 threelabset1 <- threelabset[c(1:5,20:25,50:55,100:105,130:135),]
 twolabset1 <- threelabset1[,2:3]
 ```
@@ -1099,7 +1103,7 @@ Make sure that the labels are character datatype. When reading from a text file,
 
 For now we use a single label set. Note the use of `drop=FALSE` to preserve the single label set as a 'data.frame'.
 
-```{r, echo=TRUE,eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 onelabset1 <- threelabset1[,2,drop=FALSE]
 head(onelabset1)
 #plotQ(qlist=slist[1], grplab=threelabset, outputfilename="structure-single-grplab")
@@ -1125,10 +1129,12 @@ The group label set title or the header of the group label 'data.frame' is shown
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=8}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
-            grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T)
+            grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,
+            showindlab=T,grplabface="italic")
 
-p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
-            grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T)
+p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,
+            basesize=11,grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,
+            showindlab=T)
 
 grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```
@@ -1194,14 +1200,13 @@ Turning on individual labels help to identify individuals. Shown for 'join' plot
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=6}
 # modified for this document
-p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
+p1 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=4,linesize=0.8,pointsize=3,
             sharedindlab=F,sortind="all",showindlab=T)
-
-grid.arrange(p2$plot[[1]])
+grid.arrange(p1$plot[[1]])
 ```
 
-`r fc(name="fc_plotq_grplab_sort_indlab",caption="_Sorting of individuals with group labels in a 'join' plot. Unshared individual labels are displayed._")` 
+`r fc(name="fc_plotq_grplab_sort_indlab",caption="_Sorting of individuals with group labels in a 'join' plot. Individual labels are displayed under each subplot. The individual label reflects how samples were sorted from their original order._")` 
 
 Sorting by `label` sorts all individuals by the individual label. Since this is same across all runs and K, a shared individual label is possible when `imgoutput="join"`. If group labels are concatenated to the individual labels, the full concatenated string will determine the final sort order of the individuals. See previous section 'Individual labels' and 'Sort individuals' for more information. 
 
@@ -1220,11 +1225,13 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 
 `r fc(name="fc_plotq_grplab_sort_indlab_useindlab",caption="_Sorting of individuals with group labels in a 'join' plot. Both plots are sorted by 'label' Left plot uses default individual labels (\x60useindlab=F\x60) while the right plot uses individual labels from the qlist (\x60useindlab=T\x60). Note the difference in sorting order._")` 
 
+Shared labelling between runs is possible only when unsorted or sorting by 'label'. When sorting by 'all' or a cluster, each run may have a different sort order and a shared common label is not possible.
+
 ### Subset/reorder groups
 
 When using group labels, the plot can be subsetted or reordered based on group labels. Below are examples using group labels with single group label set.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # subsetting groups
 plotQ(slist[1], grplab=onelabset, subsetgrp="CatB")
 # change order of groups
@@ -1236,7 +1243,8 @@ plotQ(slist[1], grplab=onelabset, subsetgrp="CatA",sortind="all")
 
 # change order of groups and sorting individuals
 plotQ(slist[1], grplab=onelabset, subsetgrp=c("CatB","CatA"), sortind="Cluster1")
-plotQ(slist[c(1,3)], grplab=onelabset, subsetgrp=c("CatB","CatA"), sortind="all", imgoutput="join")
+plotQ(slist[c(1,3)], grplab=onelabset, subsetgrp=c("CatB","CatA"), 
+      sharedindlab=F, sortind="all", imgoutput="join")
 ```
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=10}
@@ -1258,39 +1266,39 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],p3$plot[[1]],ncol=3)
 
 We can also sort along with subset and reordering.
 
-```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=10}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=10}
 # modified for this document
 p1 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T)
 
 p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
-            subsetgrp="CatA",sort="Cluster1",sharedindlab=F)
+            subsetgrp="CatA",sortind="Cluster1",sharedindlab=F)
 
 p3 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
-            subsetgrp=c("CatB","CatA"),sort="Cluster1",sharedindlab=F)
+            subsetgrp=c("CatB","CatA"),sortind="Cluster1",sharedindlab=F)
 
 p4 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
-            subsetgrp="CatA",sort="all",sharedindlab=F)
+            subsetgrp="CatA",sortind="all",sharedindlab=F)
 
 p5 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
-            subsetgrp=c("CatB","CatA"),sort="all",sharedindlab=F)
+            subsetgrp=c("CatB","CatA"),sortind="all",sharedindlab=F)
 
 grid.arrange(p1$plot[[1]],p2$plot[[1]],p3$plot[[1]],p4$plot[[1]],p5$plot[[1]],
              layout_matrix=matrix(c(1,2,3,1,4,5),ncol=3,byrow=T))
 ```
 `r fc(name="fc_plotq_grplab_subsetreorder_sort",caption="_'join' plots showing subsetting and reordering using group labels and sorting. Left shows a 'join' plot with one group label set. Middle top shows subset on 'CatA' and sorted by 'Cluster1'. Middle bottom shows subset on 'CatA' and sorted by 'all'. Right top shows reorder to 'CatB,CatA' and sorted by 'Cluster1'. Right bottom shows reorder to 'CatB,CatA' and sorted by 'all'. Individual labels are displayed to show change in positions._")`  
 
-All of the above can be extended to group labels with more than one set. For more details for group labels with more than one label set, see 'Multiple label sets'.
+All of the above can be extended to group labels with more than one set. For more details for group labels with more than one label set, see 'Multiple label sets' further below.
 
 ### Group mean  
 
 An additional feature is the ability to plot mean values (`grpmean=T`) by group when group labels are in use.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # group mean
 plotQ(slist[4], grplab=onelabset, grpmean=T)
 plotQ(readQ(al), imgoutput="join", grplab=onelabset, grpmean=T)
@@ -1315,14 +1323,14 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 
 In the example group label so far, the labels were already in contiguous blocks. But, if labels are not in contiguous blocks, ie; there are duplicated non-contiguous blocks of labels, many of the options such as sorting, subsetting etc cannot be used. Below illustrates this concept.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE, eval=FALSE}
 Contiguous block: A,A,A,A,B,B,C,C,C
 Non-contiguous block: A,A,A,B,B,A,A,C,C
 ```
 
 Here we use a single group label set which is in non-contiguous blocks. And we plot the data.
 
-```{r, echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
+```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
 onelabsetrep <- threelabset1[,1,drop=FALSE]
 
 # multiple blocks of duplicate labels
@@ -1347,7 +1355,7 @@ Error in pophelper:::grpLabels(dframe = df1, grplab = grplabloop, selgrp = selgr
 
 Non-contiguous labels can be grouped into contiguous blocks using `ordergrp=TRUE`. When using this, the labels are sorted alphabetically along with the data. The individuals are no longer in the original order as input.
 
-```{r, echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
+```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabsetrep,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
@@ -1360,11 +1368,11 @@ grid.arrange(p1$plot[[1]])
 
 Ordered group labels can now be sorted, subsetted or reordered.
 
-```{r, echo=TRUE,eval=TRUE,fig.height=2,fig.width=10}
+```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=10}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabsetrep,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
-            ordergrp=T,sort="all")
+            ordergrp=T,sortind="all")
 
 p2 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=onelabsetrep,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
@@ -1382,10 +1390,10 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],p3$plot[[1]],ncol=3)
 
 ### Multiple label sets
 
-More than one set of group label sets can be be added to the plot simply by providing more columns in the `grplab` 'data.frame'.
+More than one set of group label sets can be be added to the plot simply by providing more columns in the `grplab` 'data.frame'. Here is an example.
 
 ```{r, echo=TRUE, eval=TRUE}
-head(threelabset1)
+threelabset1
 ```
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2.5,fig.width=8}
@@ -1397,24 +1405,43 @@ p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,ba
 grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```
 
-`r fc(name="fc_plotq_grplab_three",caption="_Barplot with three group label sets. 'sep' plot (top) and 'join' plot (bottom)._")` 
+`r fc(name="fc_plotq_grplab_three",caption="_Barplot with three group label sets. 'sep' plot (left) and 'join' plot (right)._")` 
 
-When plotting with mutiple group label sets, one group label set is defined as the selected group. This is declared using the argument `selgrp`. The value in `selgrp` must be one the group label set titles (headers in the grplab 'data.frame'). If `selgrp` is not explicitly specified, the first group label set is taken as `selgrp`. If only one group label set is used, then `selgrp` is automatically the title of that set. `selgrp` denotes which label set is used for `subsetgrp`, `ordergrp` and `grpmean`. `sortind` will sort within `selgrp`.
+When plotting with mutiple group label sets, one group label set is defined as the selected group. This is declared using the argument `selgrp`. The value in `selgrp` must be one the group label set titles (headers in the grplab 'data.frame'). If `selgrp` is not explicitly specified, the first group label set is taken as `selgrp`. If only one group label set is used, then `selgrp` is automatically the title of that set. `selgrp` denotes which label set is used for `subsetgrp`, `ordergrp` and `grpmean`. 
+
+When sorting by 'label', 'all' or a cluster, sorting occurs within group labels. `ordergrp=T` must be set when sorting in a 'joined' plot with multiple group labels. This orders all group labels starting with `selgrp`.
+
+To illustrate this further, imagine three label sets 'type', 'cat' and 'loc'. `selgrp` is set as `selgrp="cat"`. When sorting by 'Cluster1' (`sortind="Cluster1"`), the table is ordered by 'cat','type','loc' and 'Cluster1' in that order.
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2.5,fig.width=8}
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,panelratio=c(5,1),
-            selgrp="cat",sort="Cluster1")
+            selgrp="cat",sortind="Cluster1")
 
 p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,sharedindlab=F,
-            selgrp="cat",sort="all")
+            selgrp="cat",sortind="all",ordergrp=TRUE)
 
 grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 ```
 
 `r fc(name="fc_plotq_grplab_mlsort",caption="_Sorting when using multiple group label sets._")`   
+
+```{r,echo=TRUE,eval=TRUE,fig.height=2.5,fig.width=8}
+# modified for this document
+p1 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
+            grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,sharedindlab=F,
+            selgrp="cat",sortind="all",ordergrp=TRUE)
+
+p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
+            grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,sharedindlab=F,
+            selgrp="loc",sortind="all",ordergrp=TRUE)
+
+grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
+```
+
+`r fc(name="fc_plotq_grplab_mlsort_selgrp",caption="_Changing the selected group when sorting individuals. Left by cat and right, by loc. Both plots are sorted by 'all'._")` 
 
 Subsetting and reordering works similarly when using multiple label sets.
 
@@ -1474,9 +1501,24 @@ grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
 
 `r fc(name="fc_plotq_divgrp",caption="_(A) Left: Default divider lines for 'type'. (B) Right: Divider lines for both group label sets 'type' and 'cat'._")`   
 
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
+# modified for this document
+p1 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
+            grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,
+            ordergrp=T,sortind="all",sharedindlab=F)
+
+p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
+            grplab=threelabset1,grplabsize=3.5,linesize=0.8,pointsize=3,showindlab=T,ordergrp=T,
+            divgrp=c("type","cat"),sortind="Cluster1",sharedindlab=F)
+
+grid.arrange(p1$plot[[1]],p2$plot[[1]],ncol=2)
+```
+
+`r fc(name="fc_plotq_divgrp",caption="_(A) Left: Default divider lines for 'type'. (B) Right: Divider lines for both group label sets 'type' and 'cat'._")`  
+
 The divider liness can also be modified and adjusted.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # change div colour, type and thickness
 plotQ(slist[1], grplab=threelabset, divcol="coral", divtype=1, divsize=0.8, divalpha=0.5)
 ```
@@ -1519,7 +1561,7 @@ __Plot visual adjustments__
 
 Examples of some of plot options that can be modified.  
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # adjust label angle and justification
 plotQ(slist1[1], grplab=threelabset1, grplabangle=-90, grplabjust=0.5)
 
@@ -1602,7 +1644,7 @@ __Export dimensions and resolution__
 
 The height, width, resolution and figure format can be changed as shown below. The `height` specifies the height of one panel if the plot is joined. The function multiplies the height values by the number of panels. Similarly, the `grplabheight` specifies the height of the group label panel with one group label set. Multiple label sets are multipled. The width of the plot is automatically calculated based on the number of individuals. This ranges from 5cm to 30cm.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 slist <- readQ(sfiles)
 
 # change height and width of figure
@@ -1679,13 +1721,13 @@ It is recommended to read through the `plotQ` section first because many of the 
 
 ### Basic usage
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 #do not use this command to read local files
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"), full.names=T)
 slist <- readQ(files=sfiles,indlabfromfile=T)
 ```
 
-```{r,echo=TRUE, eval=TRUE,fig.height=4,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=8}
 #normal usage
 #plotQMultiline(slist[1])
 
@@ -1698,7 +1740,7 @@ grid.arrange(p$plot[[1]][[1]])
 
 The number of individuals per line (samples per line `spl`) and the number of lines per page `lpp` can be controlled separately or together.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=4,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=8}
 #normal usage
 #plotQMultiline(slist[1],spl=60)
 
@@ -1711,7 +1753,7 @@ grid.arrange(p$plot[[1]][[1]])
 
 When `spl` is fixed to 60, a new line created to accomodate the rest of the samples.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=4,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=8}
 #normal usage
 #plotQMultiline(slist[1],lpp=4)
 
@@ -1726,7 +1768,7 @@ grid.arrange(p$plot[[1]][[1]])
 
 More examples of adjustments.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 plotQMultiline(slist[1])
 plotQMultiline(slist[1:3])
@@ -1742,9 +1784,9 @@ plotQMultiline(readQ(co),spl=75, lpp=10)
 
 # change bar width and turn off labels
 al <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt", package="pophelper")
-plotQMultiline(readQ(al), barsize=1, indlab=F)
+plotQMultiline(readQ(al), barsize=1, showindlab=F)
 # yaxis labels and ticks and modified height and width
-plotQMultiline(readQ(al), spl=75, lpp=2, indlab=T, showyaxis=T, showticks=T, height=5, width=20)
+plotQMultiline(readQ(al), spl=75, lpp=2, showindlab=T, showyaxis=T, showticks=T, height=5, width=20)
 # modified spl
 me <- system.file("files/STRUCTUREpop_K4-combined-merged.txt", package="pophelper")
 plotQMultiline(readQ(me), spl=38, height=8, width=14)
@@ -1754,7 +1796,7 @@ plotQMultiline(readQ(me), spl=38, height=8, width=14)
 
 `plotMultiline()` labels individuals numerically with padded zeros (01,02,03..). The number of padded zeros depend on the total number of individuals. Less than 100 individuals start with 01, 02... while hundreds of individuals start with 001, 002.. etc. Labels with padded zeros are better suited for sorting. This is default behaviour `useindlab=F`. Instead of automatically creating the labels, predefined labels can be used from the rownames of input data by specifying `useindlab=T`. Custom labels can be manually added as rownames anytime.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # get a qlist
 list1 <- slist[1]
 # show rownames
@@ -1790,7 +1832,7 @@ Note that runs read in using `readQ()` have rownames 1,2,3.. etc which may not b
 
 Individual labels are displayed on the plot by default when `showindlab=T`. They can be turned off by `showindlab=F`. Note that this only controls the display of individual labels on the plot. The labels are still present in the underlying data and are still in use for sorting etc.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=4,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1)
 p2 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,useindlab=T)
@@ -1805,7 +1847,7 @@ Similar to `plotQ()`, the individuals can be sorted based on the value of any on
 
 Using `sortind="label"` sorts individuals by individual labels. The default `useindlab=F`, creates labels numerically in the original order of data but with zero padding. For example, if there are 10 individuals, labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up to 100. Zero padding to ensure optimal sorting. When `useindlab=T`, labels are used from rownames of 'qlist' dataframes. They are usually labelled 1,2,3.. if read in using `readQ()`. This can be an issue with sorting by labels `sortind="label"`. For STRUCTURE files with individual labels, they can be read in automatically using `readQ(indlabfromfile=T)`. The rownames of 'qlist' dataframes can also be modified by the user. 
 
-```{r,echo=TRUE, eval=TRUE,fig.height=4,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=4,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,lpp=1,barsize=1,useindlab=T)
 p2 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,lpp=1,barsize=1,useindlab=T,sortind="Cluster1")
@@ -1820,14 +1862,14 @@ grid.arrange(p1$plot[[1]][[1]],p2$plot[[1]][[1]],p3$plot[[1]][[1]],p4$plot[[1]][
 
 One or more sets of group labels can be added to the bottom of barplots by providing a 'data.frame' object. The number of rows of the 'data.frame' must be equal to the number of individuals. The header of the 'data.frame' is the group label set title. See section 'Group labels' under 'plotQ' for more information about group labels.  
 
-```{r,echo=TRUE, eval=TRUE}
+```{r,echo=TRUE,eval=TRUE}
 #do not use this command to read local files
 threelabset <- read.delim(system.file("files/metadata.txt", package="pophelper"), header=T,stringsAsFactors=F)
 twolabset <- threelabset[,2:3]
 onelabset <- threelabset[,2,drop=F]
 ```
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=onelabset)
 grid.arrange(p1$plot[[1]][[1]])
@@ -1837,7 +1879,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 Group labels are displayed on the top of the plot as strip panels by default. A gap is added between individuals of different label groups. By setting `indlabwithgrplab=T`, group labels can be concatenated to the individual labels using separator `indlabsep`. The default label separator is space. For example, individuals 1 and 2 with group labels popA and popB produces labels '1 popA' and '2 popB'. Top strip panels can be turned off using `showgrplab=FALSE`.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=onelabset,indlabwithgrplab=T)
 grid.arrange(p1$plot[[1]][[1]])
@@ -1847,7 +1889,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 Multiple group label sets can be added. When using multiple group label sets, argument `selgrp` is used to declare which is the selected/active group. `selgrp` is used for `subsetgrp`, `grpmean` and `ordergrp`. `sortind` will sort within `selgrp`. If labels are in non-contiguous blocks, set `ordergrp=T` to order all labels into contiguous blocks starting with `selgrp`.  
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=threelabset,ordergrp=T)
 grid.arrange(p1$plot[[1]][[1]])
@@ -1859,7 +1901,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 When using group labels, the plot can be subsetted or reordered based on group labels. When sorting individuals, all individuals are sorted by full individual names when using `sortind="labels"`. But when using `sortind="Cluster1"` or `sortind="all"`, individuals are sorted within groups.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=threelabset,ordergrp=T,subsetgrp="Tropical")
 grid.arrange(p1$plot[[1]][[1]])
@@ -1867,7 +1909,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 `r fc(name="fc_pqm_grplab_subset",caption="_Using group labels with subsetting._")`  
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=threelabset,ordergrp=T,selgrp="loc",subsetgrp=c("Greece","Brazil"))
 grid.arrange(p1$plot[[1]][[1]])
@@ -1877,7 +1919,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 More examples of sorting, subsetting and reordering.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # subsetting groups
 plotQMultiline(list1, grplab=threelabset, ordergrp=T, subsetgrp="Tropical")
 # change order of groups
@@ -1898,7 +1940,7 @@ plotQMultiline(list1, grplab=threelabset, selgrp="cat", subsetgrp=c("CatA","CatB
 
 Title and/or subtitle can be displayed using `showtitle=T` and `showsubtitle=T` respectively. The file name is displayed by default. Custom label can be provided using `titlelab` or `subtitlelab`. If multiple plots are exported, then a character vector of labels equal to number of plots must be provided. Title/subtitle is only displayed in the topmost panel on the first page (in case of multiple pages).  
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=threelabset,ordergrp=T,
                      showtitle=T,showsubtitle=T,titlelab="Structure plot",
@@ -1912,7 +1954,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 Legend can be displayed using `showlegend=T`. The file name is displayed by default. The clusters in 'qlist' are by default named Cluster1, Cluster2 etc. The cluster names can be renamed by providing custom labels to argument `legendlab`. The length of `legendlab` must be equal to the max number of clusters in the selected runs. Legend is only displayed in the topmost panel on the first page (in case of multiple pages).  
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p1 <- plotQMultiline(slist[1],exportplot=F,returnplot=T,barsize=1,grplab=threelabset,ordergrp=T,
                      showlegend=T,legendkeysize=8,legendtextsize=10,legendlab=c("group1","group2"))
@@ -1925,7 +1967,7 @@ grid.arrange(p1$plot[[1]][[1]])
 
 The cluster colours can be changed by passing a vector of colours to the argument `clustercol`. For examples of colour palettes, see section under `plotQ()`, 'Cluster colours'.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # change cluster colours
 plotQMultiline(list1, useindlab=T, clustercol=c("steelblue","coral","darkorchid3"))
 
@@ -1945,7 +1987,7 @@ Output file names are created automatically by default using the input 'qlist' n
 
 The plot can be returned and saved as done in this document.
 
-```{r,echo=TRUE, eval=TRUE,fig.height=3,fig.width=8}
+```{r,echo=TRUE,eval=TRUE,fig.height=3,fig.width=8}
 #modified for this document
 p <- plotQMultiline(slist[1],exportplot=F,returnplot=T)
 print(p)
@@ -1959,7 +2001,7 @@ Note that this function can be slow and takes several minutes to run depending o
 
 DISTRUCT^7^ is one of the original programs written to generate assignment barplots from a q-matrix. This function generates all output files necessary to run DISTRUCT from a 'qlist'. A directory labelled 'filename-distruct' is created for each input file. Each directory contains the 'filename-indq.txt', 'filename-grpq.txt', 'filename-colours.txt' and 'drawparams'. If grplab is in use, then 'filename-grplabbottom.txt' and/or 'filename-grplabtop.txt' are also created. The DISTRUCT executable can be run in this directory to create a 'filename.ps' postcript vector file. Using `useexe=T` will run the DISTRUCT executable automatically. Remember to cite DISTRUCT^7^ if this option is used. The 'filename.ps' file can be imported into a vector image editing software or seen using a viewer.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 # basic usage
 distructExport(slist[1])
 distructExport(slist[1], quiet=T)
@@ -1995,7 +2037,7 @@ The `readQ()` function in `pophelper` is used to read in these different input f
 
 A schematic data structure of a two run 'qlist' would look like below:
 
-```{r, eval=FALSE}
+```{r,eval=FALSE}
 $list
 +--$list
 +  +--$data.frame
@@ -2005,7 +2047,7 @@ $list
 
 An example is shown below
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=T)
 sf <- readQ(files=sfiles[1:2])
 str(sf)
@@ -2013,7 +2055,7 @@ str(sf)
 
 The function `is.qlist()` can be used to verify if a 'qlist' meets the basic structure to work with `pophelper` functions. `is.qlist()` returns `TRUE` if yes else `FALSE` with warnings. 
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 is.qlist(sf)
 ```
 
@@ -2021,7 +2063,7 @@ A 'qlist' can also be create manually or generated in R just like any other list
 
 Here is a toy 'qlist' object
 
-```{r, eval=FALSE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 # create two data frames
 df1 <- data.frame(Cluster1=c(0.2,0.4,0.6,0.2), Cluster2=c(0.8,0.6,0.4,0.8))
 df2 <- data.frame(Cluster1=c(0.3,0.1,0.5,0.6), Cluster2=c(0.7,0.9,0.5,0.4))
@@ -2105,7 +2147,7 @@ sapply(slist,function(x) x[x[,1]>0.2,])
 
 Here is a list of all functions in a order typical of workflow. The steps are applicable to all run types unless indicated.
 
-```{r,echo=TRUE, eval=FALSE}
+```{r,echo=TRUE,eval=FALSE}
 
 # collect runs (only for TESS 2.3 output)
 collectRunsTess(runsdir=choose.dir())
@@ -2203,22 +2245,31 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] pophelper_2.2.5 ggplot2_2.2.1   Cairo_1.5-9    
+[1] testthat_2.0.0     pophelper_2.2.6    ggplot2_2.2.1.9000
+[4] Cairo_1.5-9       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     tidyr_0.7.2      grid_3.4.3       plyr_1.8.4      
- [5] gtable_0.2.0     magrittr_1.5     scales_0.5.0     pillar_1.0.1    
- [9] rlang_0.1.6      lazyeval_0.2.1   tools_3.4.3      glue_1.2.0      
-[13] purrr_0.2.4      munsell_0.4.3    compiler_3.4.3   colorspace_1.3-2
-[17] gridExtra_2.3    tibble_1.4.1
+ [1] Rcpp_0.12.16      magrittr_1.5      tidyselect_0.2.4 
+ [4] munsell_0.4.3     colorspace_1.3-2  R6_2.2.2         
+ [7] rlang_0.2.0.9001  stringr_1.3.0     plyr_1.8.4       
+[10] tools_3.4.3       grid_3.4.3        gtable_0.2.0     
+[13] withr_2.1.2       yaml_2.1.18       lazyeval_0.2.1   
+[16] digest_0.6.15     tibble_1.4.2      gridExtra_2.3    
+[19] purrr_0.2.4       reshape2_1.4.3    tidyr_0.8.0      
+[22] glue_1.2.0        labeling_0.3      stringi_1.1.7    
+[25] compiler_3.4.3    pillar_1.2.1      scales_0.5.0.9000
 ```
 
-+ Windows 10 64bit, R 3.3.3
++ Windows 7 64bit, R 3.4.3
+
+DISTRUCT executable worked but unstable.
 
 ```{coffee,echo=TRUE, eval=FALSE}
-R version 3.3.3 (2017-03-06)
+R version 3.4.3 (2017-11-30)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows >= 8 x64 (build 9200)
+Running under: Windows 7 x64 (build 7601) Service Pack 1
+
+Matrix products: default
 
 locale:
 [1] LC_COLLATE=English_United Kingdom.1252 
@@ -2231,15 +2282,16 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] pophelper_2.2.4 ggplot2_2.2.1   Cairo_1.5-9     testthat_1.0.2 
+[1] testthat_2.0.0  pophelper_2.2.6 ggplot2_2.2.1   Cairo_1.5-9    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     tidyr_0.7.2      digest_0.6.12    crayon_1.3.4    
- [5] grid_3.3.3       R6_2.2.2         plyr_1.8.4       gtable_0.2.0    
- [9] magrittr_1.5     scales_0.5.0     rlang_0.1.4      lazyeval_0.2.1  
-[13] rstudioapi_0.7   labeling_0.3     tools_3.3.3      glue_1.2.0      
-[17] purrr_0.2.4      munsell_0.4.3    colorspace_1.3-2 tidyselect_0.2.3
-[21] gridExtra_2.3    tibble_1.3.4   
+ [1] Rcpp_0.12.16     magrittr_1.5     tidyselect_0.2.4 munsell_0.4.3   
+ [5] colorspace_1.3-2 R6_2.2.2         rlang_0.2.0      stringr_1.3.0   
+ [9] plyr_1.8.4       tools_3.4.3      grid_3.4.3       gtable_0.2.0    
+[13] withr_2.1.1      yaml_2.1.18      lazyeval_0.2.1   digest_0.6.15   
+[17] tibble_1.4.2     gridExtra_2.3    purrr_0.2.4      reshape2_1.4.3  
+[21] tidyr_0.8.0      glue_1.2.0       labeling_0.3     stringi_1.1.7   
+[25] compiler_3.4.3   pillar_1.2.1     scales_0.5.0 
 ```
 
 + Windows 7 64bit, R 3.4.0
@@ -2264,19 +2316,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] pophelper_2.2.4 ggplot2_2.2.1   Cairo_1.5-9     testthat_1.0.2 
+ [1] tibble_1.4.2    bookdown_0.7    markdown_0.8    rmarkdown_1.9  
+ [5] knitr_1.20      testthat_2.0.0  extrafont_0.17  gridExtra_2.3  
+ [9] captioner_2.2.3 pophelper_2.2.6 ggplot2_2.2.1   Cairo_1.5-9    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     compiler_3.4.0   git2r_0.19.0     plyr_1.8.4      
- [5] bindr_0.1        tools_3.4.0      digest_0.6.12    memoise_1.1.0   
- [9] tibble_1.3.4     gtable_0.2.0     pkgconfig_2.0.1  rlang_0.1.2     
-[13] curl_2.8.1       bindrcpp_0.2     gridExtra_2.3    withr_2.0.0     
-[17] httr_1.3.0       dplyr_0.7.2      stringr_1.2.0    knitr_1.16      
-[21] devtools_1.13.3  grid_3.4.0       tidyselect_0.2.0 glue_1.1.1      
-[25] R6_2.2.2         tidyr_0.7.2      purrr_0.2.3      reshape2_1.4.2  
-[29] magrittr_1.5     scales_0.5.0     assertthat_0.2.0 colorspace_1.3-2
-[33] labeling_0.3     stringi_1.1.5    lazyeval_0.2.0   munsell_0.4.3   
-[37] crayon_1.3.2
+ [1] Rcpp_0.12.15     pillar_1.1.0     compiler_3.4.0   plyr_1.8.4      
+ [5] tools_3.4.0      digest_0.6.15    jsonlite_1.5     evaluate_0.10.1 
+ [9] gtable_0.2.0     rlang_0.1.6      yaml_2.1.16      xfun_0.1        
+[13] Rttf2pt1_1.3.5   withr_2.1.1      stringr_1.2.0    rprojroot_1.3-2 
+[17] grid_3.4.0       tidyselect_0.2.3 glue_1.2.0       R6_2.2.2        
+[21] tidyr_0.8.0      purrr_0.2.4      reshape2_1.4.3   extrafontdb_1.0 
+[25] magrittr_1.5     backports_1.1.2  scales_0.5.0     htmltools_0.3.6 
+[29] colorspace_1.3-2 labeling_0.3     stringi_1.1.6    lazyeval_0.2.1  
+[33] munsell_0.4.3 
 ```
 
 + Scientific Linux 6.8 (Carbon) 64bit, R 3.4.0
@@ -2302,18 +2355,19 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base
 
 other attached packages:
-[1] pophelper_2.2.1 ggplot2_2.2.1   Cairo_1.5-9     testthat_1.0.2
+[1] testthat_1.0.2  pophelper_2.2.6 ggplot2_2.2.1   Cairo_1.5-9
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.12     bindr_0.1        knitr_1.16       magrittr_1.5
- [5] devtools_1.13.3  munsell_0.4.3    colorspace_1.3-2 R6_2.2.2
- [9] rlang_0.1.1      stringr_1.2.0    dplyr_0.7.2      httr_1.2.1
-[13] plyr_1.8.4       tools_3.4.0      grid_3.4.0       gtable_0.2.0
-[17] git2r_0.19.0     withr_2.0.0      assertthat_0.2.0 lazyeval_0.2.0
-[21] digest_0.6.12    tibble_1.3.3     crayon_1.3.2     bindrcpp_0.2
-[25] gridExtra_2.2.1  reshape2_1.4.2   tidyr_0.6.3      curl_2.8.1
-[29] glue_1.1.1       memoise_1.1.0    labeling_0.3     stringi_1.1.5
-[33] compiler_3.4.0   scales_0.4.1     pkgconfig_2.0.1
+ [1] Rcpp_0.12.16     compiler_3.4.0   pillar_1.2.2     git2r_0.19.0
+ [5] plyr_1.8.4       tools_3.4.0      digest_0.6.12    evaluate_0.10.1
+ [9] memoise_1.1.0    tibble_1.4.2     gtable_0.2.0     rlang_0.2.0
+[13] curl_2.8.1       gridExtra_2.3    withr_2.0.0      httr_1.2.1
+[17] stringr_1.2.0    knitr_1.16       devtools_1.13.3  tidyselect_0.2.4
+[21] rprojroot_1.2    grid_3.4.0       glue_1.2.0       R6_2.2.2
+[25] rmarkdown_1.6    reshape2_1.4.2   tidyr_0.8.0      purrr_0.2.4
+[29] magrittr_1.5     backports_1.1.0  scales_0.4.1     htmltools_0.3.6
+[33] colorspace_1.3-2 labeling_0.3     stringi_1.1.7    lazyeval_0.2.0
+[37] munsell_0.4.3    crayon_1.3.4
 ```
 
 ---
