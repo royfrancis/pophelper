@@ -1,4 +1,4 @@
-# pophelper 2.2.6
+# pophelper 2.2.7
 
 `pophelper` is an R package and web app to analyse and visualise population structure. `pophelper` curently supports output run files generated from population analysis programs such as STRUCTURE, TESS, TESS3, BAPS and numeric delimited formats such as ADMIXTURE or fastSTRUCTURE. The `pophelper` package can be used to read run files to R, tabulate runs, summarise runs, estimate *K* using the Evanno method, align clusters within K using CLUMPP, export files for DISTRUCT and generate barplot figures.  
 
@@ -63,4 +63,4 @@ The `pophelper` R package is offered free and without warranty of any kind, eith
 
 If you have an comments, suggestions, corrections or ideas on ways to improve or extend this package, feel free to contact me. Submit a report on the [Github issues page](https://github.com/royfrancis/pophelper/issues).  
 
-2018 Roy M Francis  
+2018 | Roy M Francis  

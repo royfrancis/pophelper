@@ -342,7 +342,7 @@ plotQ(qlist=slist[1:2],imgoutput="join")
 plotQ(qlist=slist[c(1,3)],sortind="all")
 plotQ(qlist=slist[c(1,3)],sortind="Cluster1")
 plotQ(qlist=slist[c(1,3)],sortind="label")
-plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join")
+plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join",sharedindlab=F)
 
 # read group labels
 md <- read.delim(system.file("files/metadata.txt", package="pophelper"), header=T,stringsAsFactors=F)
@@ -352,8 +352,8 @@ plotQ(qlist=slist[1],grplab=md[,2,drop=F])
 plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join")
 
 # sort within groups
-plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="all")
-plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="Cluster1")
+plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="all",sharedindlab=F)
+plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="Cluster1",sharedindlab=F)
 plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="label")
 
 # reorder groups

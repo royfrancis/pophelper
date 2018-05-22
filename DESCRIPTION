@@ -2,8 +2,8 @@ Package: pophelper
 Type: Package
 Title: Tabulate, analyse and visualise admixture proportions from STRUCTURE, TESS, BAPS, ADMIXTURE and tab-delimited q-matrices
     files
-Version: 2.2.6
-Date: 2018-05-02
+Version: 2.2.7
+Date: 2018-05-23
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>

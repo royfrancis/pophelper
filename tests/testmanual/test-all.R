@@ -1,6 +1,6 @@
 # Test Script
-# v2.2.6
-# 02-May-2018
+# v2.2.7
+# 23-May-2018
 
 library(testthat)
 library(pophelper)
@@ -597,8 +597,14 @@ for(i in seq_along(imgout))
   #multiple labels
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs)
   
+  #multiple labels change selgrp
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,selgrp="mixed")
+  
   #multiple labels grpmean
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T)
+  
+  #multiple labels grpmean change selgrp
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T,selgrp="mixed")
   
   #multiple labels grpmean ordergrp
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T,ordergrp=T)
@@ -634,7 +640,7 @@ for(i in seq_along(imgout))
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,ordergrp=TRUE,sortind="label",showindlab=TRUE)
   
   #multiple labels grpmean
-  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T)
+  plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T,showindlab=TRUE)
   
   #multiple labels grpmean showindlab
   plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,grpmean=T,showindlab=TRUE,width=15)
@@ -696,25 +702,25 @@ for(i in seq_along(imgout))
   if(imgo=="join")
   {
     #sharedindlab off
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=F)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=F,outputfilename="joined")
     #sharedindlab on
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,outputfilename="joined")
     #sharedindlab on with sort label
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,sort="label")
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,sort="label",outputfilename="joined")
     #sharedindlab with sort all
     expect_error(plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sortind="all"))
     #sharedindlab with sort cluster
     expect_error(plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sortind="Cluster1"))
     #sharedindlab off with grplab
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=F,grplab=grplabs)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=F,grplab=grplabs,outputfilename="joined")
     #sharedindlab on with grplab
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,width=16)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,width=16,outputfilename="joined")
     #shared indlab with repeated grplab
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grpsrep)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grpsrep,outputfilename="joined")
     #sharedindlab with grplab subset
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp="a",width=16)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp="a",width=16,outputfilename="joined")
     #sharedindlab with reorder
-    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp=c("b","a"),width=16)
+    plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp=c("b","a"),width=16,outputfilename="joined")
     #error sharedindlab error
     expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,showindlab=T,sortind="Cluster1"))
     #error ordergrp error

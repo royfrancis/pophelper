@@ -1,8 +1,8 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.6
+# pophelper v2.2.7
 # Functions
-# 02-May-2018
+# 23-May-2018
 
 # check packages
 pkgs <- c("Cairo","grid","gridExtra","ggplot2","gtable","tidyr")
@@ -2088,7 +2088,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   marker_position$divxpos <- marker_position$markerxpos+0.5
   # add runid
   marker_position$run <- runid
-  
+
   return(list(dframe=dfwork1,grplab=grplab1,label_position=label_position,
               marker_position=marker_position))
 }
@@ -2509,7 +2509,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' plotQ(qlist=slist[c(1,3)],sortind="all")
 #' plotQ(qlist=slist[c(1,3)],sortind="Cluster1")
 #' plotQ(qlist=slist[c(1,3)],sortind="label")
-#' plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join")
+#' plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join",sharedindlab=F)
 #' 
 #' # read group labels
 #' md <- read.delim(system.file("files/metadata.txt", package="pophelper"), header=T,stringsAsFactors=F)
@@ -2519,8 +2519,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join")
 #' 
 #' # sort within groups
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="all")
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="Cluster1")
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="all",sharedindlab=F)
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="Cluster1",sharedindlab=F)
 #' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="label")
 #' 
 #' # reorder groups
@@ -3017,6 +3017,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       list_qlist <- vector("list",length=flen)
       list_grplab <- vector("list",length=flen)
     }
+    div_multiplier <- seq(from=0,to=(flen-1))
     for (i in seq_along(qlist))
     {
       fname <- names(qlist)[i]
@@ -3072,9 +3073,17 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       df1$ind <- as.character(rownames(df1))
       df1$run <- factor(rep(i,nrow(df1)))
       df1$order_ind <- seq(from=1,to=Ind)
-      order_cumulative <- seq(from=strt,to=(i*Ind))
-      df1$order_cumulative <- order_cumulative
-      strt <- (i*Ind)+1
+
+      # cumulative numbering
+      if(i==1) {
+        start <- 1
+        end <- Ind
+      }else{
+        start <- end+1
+        end <- Ind*i
+      }
+      
+      df1$order_cumulative <- seq(from=start,to=end)
       
       # strip panel labelling
       if(any(is.na(splab)))
@@ -3102,16 +3111,11 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(grplabcheck)
       {
         div_position <- marker_position[c(marker_position$count %in% divgrp),]
-        div_position <- div_position[seq(from=2,to=(nrow(div_position)-1)),,drop=F]
+        div_position <- div_position[seq(from=2,to=(nrow(div_position)-1)),c("count","divxpos"),drop=F]
         div_position$run <- i
-        if(i>1 && sortindcheck!="label" && sortindcheck!="empty") 
-        {
-          div_position$divxpos <- div_position$divxpos+Ind
-          div_position$markerxpos <- div_position$markerxpos+Ind
-        }
+        if(sortindcheck!="label" && sortindcheck!="empty") div_position$divxpos <- div_position$divxpos+(Ind*div_multiplier[i])
         div_position_list[[i]] <- div_position
       }
-      
       rm(df2)
     }
     
@@ -3170,7 +3174,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     # when ind labels are not shared, x-axis is free
     if(sharedindlab) gg_plot_panel <- gg_plot_panel+facet_wrap(~run,labeller=labeller(run=facetnames),strip.position=sppos,scales="fixed",nrow=flen,drop=TRUE)
     if(!sharedindlab) gg_plot_panel <- gg_plot_panel+facet_wrap(~run,labeller=labeller(run=facetnames),strip.position=sppos,scales="free_x",nrow=flen,drop=TRUE)
-
+    
     gg_plot_panel <- gg_plot_panel+
       labs(x=NULL,y=NULL)+
       theme(legend.position="top",
@@ -4526,7 +4530,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.6 ready.")
+  packageStartupMessage("pophelper v2.2.7 ready.")
 }
 
 # End --------------------------------------------------------------------------

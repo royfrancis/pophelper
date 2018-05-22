@@ -10,7 +10,7 @@ bibentry(bibtype = "Article",
   pages = "27-32",
   doi = "10.1111/1755-0998.12509",
   url = "https://github.com/royfrancis/pophelper",
-  note = "pophelper R package version 2.2.6",
+  note = "pophelper R package version 2.2.7",
   textVersion=
   paste("Francis, R. M. (2017).", 
   "pophelper: an R package and web app to analyse and visualize population structure.",
