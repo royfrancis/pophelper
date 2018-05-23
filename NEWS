@@ -2,6 +2,7 @@ pophelper 2.2.7
 ===========
 * 23-May-2018
 * With joined plots, group labels and sorting, div lines were incorrectly printed causing plots to be misaligned. This has been resolved.
+* Removed restriction of setting 'ordergrp=T' when sorting by cluster or 'all'.
 
 pophelper 2.2.6
 ===========

@@ -2976,8 +2976,6 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   {
     # checks
     if(flen < 2) stop("plotQ: Joined plot cannot be created. Number of selected files less than 2.")
-    if(grplabcheck && grplablen>1 && sortindcheck!="empty" && !ordergrp) stop("plotQ: With Joined plot, when using grplab with multiple label groups and sorting by cluster or 'all', set 'ordergrp=TRUE'.")
-
     tempdf <- tabulateQ(qlist,sorttable=FALSE)
     
     # checks if num of individuals differ between runs
