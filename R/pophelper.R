@@ -2309,7 +2309,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' @param qlist A qlist (list of dataframes). An output from \code{\link{readQ}}.
 #' @param imgoutput A character with options: 'sep' or 'join'.If set to "sep", each run is plotted as separate image file. If set to "join", multiple runs are joined into a single image.
 #' @param clustercol A vector of colours for clusters. If NA, colours are automatically generated. K=1 to K=12 are custom unique colours while K>12 are coloured by function \code{gplots::rich.colors()}.
-#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.
+#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'label' (sorting by individual labels). See details.
 #' @param grplab A dataframe with one or more columns (group label sets), and rows equal to the number of individuals. See details.
 #' @param selgrp A single character denoting a selected group label set. The selected label must be a group label title used in \code{grplab}. See details.
 #' @param ordergrp A logical indicating if individuals must be grouped into contiguous blocks based on \code{grplab} starting with \code{selgrp}.
@@ -3356,7 +3356,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' @param spl An integer indicating samples per line. Defaults to 60.
 #' @param lpp An integer indicating lines per page. Defaults to 11.
 #' @param clustercol A character vector of colours for clusters.
-#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels). See details.
+#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'label' (sorting by individual labels). See details.
 #' @param grplab A dataframe with one or more columns (group label sets), and rows equal to the number of individuals. See details.
 #' @param selgrp A single character denoting a selected group label set. The selected label must be a group label title used in \code{grplab}. See details.
 #' @param ordergrp A logical indicating if individuals must be grouped into contiguous blocks based on \code{grplab} starting with \code{selgrp}.
