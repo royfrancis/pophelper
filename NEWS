@@ -7,6 +7,7 @@ pophelper 2.2.8
 * plotQMultiline(): Several undocumented arguments added to documentation
 * Minor corrections to documentation
 * Adjustments to getDim()
+* add argument exportpath to all functions
 * plotQ(): Added argument 'showgrplab'
 * readQ() and readQStructure(): Reads confidence intervals from structure files if available
 
