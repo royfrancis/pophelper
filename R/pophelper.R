@@ -1,11 +1,11 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.7
+# pophelper v2.2.8
 # Functions
-# 23-May-2018
+# 15-Mar-2019
 
 # check packages
-pkgs <- c("Cairo","grid","gridExtra","ggplot2","gtable","tidyr")
+pkgs <- c("grid","gridExtra","ggplot2","gtable","tidyr")
 if(any(!pkgs %in% installed.packages()))
 {
   warning(paste0("Package(s) '",paste0(pkgs[which(!pkgs %in% installed.packages())],collapse=", "),"' is not installed."))
@@ -20,7 +20,8 @@ rm(pkgs)
 #' @description Internal: Generate colours based on number of K.
 #' @param k A numeric indicating the number of colours required
 #' @return Returns a character vector of k colours in hexadecimal format
-#' @details Colours 1 to 12 are custom unique colours. Colours beyond 15 are generated from colour ramp \code{rich.colors()} from package \code{gplots}.
+#' @details Colours 1 to 12 are custom unique colours. Colours beyond 15 are 
+#' generated from colour ramp \code{rich.colors()} from package \code{gplots}.
 # @export
 #' 
 getColors <- getColours <- function(k)
@@ -56,9 +57,13 @@ getColors <- getColours <- function(k)
 
 #' @title Internal: Check input filetype.
 #' @description Internal: Check input filetype.
-#' @param files A character or character vector of one or more input text files or a list of dataframes.
-#' @param warn A logical indicating if a warning must be displayed for file those are not STRUCTURE, TESS or BASIC file.
-#' @return A character or character vector indicating input type 'STRUCTURE', 'TESS', 'BASIC', 'CLUMPP', 'list', 'data.frame', 'UNIDENTIFIED' for all selected files.
+#' @param files A character or character vector of one or more input text files 
+#' or a list of dataframes.
+#' @param warn A logical indicating if a warning must be displayed for file 
+#' those are not STRUCTURE, TESS or BASIC file.
+#' @return A character or character vector indicating input type 'STRUCTURE', 
+#' 'TESS', 'BASIC', 'CLUMPP', 'list', 'data.frame', 'UNIDENTIFIED' for all 
+#' selected files.
 # @export
 #' 
 checkQ <- function(files=NULL,warn=FALSE)
@@ -219,9 +224,12 @@ verifyGrplab <- function(grplab=NULL)
 #' @title Internal: Convert value between dimension units
 #' @description Internal: Convert value between dimension units
 #' @param value A numeric value or numeric vector to convert
-#' @param fromunit A character indicating the current unit of the value. Options are "cm", "mm", "in" or "px".
-#' @param tounit A character indicating the unit to change to. Options are "cm", "mm", "in" or "px".
-#' @param dpi A numeric indicating the resolution for pixel conversion. This should be in PPI (pixels per inch).
+#' @param fromunit A character indicating the current unit of the value. 
+#' Options are "cm", "mm", "in" or "px".
+#' @param tounit A character indicating the unit to change to. Options are 
+#' "cm", "mm", "in" or "px".
+#' @param dpi A numeric indicating the resolution for pixel conversion. This 
+#' should be in PPI (pixels per inch).
 #' @return Returns a numeric value or numeric vector in changed units.
 #' 
 unitConverter <- function(value=NA,fromunit=NA,tounit=NA,dpi=NA)
@@ -298,26 +306,33 @@ unitConverter <- function(value=NA,fromunit=NA,tounit=NA,dpi=NA)
 # readQ ------------------------------------------------------------------------
 
 #' @title Convert run files (q-matrices) to qlist.
-#' @description Takes one or more STRUCTURE, TESS, BAPS, numeric delimited run files or 
-#' CLUMPP format files and converts them to a qlist (list of dataframes).
+#' @description Takes one or more STRUCTURE, TESS, BAPS, numeric delimited runs 
+#' or CLUMPP format files and converts them to a qlist (list of dataframes).
 #' @param files A character or character vector of one or more files.
-#' @param filetype A character indicating input filetype. Options are 'auto','structure','tess','baps',
-#' 'basic' or 'clumpp'. See details.
+#' @param filetype A character indicating input filetype. Options are 'auto',
+#' 'structure','tess2','baps','basic' or 'clumpp'. See details.
 #' @param indlabfromfile A logical indicating if individual labels must be read 
 #' from input file and used as row names for resulting dataframe. Spaces in 
-#' labels may be replaced with _. Currently only applicable to STRUCTURE runs files.
-#' @return A list of lists with dataframes is returned. List items are named by input filenames.
-#' File extensions such as '.txt','.csv','.tsv' and '.meanQ' are removed from filename.
-#' In case filenames are missing or not available, lists are named sample1, sample2 etc.
-#' For STRUCTURE runs, if individual labels are present in the run file and \code{indlabfromfile=T}, 
-#' they are added to the dataframe as row names. Structure metadata including loci, 
-#' burnin, reps, elpd, mvll, and vll is added as attributes to each dataframe.
+#' labels may be replaced with _. Currently only applicable to STRUCTURE runs.
+#' @param readci A logical indicating if confidence intervals from the STRUCTURE
+#' run file (if available) should be read. Set to FALSE by default as it take up 
+#' excess space. This argument is only applicable to STRUCTURE run files.
+#' @return A list of lists with dataframes is returned. List items are named by 
+#' input filenames. File extensions such as '.txt','.csv','.tsv' and '.meanQ' 
+#' are removed from filename. In case filenames are missing or not available, 
+#' lists are named sample1, sample2 etc. For STRUCTURE runs, if individual 
+#' labels are present in the run file and \code{indlabfromfile=TRUE}, they are 
+#' added to the dataframe as row names. Structure metadata including loci, 
+#' burnin, reps, elpd, mvll, and vll is added as attributes to each dataframe. 
+#' When \code{readci=TRUE} and if CI data is available in STRUCTURE run files, 
+#' it is read in and attached as attribute named ci.
 #' For CLUMPP files, multiple runs within one file are suffixed by -1, -2 etc.
 #' @details
-#' STRUCTURE, TESS and BAPS run files have unique layout and format (See vignette). BASIC files can be Admixture run files, 
-#' fastStructure meanQ files or any tab-delimited, space-delimited or comma-delimited tabular data 
-#' without a header. CLUMPP files can be COMBINED, ALIGNED or 
-#' MERGED files. COMBINED files are generated from \code{clumppExport}. ALIGNED and 
+#' STRUCTURE, TESS2 and BAPS run files have unique layout and format (See 
+#' vignette). BASIC files can be Admixture run files, fastStructure meanQ files 
+#' or any tab-delimited, space-delimited or comma-delimited tabular data 
+#' without a header. CLUMPP files can be COMBINED, ALIGNED or MERGED files. 
+#' COMBINED files are generated from \code{clumppExport}. ALIGNED and 
 #' MERGED files are generated by CLUMPP.
 #' 
 #' To convert TESS3 R objects to pophelper qlist, see \code{\link{readQTess3}}.
@@ -329,13 +344,14 @@ unitConverter <- function(value=NA,fromunit=NA,tounit=NA,dpi=NA)
 #' @examples 
 #' 
 #' # STRUCTURE files
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist of all runs
 #' slist <- readQ(sfiles)
 #' slist <- readQ(sfiles,filetype="structure")
 #' 
 #' # use ind names from file
-#' readQ(sfiles[1],indlabfromfile=T)
+#' readQ(sfiles[1],indlabfromfile=TRUE)
 #' 
 #' # access the first run
 #' readQ(sfiles)[[1]]
@@ -343,20 +359,31 @@ unitConverter <- function(value=NA,fromunit=NA,tounit=NA,dpi=NA)
 #' # access names of runs
 #' names(slist)
 #' 
+#' # get attributes of a run
+#' attributes(slist[[1]])
+#' 
+#' # get attributes of all runs
+#' lapply(slist,attributes)
+#' 
 #' # TESS files
-#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist
 #' readQ(tfiles)
 #' 
 #' # BASIC files
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist
 #' readQ(afiles)
 #' 
 #' # CLUMPP files
-#' tabs1 <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
-#' tabs2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper")
-#' tabs3 <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper")
+#' tabs1 <- system.file("files/STRUCTUREpop_K4-combined.txt",
+#' package="pophelper")
+#' tabs2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",
+#' package="pophelper")
+#' tabs3 <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",
+#' package="pophelper")
 #' 
 #' # create a qlist
 #' readQ(tabs1)
@@ -377,7 +404,7 @@ unitConverter <- function(value=NA,fromunit=NA,tounit=NA,dpi=NA)
 #' 
 #' @export
 #' 
-readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
+readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
 {
   if(is.null(files) || (length(files)==0)) stop("readQ: No input files.")
   if(!is.character(files)) stop("readQ: Argument 'files' is not a character datatype.")
@@ -394,7 +421,7 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
 
       if(chk %in% c("structure","tess","baps","basic","clumpp")) 
       {
-        if(chk=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile)
+        if(chk=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
         if(chk=="tess") dfr <- pophelper:::readQTess(files[i])
         if(chk=="basic") dfr <- pophelper:::readQBasic(files[i])
         if(chk=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
@@ -404,7 +431,7 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
         warning(paste0("readQ: Input file ",files[i]," was not identified as a STRUCTURE, TESS, BAPS, BASIC or CLUMPP filetype. Specify 'filetype' manually or check input."))
       }
     }else{
-      if(filetype=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile)
+      if(filetype=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
       if(filetype=="tess") dfr <- pophelper:::readQTess(files[i])
       if(filetype=="basic") dfr <- pophelper:::readQBasic(files[i])
       if(filetype=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
@@ -418,21 +445,31 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
 # readQStructure ------------------------------------------------------------
 
 #' @title Convert STRUCTURE run files to qlist.
-#' @description Takes one or more STRUCTURE run files and converts them to a list of dataframes.
-#' @param files A character or character vector of one or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)} 
+#' @description Takes one or more STRUCTURE run files and converts them to a 
+#' list of dataframes.
+#' @param files A character or character vector of one or more STRUCTURE run 
+#' files. Use \code{choose.files(multi=TRUE)} 
 #' to select interactively.
-#' @param indlabfromfile A logical indicating if individual labels must be read from input file and used as row names for resulting dataframe. Spaces in labels may be replaced with _.
+#' @param indlabfromfile A logical indicating if individual labels must be read 
+#' from input file and used as row names for resulting dataframe. Spaces in 
+#' labels may be replaced with _.
+#' @param readci A logical indicating if confidence intervals from the structure
+#' file (if available) should be read. Set to FALSE by default as it take up 
+#' excess space.
 #' @return A list of lists with dataframes is returned. If individual labels are 
-#' present in the STRUCTURE file, they are added to the dataframe as row names. Structure
-#' metadata including loci, burnin, reps, elpd, mvll, and vll is added as attributes 
-#' to each dataframe. List items are named by input filenames.
+#' present in the STRUCTURE file, they are added to the dataframe as row names. 
+#' Structure metadata including loci, burnin, reps, elpd, mvll, and vll is added 
+#' as attributes to each dataframe. When \code{readci=TRUE} and if CI data is
+#' available, it is read in and attached as attribute named ci. List items are 
+#' named by input filenames.
 #' @examples 
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist of all runs
 #' slist <- readQStructure(sfiles)
 #' 
 #' # use ind names from file
-#' readQStructure(sfiles[1],indlabfromfile=T)
+#' readQStructure(sfiles[1],indlabfromfile=TRUE)
 #' 
 #' # access the first run
 #' readQStructure(sfiles)[[1]]
@@ -441,21 +478,21 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE)
 #' names(slist)
 #' @export
 #' 
-readQStructure <- function(files=NULL,indlabfromfile=FALSE)
+readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
 {
   if(is.null(files) || (length(files)==0)) stop("readQStructure: No input files.")
   # number of files selected
   flen <- length(files)
   
   #check file
-  if(any(pophelper:::checkQ(files)$type != "STRUCTURE")) error("readQStructure: Input may be in incorrect format.")
+  if(any(pophelper:::checkQ(files)$type != "STRUCTURE")) stop("readQStructure: Input may be in incorrect format.")
   
   i <- 1
   dlist <- vector("list",length=flen)
   len1 <- length(files)
   for (i in seq_along(files))
   {
-    fname <- basename(files[i]) 
+    fname <- basename(files[i])
     file1 <- readLines(as.character(files[i]),warn=FALSE)
     
     # find individuals and get number of individuals
@@ -503,13 +540,13 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
     
     # error check
     tc_file_a <- textConnection(file_a)
-    file_b <- read.delim(tc_file_a,header=F,sep="",stringsAsFactors=F)
+    file_b <- read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
     close(tc_file_a)
     
     suppressWarnings(
       errorcheck <- try(
-        file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=F],
-        silent=T)
+        file_b[1,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=FALSE],
+        silent=TRUE)
     )
     rm(file_b)
     
@@ -517,7 +554,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
     {
       # using manual substring
       file_a <- base::gsub("\\([0-9.,]+\\)","",file_a)
-      file_b <- base::gsub(":  ","",substr(file_a,base::regexpr(":\\W+\\d\\.\\d+",file_a),base::nchar(file_a)-1))
+      file_b <- base::gsub(":  ","",base::substr(file_a,base::regexpr(":\\W+\\d\\.\\d+",file_a),base::nchar(file_a)-1))
       file_b <- base::sub("\\s+$","",base::sub("^\\s+","",file_b))
       rm(file_a)
       file_c <- as.vector(as.numeric(as.character(unlist(base::strsplit(file_b," ")))))
@@ -526,9 +563,9 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
     }else{
       # using textconnection
       tc_file_a <- textConnection(file_a)
-      file_b <- read.delim(tc_file_a,header=F,sep="",stringsAsFactors=F)
+      file_b <- read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
       close(tc_file_a)
-      dframe <- file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=F]
+      dframe <- file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=FALSE]
     }
     
     dframe <- as.data.frame(sapply(dframe,as.numeric),stringsAsFactors=FALSE)
@@ -564,8 +601,22 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
     attr(dframe,"mvll") <- mvll
     attr(dframe,"vll") <- vll
     
+    # confidence intervals
+    if(readci) {
+      cichk <- base::grep("([0-9.]+,[0-9.]+)",file_b[1,])
+      if(length(cichk)!=0) {
+        file_b <- apply(file_b[,cichk,drop=FALSE],1,paste0,collapse="")
+        file_b <- base::gsub("[()]","",base::gsub(")(",",",file_b,fixed=T))
+        cframe <- as.data.frame(matrix(as.numeric(unlist(base::strsplit(file_b,","))),ncol=ncol(dframe)*2,byrow=TRUE))
+        colnames(cframe) <- as.vector(t(outer(paste0("Cluster",1:ncol(dframe)),c("L","H"),paste,sep="")))
+        row.names(cframe) <- row.names(dframe)
+        attr(dframe,"ci") <- cframe
+      }else{
+        warning("plotQStructure: Confidence intervals could not be read.")
+      }
+    }
+    
     dlist[[i]] <- dframe
-    #names(dlist[[i]]) <- as.character(name)
   }
   
   fnames <- sub(".txt","",basename(files))
@@ -578,12 +629,14 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE)
 #' @title Convert TESS cluster files to qlist.
 #' @description Takes one or more TESS cluster run files and converts them to a 
 #' list of dataframes.
-#' @param files A character or character vector of one or more TESS cluster run files. Use \code{choose.files(multi=TRUE)} 
-#' to select interactively.
-#' @return A list of lists with dataframes is returned. List items are named by input filename.
+#' @param files A character or character vector of one or more TESS cluster run 
+#' files. Use \code{choose.files(multi=TRUE)} to select interactively.
+#' @return A list of lists with dataframes is returned. List items are named by 
+#' input filename.
 #' @details Use collectRunsTess() to collect TESS runs into one directory.
 #' @examples 
-#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist
 #' readQTess(tfiles)
 #' @export
@@ -615,7 +668,7 @@ readQTess <- function(files=NULL)
     tc_file1 <- textConnection(file1)
     
     # read as a table
-    file2 <- read.delim(tc_file1,header=F,sep="\t",stringsAsFactors=FALSE)
+    file2 <- read.delim(tc_file1,header=FALSE,sep="\t",stringsAsFactors=FALSE)
     
     # close text connection
     close(tc_file1)
@@ -650,15 +703,18 @@ readQTess <- function(files=NULL)
 # readQBasic ---------------------------------------------------------------
 
 #' @title Convert delimited text files to qlist.
-#' @description Takes one or more delimited numeric text files and converts each of 
-#' them to separate dataframes.
-#' @param files A character or character vector of one or more delimited text files. Use \code{choose.files(multi=TRUE)} 
-#' to select interactively.
-#' @return A list of lists with dataframes is returned. List items are named by input filename.
+#' @description Takes one or more delimited numeric text files and converts each 
+#' of them to separate dataframes.
+#' @param files A character or character vector of one or more delimited text 
+#' files. Use \code{choose.files(multi=TRUE)} to select interactively.
+#' @return A list of lists with dataframes is returned. List items are named by 
+#' input filename.
 #' @details Input files can be Admixture run files, fastStructure meanQ files. 
-#' or any tab-delimited, space-delimited or comma-delimited tabular data without header.
+#' or any tab-delimited, space-delimited or comma-delimited tabular data without 
+#' header.
 #' @examples 
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist
 #' readQBasic(afiles)
 #' @export
@@ -681,9 +737,9 @@ readQBasic <- function(files=NULL)
   for (i in seq_along(files))
   {
     # read in delimited files
-    if(chk$subtype[i]=="SPACE") dframe <- read.delim(files[i],header=F,sep="",dec=".",stringsAsFactors=FALSE)
-    if(chk$subtype[i]=="TAB") dframe <- read.delim(files[i],header=F,sep="\t",dec=".",stringsAsFactors=FALSE)
-    if(chk$subtype[i]=="COMMA") dframe <- read.delim(files[i],header=F,sep=",",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="SPACE") dframe <- read.delim(files[i],header=FALSE,sep="",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="TAB") dframe <- read.delim(files[i],header=FALSE,sep="\t",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="COMMA") dframe <- read.delim(files[i],header=FALSE,sep=",",dec=".",stringsAsFactors=FALSE)
     
     # error if columns contain non-numeric
     if(!all(sapply(dframe,is.numeric))) stop("readQBasic: One or more columns are not numeric.")
@@ -713,16 +769,18 @@ readQBasic <- function(files=NULL)
 #' @title Convert CLUMPP format numeric text files to qlist.
 #' @description Takes one or more CLUMPP format numeric text files and converts
 #' them to a list of dataframes.
-#' @param files A character or character vector of one or more COMBINED, ALIGNED or 
-#' MERGED files. COMBINED files are generated from \code{clumppExport}. ALIGNED and 
-#' MERGED files are generated by CLUMPP. Use \code{choose.files(multi=TRUE)} to 
-#' select interactively.
-#' @return A list of lists with dataframes is returned. Each list item is named by 
-#' input filename. Multiple runs within one file are suffixed by -1, -2 etc.
+#' @param files A character or character vector of one or more COMBINED, ALIGNED 
+#' or MERGED files. COMBINED files are generated from \code{clumppExport}. 
+#' ALIGNED and MERGED files are generated by CLUMPP. 
+#' Use \code{choose.files(multi=TRUE)} to select interactively.
+#' @return A list of lists with dataframes is returned. Each list item is named 
+#' by input filename. Multiple runs within one file are suffixed by -1, -2 etc.
 #' @examples 
 #' tabs1 <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
-#' tabs2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",package="pophelper")
-#' tabs3 <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",package="pophelper")
+#' tabs2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",
+#' package="pophelper")
+#' tabs3 <- system.file("files/STRUCTUREpop_K4-combined-merged.txt",
+#' package="pophelper")
 #' 
 #' # create a qlist
 #' readQClumpp(tabs1)
@@ -750,7 +808,7 @@ readQClumpp <- function(files=NULL)
   {
     fname <- base::gsub(".txt","",basename(files[i]))
     
-    df1 <- read.table(files[i],header=F,sep="",dec=".",quote="",stringsAsFactors=FALSE)
+    df1 <- read.table(files[i],header=FALSE,sep="",dec=".",quote="",stringsAsFactors=FALSE)
     if(class(df1)!="data.frame") stop("readQClumpp: Read error. Check input format.")
     
     df1[,1] <- factor(df1[ ,1])
@@ -798,13 +856,18 @@ readQClumpp <- function(files=NULL)
 # readQTess3 -------------------------------------------------------------------
 
 #' @title Convert TESS3 R object to pophelper qlist.
-#' @description Takes a TESS3 R object and convert to pophelper qlist for use with pophelper.
-#' @param t3list A TESS3 object. An output from function \code{tess3()} from package \code{tess3r}.
+#' @description Takes a TESS3 R object and convert to pophelper qlist for use 
+#' with pophelper.
+#' @param t3list A TESS3 object. An output from function \code{tess3()} from 
+#' package \code{tess3r}. This is not an external object. If imported from outside
+#' of R, it must be read in as an Rdata or Rds file.
 #' @param progressbar A logical indicating if execution progress must be shown.
-#' @return A list of lists with dataframes (qlist) is returned. Each list item is named by 
-#' as sample1, sample2 etc. Within TESS3, 'tess3Main' attributes L, n, ploidy, K, rmse 
-#' and crossentropy are preserved as attributes in the qlist dataframe.
-#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' @return A list of lists with dataframes (qlist) is returned. Each list item 
+#' is named by as sample1, sample2 etc. Within TESS3, 'tess3Main' attributes L, 
+#' n, ploidy, K, rmse and crossentropy are preserved as attributes in the qlist 
+#' dataframe.
+#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
+#' more details.
 #' @examples 
 #' t3obj <- readRDS(system.file("files/tess3.rds",package="pophelper"))
 #' t3list <- readQTess3(t3obj)
@@ -827,7 +890,7 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
     if(progressbar) setTxtProgressBar(pb,i)
     if(!"tess3.run" %in% names(t3list[[i]])) stop("readQTess3: 'tess3.run' slot not found in list item ",i,".")
     dlist <- t3list[[i]]$tess3.run[[1]]
-    dframe <- as.data.frame(dlist$Q,stringsAsFactors=F)
+    dframe <- as.data.frame(dlist$Q,stringsAsFactors=FALSE)
     colnames(dframe) <- paste0("Cluster",1:ncol(dframe))
     
     # attribute values as added if available else set to NA
@@ -853,12 +916,15 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
 #' @title Convert BAPS cluster files to qlist.
 #' @description Takes one or more BAPS cluster run files and converts them to a 
 #' list of dataframes.
-#' @param files A character or character vector of one or more BAPS cluster run files. Use \code{choose.files(multi=TRUE)} 
-#' to select interactively.
-#' @return A list of lists with dataframes is returned. List items are named by input filename.
-#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' @param files A character or character vector of one or more BAPS cluster run 
+#' files. Use \code{choose.files(multi=TRUE)} to select interactively.
+#' @return A list of lists with dataframes is returned. List items are named by 
+#' input filename.
+#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
+#' more details.
 #' @examples 
-#' bfiles <- list.files(path=system.file("files/baps",package="pophelper"),full.names=TRUE)
+#' bfiles <- list.files(path=system.file("files/baps",package="pophelper"),
+#' full.names=TRUE)
 #' # create a qlist
 #' readQBaps(bfiles)
 #' @export
@@ -884,11 +950,11 @@ readQBaps <- function(files=NULL)
     
     # read table using delimiter : and use column V2
     tc_file1 <- textConnection(file1)
-    file2 <- read.delim(tc_file1,sep=":",header=F,stringsAsFactors=F)$V2
+    file2 <- read.delim(tc_file1,sep=":",header=FALSE,stringsAsFactors=FALSE)$V2
     
     # read table using delimiter space
     tc_file2 <- textConnection(file2)
-    dframe <- read.delim(tc_file2,sep="",header=F,stringsAsFactors=F)
+    dframe <- read.delim(tc_file2,sep="",header=FALSE,stringsAsFactors=FALSE)
     
     # close text connections
     close(tc_file1,tc_file2)
@@ -924,19 +990,21 @@ readQBaps <- function(files=NULL)
 #' @description Takes a qlist of one of more numeric dataframes and creates a 
 #' table with filenames, K and number of individuals.
 #' @param qlist A qlist (list of dataframes). An output from \code{\link{readQ}}.
-#' @param writetable A logical indicating if the output table must be exported as 
-#' a tab-delimited text file in the working directory.
-#' @param sorttable A logical indicating if output table is to be sorted. Sorts table by ind and K.
-#' @return Returns a dataframe with filenames (if list is not named, then sample1, sample2 etc. is used), 
-#' K and number of individuals of all runs sorted by ind and K (if \code{sorttable=T}). 
-#' The row numbers of the output table denotes the file number selected. This is helpful 
-#' if a particular file from the table needs to 
-#' be identified in the selection vector. If input files come from STRUCTURE runs, 
-#' columns loci, burnin, reps, elpd, mvll and vll are also returned. In input files come
-#' from TESS3, columns loci, gif, rmse, crossentropy and ploidy are included as well.
-#' @details The input must be a list of dataframes. If one dataframe is used, then it 
-#' must be inside a list. If the list items are named, then the item name is used as 
-#' filename, else sample1, sample2 etc. is used.
+#' @param writetable A logical indicating if the output table must be exported 
+#' as a tab-delimited text file in the working directory.
+#' @param sorttable A logical indicating if output table is to be sorted. Sorts 
+#' table by ind and K.
+#' @return Returns a dataframe with filenames (if list is not named, then 
+#' sample1, sample2 etc. is used), K and number of individuals of all runs 
+#' sorted by ind and K (if \code{sorttable=TRUE}). The row numbers of the output 
+#' table denotes the file number selected. This is helpful if a particular file 
+#' from the table needs to be identified in the selection vector. If input files 
+#' come from STRUCTURE runs, columns loci, burnin, reps, elpd, mvll and vll are 
+#' also returned. In input files come from TESS3, columns loci, gif, rmse, 
+#' crossentropy and ploidy are included as well.
+#' @details The input must be a list of dataframes. If one dataframe is used, 
+#' then it must be inside a list. If the list items are named, then the item 
+#' name is used as filename, else sample1, sample2 etc. is used.
 #' 
 #' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
 #' 
@@ -944,17 +1012,20 @@ readQBaps <- function(files=NULL)
 #' @examples 
 #' 
 #' # STRUCTURE files
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' slist <- readQ(sfiles)
 #' tabulateQ(qlist=slist)
 #' 
 #' # TESS files
-#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+#' full.names=TRUE)
 #' tlist <- readQ(tfiles)
 #' tabulateQ(qlist=tlist)
 #' 
 #' # ADMIXTURE files
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' alist <- readQ(afiles)
 #' tabulateQ(qlist=alist)
 #' 
@@ -1051,30 +1122,34 @@ tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
 # summariseQ ----------------------------------------------------------------
 
 #' @title Summarise a tabulated dataframe
-#' @description Creates a summary table from a tabulated dataframe of two or more 
-#' runs with k, number of runs and individuals.
+#' @description Creates a summary table from a tabulated dataframe of two or 
+#' more runs with k, number of runs and individuals.
 #' @param data A dataframe with tabulated runs. An output from \code{tabulateQ()}. 
 #' Must have minimum 2 columns named k and ind.
-#' @param writetable A logical indicating if the output table is to be exported as 
-#' a tab-delimited text file in the working directory.
+#' @param writetable A logical indicating if the output table is to be exported 
+#' as a tab-delimited text file in the working directory.
 #' @return Returns a dataframe with all values of K sorted by K. The table has 
-#' 3 columns namely value of K, number of runs for each K and number of individuals.
-#' If the input file is derived from STRUCTURE runs, the table is sorted by loci as well.
-#' Other columns include elpdmean, elpdsd, elpdmin and elpdmax.
-#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' 3 columns namely value of K, number of runs for each K and number of 
+#' individuals.
+#' If the input file is derived from STRUCTURE runs, the table is sorted by loci 
+#' as well. Other columns include elpdmean, elpdsd, elpdmin and elpdmax.
+#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
+#' more details.
 #' @aliases summarizeQ
 #' @seealso \code{\link{tabulateQ}}
 #  @import xlsx
 #' @examples 
 #' 
 #' # STRUCTURE files
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' slist <- readQ(sfiles)
 #' tr1 <- tabulateQ(slist)
 #' summariseQ(tr1)
 #' 
 #' # ADMIXTURE files
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' tr1 <- tabulateQ(readQ(afiles))
 #' summariseQ(tr1)
 #' 
@@ -1096,13 +1171,13 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
   if(length(grep("ind",colnames(data)))==0) stop("summariseQ: Column ind not available.")
   
   # check
-  if(nrow(data) < 2) stop("summariseQ: At least 2 runs are required for this function.")
+  #if(nrow(data) < 2) stop("summariseQ: At least 2 runs are required for this function.")
   
   if(all(c("k","ind","loci","elpd") %in% colnames(data)))
   {
     dframe1 <- stats::aggregate(elpd ~ loci + ind + k,data=data,length)
     colnames(dframe1)[4] <- "runs"
-    dframe2 <- aggregate(elpd ~ loci + ind + k,data=data,FUN=function(x) c(elpdmean =mean(x,na.rm=T),elpdsd=sd(x,na.rm=T),elpdmin=min(x,na.rm=T),elpdmax=max(x,na.rm=T)))[,-c(1:3)]
+    dframe2 <- aggregate(elpd ~ loci + ind + k,data=data,FUN=function(x) c(elpdmean =mean(x,na.rm=TRUE),elpdsd=sd(x,na.rm=TRUE),elpdmin=min(x,na.rm=TRUE),elpdmax=max(x,na.rm=TRUE)))[,-c(1:3)]
     dframe1 <- cbind(dframe1,dframe2)
   }else{
     dframe1 <- stats::aggregate(file ~ ind + k,data=data[,c("file","k","ind")],length)
@@ -1118,41 +1193,78 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
 # evannoMethodStructure --------------------------------------------------------
 
 #' @title Perform the Evanno method for STRUCTURE runs.
-#' @description The Evanno method for detecting the appropriate number of population clusters from STRUCTURE results. Creates table and figure with 
-#' Evanno method derivatives. Refer to return for detailed list of columns. See details for Evanno method reference.
-#' @param data A dataframe with summarised runs. An output from \code{summariseQ()} derived from STRUCTURE runs. Must have minimum 7 columns named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.
-#' @param writetable A logical indicating if the output table is to be exported as a file in the working directory.
-#' @param exportplot A logical indicating if the Evanno plots are to be exported as an image in the working directory. If Evanno method cannot be computed, a kPlot (elpd over k) is exported instead.
-#' @param returndata A logical indicating if the data must be returned. A data.frame object is returned alone when \code{returnplot=F}. When \code{returnplot=T}, the data.frame object is returned in a list. See 'Value'.
-#' @param returnplot A logical indicating if the plot must be returned. A gtable object is returned alone when \code{returndata=F}. When \code{returndata=T}, the gtable object is returned in a list. See 'Value'.
-#' @param pointsize A numeric indicating size of points. Default for \code{basesize=6} is 1.8.
-#' @param pointype A character or number for the type of points. Defaults to 20. Same as pch in standard R.
-#' @param pointcol A colour character for the colour of points. Defaults to "steelblue".
-#' @param linesize A numeric indicating the thickness of the line. Default for \code{basesize=6} is 0.24.
-#' @param linecol A colour character for the colour of line. Defaults to "steelblue".
-#' @param ebwidth A numeric indicating size od width of error abrs. Defaults to 0.2.
+#' @description The Evanno method for detecting the appropriate number of 
+#' population clusters from STRUCTURE results. Creates table and figure with 
+#' Evanno method derivatives. Refer to return for detailed list of columns. See 
+#' details for Evanno method reference.
+#' @param data A dataframe with summarised runs. An output from 
+#' \code{summariseQ()} derived from STRUCTURE runs. Must have minimum 7 columns 
+#' named elpdmean, elpdsd, k, runs, loci, elpdmax and elpdmin.
+#' @param writetable A logical indicating if the output table is to be exported 
+#' as a file in the working directory.
+#' @param exportplot A logical indicating if the Evanno plots are to be exported 
+#' as an image in the working directory. If Evanno method cannot be computed, a 
+#' kPlot (elpd over k) is exported instead.
+#' @param returndata A logical indicating if the data must be returned. A 
+#' data.frame object is returned alone when \code{returnplot=FALSE}. When 
+#' \code{returnplot=TRUE}, the data.frame object is returned in a list. See 'Value'.
+#' @param returnplot A logical indicating if the plot must be returned. A 
+#' gtable object is returned alone when \code{returndata=FALSE}. When 
+#' \code{returndata=TRUE}, the gtable object is returned in a list. See 'Value'.
+#' @param pointsize A numeric indicating size of points. Default for 
+#' \code{basesize=6} is 1.8.
+#' @param pointtype A character or number for the type of points. Defaults to 20. 
+#' Same as pch in standard R.
+#' @param pointcol A colour character for the colour of points. Defaults to 
+#' "steelblue".
+#' @param linesize A numeric indicating the thickness of the line. Default for 
+#' \code{basesize=6} is 0.24.
+#' @param linecol A colour character for the colour of line. Defaults to 
+#' "steelblue".
+#' @param ebwidth A numeric indicating size od width of error abrs. Defaults to 
+#' 0.2.
 #' @param ebcol A colour character for colour for errorbar. Defaults to "grey30".
-#' @param textcol A colour character for all text elements on the plot. Defaults to "grey30".
-#' @param xaxisbreaks A numeric vector indicating x-axis breaks. Automatically calculated by default.
-#' @param xaxislabels A character vector indicating x-axis labels. Automatically calculated by default.
-#' @param basesize A numeric indicating the base size of various plot elements such as pointsize, linesize etc. Increase basesize with larger figure dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) override basesize.
-#' @param gridsize A numeric indicating thickness of background grid. Default for \code{basesize=6} is 0.18.
-#' @param imgtype A character indicating the type of exported image. Default set to 'png'. Other possible 
+#' @param textcol A colour character for all text elements on the plot. 
+#' Defaults to "grey30".
+#' @param xaxisbreaks A numeric vector indicating x-axis breaks. Automatically 
+#' calculated by default.
+#' @param xaxislabels A character vector indicating x-axis labels. Automatically 
+#' calculated by default.
+#' @param basesize A numeric indicating the base size of various plot elements 
+#' such as pointsize, linesize etc. Increase basesize with larger figure 
+#' dimensions. Defaults to 6. Manually specified arguments (eg: pointsize) 
+#' override basesize.
+#' @param gridsize A numeric indicating thickness of background grid. Default 
+#' for \code{basesize=6} is 0.18.
+#' @param imgtype A character indicating the type of exported image. Default 
+#' set to 'png'. Other possible 
 #' options are 'jpeg', 'tiff' or 'pdf'.
-#' @param height A numeric denoting the height of exported image. Default units in 'cm'.
-#' @param width A numeric denoting the width of exported image. Default units in 'cm'.
-#' @param dpi A numeric denoting the resolution of exported image. Default set to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
-#' @param units A character denoting the unit of measure of the export image. Default is 'cm'. Other options are 'px', 'in' or 'mm'. 
-#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
-#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
+#' @param height A numeric denoting the height of exported image. Default units 
+#' in 'cm'.
+#' @param width A numeric denoting the width of exported image. Default units in 
+#' 'cm'.
+#' @param dpi A numeric denoting the resolution of exported image. Default set 
+#' to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
+#' @param units A character denoting the unit of measure of the export image. 
+#' Default is 'cm'. Other options are 'px', 'in' or 'mm'. 
+#' @param theme A character indicating ggplot theme to be used. Use like 
+#' "theme_grey", "theme_bw" etc.
+#' @param font A character indicating font family to be used in the plots. 
+#' Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' 
+#' as default for pdf. Use package \code{extrafonts} to import custom fonts. 
+#' See vignette for examples.
 #' @param na.rm Default set to FALSE. Does not remove NAs for plot and this 
 #' generates warnings from \code{ggplot}. If set to TRUE, NAs are removed before 
 #' plotting and warning messages from \code{ggplot} are avoided.
 #' @param quiet A logical indicating if messages must be printed to console.
-#' @param outputfilename A character indicating output file name. Defaults to 'evannoMethodStructure'.
-#' @return When \code{returndata=T} and \code{returnplot=F}, a data.frame is returned.
-#' When \code{returndata=F} and \code{returnplot=T}, a gtable plot object is returned.
-#' When \code{returndata=T} and \code{returnplot=T}, a list with data.frame and gtable object is returned.
+#' @param outputfilename A character indicating output file name. Defaults to 
+#' 'evannoMethodStructure'.
+#' @return When \code{returndata=TRUE} and \code{returnplot=FALSE}, a data.frame is 
+#' returned.
+#' When \code{returndata=FALSE} and \code{returnplot=TRUE}, a gtable plot object is 
+#' returned.
+#' When \code{returndata=TRUE} and \code{returnplot=TRUE}, a list with data.frame 
+#' and gtable object is returned.
 #' 
 #' The data.frame contains Evanno results sorted by K. The table has 16 
 #' columns namely Mean estimated ln probability of data, Standard deviation, 
@@ -1172,16 +1284,18 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
 #' 2611-2620. The Evanno plot generated from this function can be recreated 
 #' from the returned dataframe if furthur customisation is required.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #' @examples
 #' 
 #' \dontrun{
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' tr1 <- tabulateQ(readQ(sfiles))
 #' sr1 <- summariseQ(tr1)
 #' evannoMethodStructure(sr1)
-#' evannoMethodStructure(data=sr1,exportplot=T)
+#' evannoMethodStructure(data=sr1,exportplot=TRUE)
 #' }
 #' 
 #  @import xlsx
@@ -1291,10 +1405,10 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       if(exportplot)
       {
         # check image imgtype
-        if(imgtype=="pdf") pdf(filename=paste0(outputfilename,".pdf"),height=height1,width=width1,fonts=font)
-        if(imgtype=="png") png(filename=paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,type="cairo",family=font)
-        if(imgtype=="jpeg") jpeg(filename=paste0(outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
-        if(imgtype=="tiff") tiff(filename=paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",type="cairo",family=font)
+        if(imgtype=="pdf") pdf(paste0(outputfilename,".pdf"),height=height1,width=width1,fonts=font)
+        if(imgtype=="png") png(paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
+        if(imgtype=="jpeg") jpeg(paste0(outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
+        if(imgtype=="tiff") tiff(paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
         
         print(plist[[1]])
         dev.off()
@@ -1438,8 +1552,8 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
     {
       # check image imgtype  
       if(imgtype=="pdf") pdf(paste0(outputfilename,".pdf"),height=height1,width=width1,fonts=font)
-      if(imgtype =="png") png(paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,type="cairo",family=font)
-      if(imgtype =="tiff") tiff(paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",type="cairo",family=font)
+      if(imgtype =="png") png(paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
+      if(imgtype =="tiff") tiff(paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
       if(imgtype=="jpeg") jpeg(paste0(outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
       
       if(plen==3) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]],ncol=2,nrow=2)
@@ -1472,15 +1586,18 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
 #' @description Takes a qlist and combines several repeats for each K into a 
 #' single file along with a parameter file suitable for input to CLUMPP. The two 
 #' output files are organised into folders by K. CLUMPP is executed automatically 
-#' when \code{useexe=T}, else the CLUMPP executable file can be copied to the 
+#' when \code{useexe=TRUE}, else the CLUMPP executable file can be copied to the 
 #' output directories and run to reorder the clusters for each K.
 #' @param qlist A qlist (list of dataframes). An output from \code{\link{readQ}}.
 #' @param prefix A character prefix for folder names. By default, set to 'pop'.
-#' @param parammode A numeric 1, 2 or 3 indicating the algorithm option for CLUMPP paramfile. Calculated 
-#' automatically by default. Set this value to 3 if CLUMPP runs too long. See details.
-#' @param paramrep A numeric indicating the number of repeats for CLUMPP paramfile. Calculated 
-#' automatically by default. See details.
-#' @param useexe A logical indicating if CLUMPP executable must be run automatically based on system OS (experimental). May not work on all OS and versions.
+#' @param parammode A numeric 1, 2 or 3 indicating the algorithm option for 
+#' CLUMPP paramfile. Calculated automatically by default. Set this value to 3 if 
+#' CLUMPP runs too long. See details.
+#' @param paramrep A numeric indicating the number of repeats for CLUMPP 
+#' paramfile. Calculated automatically by default. See details.
+#' @param useexe A logical indicating if CLUMPP executable must be run 
+#' automatically based on system OS (experimental). May not work on all OS and 
+#' versions.
 #' @return The combined file and paramfile are written into respective folders 
 #' named by K.
 #' @details When multiple repeats are run for each K in runs, the order of 
@@ -1497,11 +1614,12 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
 #' \strong{parammode}\cr
 #' The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch' 
 #' (takes the longest time), option 2 is 'Greedy' and option 3 is 'LargeKGreedy'
-#' (fastest). If clumpp takes more than a few minutes, consider changing parammode
-#' to a higher number (ex. from 2 to 3), or open the exported paramfile and manually
-#' change GREEDY_OPTION to 3.\cr
+#' (fastest). If clumpp takes more than a few minutes, consider changing 
+#' parammode to a higher number (ex. from 2 to 3), or open the exported 
+#' paramfile and manually change GREEDY_OPTION to 3.\cr
 #' \cr
-#' The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
+#' The parammode and paramrep for CLUMPP paramfile is set based on this 
+#' calculation.
 #' T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
 #' populations, runs is number of runs for k and ind is number of individuals.
 #' If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
@@ -1511,25 +1629,29 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
 #' refer to CLUMPP documentation.\cr
 #' 
 #' \strong{useexe}\cr
-#' This option automatically runs the CLUMPP executable that is provided with this package. 
-#' The CLUMPP executable was obtained from \url{https://web.stanford.edu/group/rosenberglab/clumpp.html}.
+#' This option automatically runs the CLUMPP executable that is provided with 
+#' this package. The CLUMPP executable was obtained from 
+#' \url{https://web.stanford.edu/group/rosenberglab/clumpp.html}.
 #' Remember to cite CLUMPP if this option is used.\cr
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #' @examples
 #' 
 #' \dontrun{
 #' 
 #' # generate input files for CLUMPP from STRUCTURE files
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' clumppExport(readQ(sfiles))
 #' 
 #' # auto execute CLUMPP
 #' clumppExport(readQ(sfiles),useexe=TRUE)
 #' 
 #' # generate input files for CLUMPP from ADMIXTURE files
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' clumppExport(readQ(afiles))
 #' 
 #' }
@@ -1700,15 +1822,28 @@ clumppExport <- function(qlist=NULL,prefix=NA,parammode=NA,paramrep=NA,useexe=FA
 # collectRunsTess --------------------------------------------------------------
 
 #' @title Collect TESS cluster run files from multiple folders
-#' @description Collect TESS cluster run files from multiple folders to one folder and rename each run by folder name
-#' @param runsdir A character path indicating the directory containing TESS runs in multiple directories. Use \code{choose.dir()} for interactively selecting the directory. If NA, or no directory is selected, the current working directory is used.
-#' @param newdir A character indicating the name of the new directory to be created with the collected runs. IF NA, the default name 'AllTESSRuns' is used. 
-#' @param quiet A logical indicating if a message is to be displayed for directories without TESS runs and number of runs copied and renamed. 
-#' @details Within each TESS run folder, the function searches for filename ending with 'TR.txt' as the cluster file. This file is copied to the new folder and renamed as the name of the respective run directory. Therefore, DO NOT manually rename original run files or directories.
+#' @description Collect TESS cluster run files from multiple folders to one 
+#' folder and rename each run by folder name
+#' @param runsdir A character path indicating the directory containing TESS 
+#' runs in multiple directories. Use \code{choose.dir()} for interactively 
+#' selecting the directory. If NA, or no directory is selected, the current 
+#' working directory is used.
+#' @param newdir A character indicating the name of the new directory to be 
+#' created with the collected runs. IF NA, the default name 'AllTESSRuns' is 
+#' used. 
+#' @param quiet A logical indicating if a message is to be displayed for 
+#' directories without TESS runs and number of runs copied and renamed. 
+#' @details Within each TESS run folder, the function searches for filename 
+#' ending with 'TR.txt' as the cluster file. This file is copied to the new 
+#' folder and renamed as the name of the respective run directory. Therefore, 
+#' DO NOT manually rename original run files or directories.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
-#' @return Two integers are ruturned. The first denotes the number of TESS run files copied and renamed. The second number denotes number of directories without TESS run files.
+#' @return Two integers are ruturned. The first denotes the number of TESS run 
+#' files copied and renamed. The second number denotes number of directories 
+#' without TESS run files.
 #' @examples 
 #' \dontrun{
 #' collectRunsTess("path")
@@ -1752,16 +1887,30 @@ collectRunsTess <- function(runsdir=NA,newdir=NA,quiet=FALSE)
 
 #' @title Collect CLUMPP output files from multiple folders
 #' @description Collect CLUMPP output files from multiple folders to one folder
-#' @param prefix A character indicating the prefix of the CLUMPP directories before the underscore. For ex. if the directories are pop_K2, then prefix is pop.
-#' @param filetype A character indicating the type of file to be copied. Options are 'aligned' to copy aligned files only, 'merged' to copy merged files only and 'both' to copy both files.
-#' @param runsdir A character denoting the directory containing CLUMPP output files in multiple directories. Use \code{choose.dir()} for interactively selecting the directory. If NA, the current working directory is used.
-#' @param newdir A character indicating the name of the new directory to be created with the collected runs. IF NA, the a directory name joining prefix and filetype is created. 
-#' @param quiet A logical indicating if a message is to be displayed showing the number of folders processed and number of files processed. 
-#' @details Within each CLUMPP output folder, the function searches for filenames containing combination of prefix and filetype. This file is copied to the new folder. Therefore, do not manually rename CLUMPP output files or output directories.
+#' @param prefix A character indicating the prefix of the CLUMPP directories 
+#' before the underscore. For ex. if the directories are pop_K2, then prefix 
+#' is pop.
+#' @param filetype A character indicating the type of file to be copied. 
+#' Options are 'aligned' to copy aligned files only, 'merged' to copy merged 
+#' files only and 'both' to copy both files.
+#' @param runsdir A character denoting the directory containing CLUMPP output 
+#' files in multiple directories. Use \code{choose.dir()} for interactively 
+#' selecting the directory. If NA, the current working directory is used.
+#' @param newdir A character indicating the name of the new directory to be 
+#' created with the collected runs. IF NA, the a directory name joining prefix 
+#' and filetype is created. 
+#' @param quiet A logical indicating if a message is to be displayed showing 
+#' the number of folders processed and number of files processed. 
+#' @details Within each CLUMPP output folder, the function searches for 
+#' filenames containing combination of prefix and filetype. This file is 
+#' copied to the new folder. Therefore, do not manually rename CLUMPP output 
+#' files or output directories.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
-#' @return Two integers are ruturned. The first denotes the number of directories processed. The second number denotes the number files copied.
+#' @return Two integers are ruturned. The first denotes the number of 
+#' directories processed. The second number denotes the number files copied.
 #' @examples 
 #' \dontrun{
 #' collectClumppOutput(runsdir="path")
@@ -1819,7 +1968,8 @@ collectClumppOutput <- function(prefix="pop",filetype="aligned",runsdir=NA,newdi
 # getDim -----------------------------------------------------------------------
 
 #' @title Internal: Get dimensions for figures.
-#' @description Internal: Generate height and width of figure based on number of individuals.
+#' @description Internal: Generate height and width of figure based on number 
+#' of individuals.
 #' @param ind A numeric indicating the number of individuals.
 #' @param units A character indicating the unit of dimension: "cm","mm","in".
 #' @param height A numeric indicating the height of each plot.
@@ -1849,12 +1999,7 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
     if(plotnum > 1) height <- 1.2
     if(showindlab)
     {
-      if(sharedindlab)
-      {
-        height <- height+0.5
-      }else{
-        height <- height+(0.5*plotnum)
-      }
+      if(!sharedindlab) height <- height+0.5
     }
 
     if(imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
@@ -1867,7 +2012,8 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
     if(units=="px" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="px",tounit="in",dpi=dpi)
   }
   height <- height*plotnum
-  
+  if(showindlab) {if(sharedindlab) height <- height+0.5}
+    
   # width
   if(is.na(width))
   {
@@ -1888,8 +2034,8 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
   # grplabheight
   if(is.na(grplabheight)) 
   {
-    if(labs==1) grplabheight <- 0.4
-    if(labs>1) grplabheight <- 0.3
+    if(labs==1) grplabheight <- 0.6
+    if(labs>1) grplabheight <- 0.5
     grplabheight <- grplabheight * labs
     if(imgtype=="pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="cm",tounit="in",dpi=dpi)
   }else{
@@ -1911,13 +2057,18 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
 # getPlotParams ----------------------------------------------------------------
 
 #' @title Internal: Generate parameters for plots with labels
-#' @description Internal: Generates various parameters required for plotting with labels.
-#' @param grplab A character vector of labels same length as number of individuals.
+#' @description Internal: Generates various parameters required for plotting 
+#' with labels.
+#' @param grplab A character vector of labels same length as number of 
+#' individuals.
 #' @param plotnum A numeric indicating the number of plots on the figure.
 #' @param grplabsize A numeric indicating the size of the labels.
-#' @param grplabangle A numeric indicating the angle/rotation of labels. 0 is horizontal while 90 is vertical.
-#' @param grplabjust A numeric indicating the justification of labels. Defaults to 0.5 if grplabangle=0  or 1 if grplabangle between 20 and 135.
-#' @param pointsize  A numeric indicating the size of points on label marker line.
+#' @param grplabangle A numeric indicating the angle/rotation of labels. 0 is 
+#' horizontal while 90 is vertical.
+#' @param grplabjust A numeric indicating the justification of labels. Defaults 
+#' to 0.5 if grplabangle=0  or 1 if grplabangle between 20 and 135.
+#' @param pointsize  A numeric indicating the size of points on label marker 
+#' line.
 #' @param linesize A numeric indicating the thickness of the label marker line.
 #' @return A list with following plot parameters: grplab, plotnum, grplabsize, 
 #' grplabangle, grplabjust, pointsize, linesize.
@@ -1968,17 +2119,22 @@ getPlotParams <- function(grplab=NA,plotnum=1,grplabsize=NA,grplabangle=NA,grpla
 # grpLabels --------------------------------------------------------------------
 
 #' @title Internal: Handles grp subset/order
-#' @description Internal: Takes a q-matrix dataframe along with grp labels. Pop labels
-#' can be reordered or subsetted. The function also creates label_position and marker_position dfs.
-#' @param df A q-matrix dataframe
+#' @description Internal: Takes a q-matrix dataframe along with group labels. 
+#' Group labels can be reordered or subsetted. The function also creates 
+#' label_position and marker_position dfs.
+#' @param dframe A q-matrix dataframe
 #' @param grplab A dataframe with group labels
 #' @param selgrp A character denoting selected group label set
-#' @param ordergrp A logical indicating if individuals must be ordered by group labels
-#' @param subsetgrp A character or character vector of grp name(s) to subset/reorder
-#' @param grpmean A logical indicating if q-matrix must be converted from individual to group mean
+#' @param ordergrp A logical indicating if individuals must be ordered by group 
+#' labels
+#' @param subsetgrp A character or character vector of grp name(s) to 
+#' subset/reorder
+#' @param grpmean A logical indicating if q-matrix must be converted from 
+#' individual to group mean
 #' @param grplabpos A numeric indicating y-axis position of labels
 #' @param linepos A numeric indicating y-axis position of label line
-#' @param indlabwithgrplab A logical indicating if grp labels are added to indlab
+#' @param indlabwithgrplab A logical indicating if grp labels are added to 
+#' indlab
 #' @param indlabsep A character specifying seperation in indlab
 #' @param runid A numeric indicating run ID
 #' @return Returns a list with subsetted/reordered q-matrix, a character vector 
@@ -2023,7 +2179,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   }
   
   # group mean by selgrp
-  if(grpmean) dfwork1 <- as.data.frame(sapply(dfwork1,ave,unlist(grplab1[selgrp])),stringsAsFactors=F)
+  if(grpmean) dfwork1 <- as.data.frame(sapply(dfwork1,ave,unlist(grplab1[selgrp])),stringsAsFactors=FALSE)
   
   # in case of subsetgrp
   if(!any(is.na(subsetgrp)))
@@ -2063,8 +2219,8 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   for(k in seq_along(gnames))
   {
     rlegrp <- rle(unlist(grplab1[gnames[k]]))
-    label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
-    marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=F)
+    label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=FALSE)
+    marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=FALSE)
     label_position_df$labxpos <- round((diff(marker_position_df$markerxpos)/2)+marker_position_df$markerxpos[1:length(marker_position_df$markerxpos)-1],1)
     label_position_df$labypos <- rep(grplabpos,nrow(label_position_df))
     #marker_position_df$temp <- factor(rep(1,nrow(marker_position_df)))
@@ -2099,17 +2255,23 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
 #' @description Internal: Handles individual sorting
 #' @param dframe A q-matrix dataframe
 #' @param grplab A dataframe with group labels
-#' @param selgrp A single character denoting selected group label set. See details.
-#' @param ordergrp A logical indicating if individuals must be ordered by all group labels
-#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels).
+#' @param selgrp A single character denoting selected group label set. 
+#' See details.
+#' @param ordergrp A logical indicating if individuals must be ordered by all 
+#' group labels
+#' @param sortind A character indicating how individuals are sorted. Default is 
+#' NA (Same order of individuals as in input file). Other options are 'all' 
+#' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 
+#' 'labels' (sorting by individual labels).
 #' @param grplabpos A numeric indicating y-axis position of labels
 #' @param linepos A numeric indicating y-axis position of label line
 #' @return Returns a list with ordered q-matrix dataframe and ordered grplab.
-#' @details When multiple group label sets are in use, \code{selgrp} defines which 
-#' group label set is used for group ordering (\code{ordergrp}), subsetting (\code{subsetgrp}) 
-#' and group mean (\code{grpmean}). \code{selgrp} is also used for plotting divider 
-#' lines and and sorting (\code{sortind}). If \code{selgrp} is not specified, the 
-#' first group label set is used by default.
+#' @details When multiple group label sets are in use, \code{selgrp} defines 
+#' which group label set is used for group ordering (\code{ordergrp}), 
+#' subsetting (\code{subsetgrp}) and group mean (\code{grpmean}). \code{selgrp} 
+#' is also used for plotting divider lines and and sorting (\code{sortind}). 
+#' If \code{selgrp} is not specified, the first group label set is used by 
+#' default.
 # @export
 sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,grplabpos=NA,linepos=NA)
 {
@@ -2272,8 +2434,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
     for(k in seq_along(gnames))
     {
       rlegrp <- rle(unlist(grplab[gnames[k]]))
-      label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=F)
-      marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=F)
+      label_position_df <- data.frame(label=rlegrp$values,freq=rlegrp$lengths,stringsAsFactors=FALSE)
+      marker_position_df <- data.frame(markerxpos=c(0,cumsum(label_position_df$freq)),stringsAsFactors=FALSE)
       label_position_df$labxpos <- round((diff(marker_position_df$markerxpos)/2)+marker_position_df$markerxpos[1:length(marker_position_df$markerxpos)-1],1)
       label_position_df$labypos <- rep(grplabpos,nrow(label_position_df))
       #marker_position_df$temp <- factor(rep(1,nrow(marker_position_df)))
@@ -2307,194 +2469,350 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' @title Generate barplots from qlists.
 #' @description Generate separate or joined barplots (group-level) from qlists.
 #' @param qlist A qlist (list of dataframes). An output from \code{\link{readQ}}.
-#' @param imgoutput A character with options: 'sep' or 'join'.If set to "sep", each run is plotted as separate image file. If set to "join", multiple runs are joined into a single image.
-#' @param clustercol A vector of colours for clusters. If NA, colours are automatically generated. K=1 to K=12 are custom unique colours while K>12 are coloured by function \code{gplots::rich.colors()}.
-#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'label' (sorting by individual labels). See details.
-#' @param grplab A dataframe with one or more columns (group label sets), and rows equal to the number of individuals. See details.
-#' @param selgrp A single character denoting a selected group label set. The selected label must be a group label title used in \code{grplab}. See details.
-#' @param ordergrp A logical indicating if individuals must be grouped into contiguous blocks based on \code{grplab} starting with \code{selgrp}.
-#' @param subsetgrp A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA. See details.
-#' @param grpmean A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and mean is calculated over \code{selgrp}.
-#' @param panelspacer A numeric indicating the spacing between barplot panels in cm. Defaults to 0.06cm.
-#' @param showsp A logical indicating if strip panels on right side must be shown. Strip panel by default displays file name and K value. Defaults to TRUE.
-#' @param sppos A character indicating position of strip panel. One of 'right' or 'left'. Defaults to 'right'.
-#' @param splab A character or character vector denoting items displayed in the strip panels. Length must be equal to number of runs.
-#' @param splabsize A numeric indicating the size of the strip panel label. Computed automatically when set to NULL. Note that overall text size can be controlled using \code{basesize}.
-#' @param splabangle A numeric indicating angle/rotation of the strip panel label. Defaults to NULL. Automatically set to -90.
-#' @param splabcol A character indicating the colour of the strip panel label. Defaults to "grey30".
-#' @param splabface A character indicating the font face of strip panel label. One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable only when \code{showsp=T}.
-#' @param spbgcol A character denoting the background colour of the strip panel. Defaults to white.
-#' @param showtitle A logical indicating if plot title must be shown on the top. Defaults to FALSE. If TRUE and \code{titlelab=NA}, file name is displayed by default.
-#' @param titlelab A character or character vector for title text. Defaults to NA, and when \code{showtitle=TRUE} displays file name.
-#' @param titlehjust A numeric denoting the horizontal justification of the title. Defaults to 0 (left).
-#' @param titlevjust A numeric denoting the vertical justification of the title. Defaults to 0.5 (center).
-#' @param titlesize A numeric indicating the size of the title text. Computed automatically when set to NULL. Note that overall text size can be controlled using \code{basesize}.
+#' @param imgoutput A character with options: 'sep' or 'join'.If set to "sep", 
+#' each run is plotted as separate image file. If set to "join", multiple runs 
+#' are joined into a single image.
+#' @param clustercol A vector of colours for clusters. If NA, colours are 
+#' automatically generated. K=1 to K=12 are custom unique colours while K>12 
+#' are coloured by function \code{gplots::rich.colors()}.
+#' @param sortind A character indicating how individuals are sorted. Default 
+#' is NA (Same order of individuals as in input file). Other options are 'all' 
+#' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 
+#' 'label' (sorting by individual labels). See details.
+#' @param grplab A dataframe with one or more columns (group label sets), and 
+#' rows equal to the number of individuals. See details.
+#' @param selgrp A single character denoting a selected group label set. The 
+#' selected label must be a group label title used in \code{grplab}. See details.
+#' @param ordergrp A logical indicating if individuals must be grouped into 
+#' contiguous blocks based on \code{grplab} starting with \code{selgrp}.
+#' @param subsetgrp A character or character vector with group names to subset 
+#' or reorder groups. Only applicable when \code{grplab} is in use. Default is 
+#' NA. See details.
+#' @param grpmean A logical indicating if q-matrix must be converted from 
+#' individual values to group mean values. Applicable only when \code{grplab} is
+#' in use and mean is calculated over \code{selgrp}.
+#' @param showgrplab A logical indicating if group labels must be displayed. Only
+#' applicable when \code{grplab} is in use. Defaults to TRUE.
+#' @param panelspacer A numeric indicating the spacing between barplot panels in 
+#' cm. Defaults to 0.06cm.
+#' @param showsp A logical indicating if strip panels on right side must be 
+#' shown. Strip panel by default displays file name and K value. Defaults to 
+#' TRUE.
+#' @param sppos A character indicating position of strip panel. One of 'right' 
+#' or 'left'. Defaults to 'right'.
+#' @param splab A character or character vector denoting items displayed in the 
+#' strip panels. Length must be equal to number of runs.
+#' @param splabsize A numeric indicating the size of the strip panel label. 
+#' Computed automatically when set to NULL. Note that overall text size can be 
+#' controlled using \code{basesize}.
+#' @param splabangle A numeric indicating angle/rotation of the strip panel 
+#' label. Defaults to NULL. Automatically set to -90.
+#' @param splabcol A character indicating the colour of the strip panel label. 
+#' Defaults to "grey30".
+#' @param splabface A character indicating the font face of strip panel label. 
+#' One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. 
+#' Applicable only when \code{showsp=TRUE}.
+#' @param spbgcol A character denoting the background colour of the strip panel. 
+#' Defaults to white.
+#' @param showtitle A logical indicating if plot title must be shown on the top. 
+#' Defaults to FALSE. If TRUE and \code{titlelab=NA}, file name is displayed by 
+#' default.
+#' @param titlelab A character or character vector for title text. Defaults to 
+#' NA, and when \code{showtitle=TRUE} displays file name.
+#' @param titlehjust A numeric denoting the horizontal justification of the 
+#' title. Defaults to 0 (left).
+#' @param titlevjust A numeric denoting the vertical justification of the title. 
+#' Defaults to 0.5 (center).
+#' @param titlesize A numeric indicating the size of the title text. Computed 
+#' automatically when set to NULL. Note that overall text size can be controlled 
+#' using \code{basesize}.
 #' @param titlecol A colour character for title. Defaults to "grey30".
-#' @param titleface A character indicating the font face of title label. One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable only when \code{showtitle=T}.
-#' @param titlespacer A numeric indicating the space below the title. Defaults to 1.2.
-#' @param titleangle A numeric indicating the angle/rotation of the title. Defaults to 0.
-#' @param showsubtitle A logical indicating if plot subtitle must be shown on the top. Defaults to FALSE. If TRUE and \code{subtitlelab=NA}, file name is displayed by default.
-#' @param subtitlelab A character or character vector for subtitle text. Defaults to NA, and when \code{showsubtitle=TRUE} displays file name.
-#' @param subtitlehjust A numeric denoting the horizontal justification of the subtitle. Defaults to 0 (left).
-#' @param subtitlevjust A numeric denoting the vertical justification of the subtitle. Defaults to 0.5 (center).
-#' @param subtitlesize A numeric indicating the size of the subtitle text. Computed automatically when set to NULL. Note that overall text size can be controlled using \code{basesize}.
+#' @param titleface A character indicating the font face of title label. One of 
+#' 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable 
+#' only when \code{showtitle=TRUE}.
+#' @param titlespacer A numeric indicating the space below the title. Defaults 
+#' to 1.2.
+#' @param titleangle A numeric indicating the angle/rotation of the title. 
+#' Defaults to 0.
+#' @param showsubtitle A logical indicating if plot subtitle must be shown on 
+#' the top. Defaults to FALSE. If TRUE and \code{subtitlelab=NA}, file name is 
+#' displayed by default.
+#' @param subtitlelab A character or character vector for subtitle text. 
+#' Defaults to NA, and when \code{showsubtitle=TRUE} displays file name.
+#' @param subtitlehjust A numeric denoting the horizontal justification of the 
+#' subtitle. Defaults to 0 (left).
+#' @param subtitlevjust A numeric denoting the vertical justification of the 
+#' subtitle. Defaults to 0.5 (center).
+#' @param subtitlesize A numeric indicating the size of the subtitle text. 
+#' Computed automatically when set to NULL. Note that overall text size can be 
+#' controlled using \code{basesize}.
 #' @param subtitlecol A colour character for subtitle. Defaults to "grey30".
-#' @param subtitleface A character indicating the font face of subtitle label. One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable only when \code{showsubtitle=T}.
-#' @param subtitlespacer A numeric indicating the space below the subtitle. Defaults to 1.2.
-#' @param subtitleangle A numeric indicating the angle/rotation of the subtitle. Defaults to 0.
-#' @param grplabspacer A numeric indicating the space between the plot panels and the group label area in cm. Defaults to 0cm. Applicable only when \code{grplab} are in use.
-#' @param grplabheight A numeric indicating the height of the group label area in cm. Defaults to 0.4cm. Multiple group sets are multiplied by 0.4. Applicable only with \code{grplab}. See details.
-#' @param grplabpos A numeric indicating the y position of the group labels. Applicable only with group labels. Defaults to 0.
-#' @param grplabsize A numeric indicating the size of the group labels. Default range between 1.5 - 2.5 depending on number of individuals. This text size is not affected by \code{basesize}.
-#' @param grplabangle A numeric indicating the angle/rotation of group labels. 0 is horizontal while 90 is vertical. Default is 0.
-#' @param grplabjust A numeric indicating the justification of group labels. Defaults to 0.5 if grplabangle=0  or 1 if grplabangle between 20 and 135.
-#' @param grplabcol A colour character for the colour of group labels. Defaults to "grey30".
-#' @param grplabalpha A numeric between 0 and 1 denoting transparency of group labels. Defaults to 1.
-#' @param grplabface A character specifying font face. Either 'plain', 'italic', 'bold' or 'bold.italic'.
-#' @param showindlab A logical indicating if individual labels must be shown. See details.
-#' @param sharedindlab A logical indicating if only one set of shared individual labels must be shown below all plots. Applicable only when \code{imgoutput="join"}. Individual labels are visible only when \code{showindlab=TRUE}.
-#' @param useindlab A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as individual labels. See details.
-#' @param indlabwithgrplab A logical indicating if individual labels must be concatenated with grplab. Applies only when grplab is in use. Relevant for sorting by label.
-#' @param indlabsep A character used as separator when concatenating individual labels and group labels. Defaults to space \code{indlabsep=" "}.
-#' @param indlabheight A numeric indicating space below the individual label panel. Increase to 0.1, 0.2 etc if labels are clipped off.
-#' @param indlabsize A numeric indicating the size of the individual labels. Computed automatically when set to NULL.  Note that overall text size can be controlled using \code{basesize}.
-#' @param indlabangle A numeric indicating the angle/rotation of individual labels. 0 is horizontal while 90 is vertical. Defaults to 90.
-#' @param indlabvjust A numeric denoting vertical justification of the individual labels. Defaults to 0.5.
-#' @param indlabhjust A numeric denoting the horizontal justification of the individual labels. Defaults to 1.
-#' @param indlabcol A colour character for the colour of individual labels. Defaults to "grey30".
-#' @param indlabspacer A numeric denoting space between the individual label and the plot area. Default set to 0.
-#' @param pointsize A numeric indicating the size of points on label marker line. Default range between 1.2 - 3.2 depending on number of individuals.
-#' @param pointcol A colour character for the colour of points on the label marker line. Defaults to "grey30".
-#' @param pointbgcol A colour character for the background of marker point for certain point types.
-#' @param pointtype A character or number for the type of points on the label marker line. Defaults to |. Same as pch in standard R.
-#' @param pointalpha A numeric between 0 and 1 denoting transparency of the points. Defaults to 1.
-#' @param linepos A numeric indicating the y position of the label marker line and the points. Applicable only with group labels. Defaults to 1.
-#' @param linesize A numeric indicating the thickness of the label marker line. Default range between 0.3 and 0.6 depending on number of individuals.
-#' @param linecol A colour character for the label marker line. Defaults to "grey30".
-#' @param linetype A numeric indicating the type of line for marker line. Same as lty in standard R. Default value is 1.
-#' @param linealpha A numeric between 0 and 1 denoting transparency of the marker line. Defaults to 1.
-#' @param showdiv A logical indicating if divider lines between groups must be drawn. Applicable only when group labels are in use.
-#' @param divgrp A character or character vector with one or more group label titles denoting which groups are used to draw divider lines. This must be a group label title used in \code{grplab}. If not provided, the value in \code{selgrp} is used by default.
-#' @param divcol A character or hexadecimal colour denoting the colour of the divider line. Default is white.
-#' @param divtype A numeric indicating the type of line for the divider line. Same as lty in standard R. Default value is '21'.
-#' @param divsize A numeric indicating the thickness of the divider line. Default is 0.25.
-#' @param divalpha A numeric between 0 and 1 denoting transparency of the divider line. Defaults to 1.
-#' @param showlegend A logical indicating if legend denoting cluster colours must be plotted. Defaults to FALSE.
-#' @param legendlab A character or character vector to for legend cluster labels. Must be equal to max number of clusters.
-#' @param legendpos A character 'right' or 'left' denoting position of the legend. Defaults to 'left'.
-#' @param legendkeysize A numeric indicating size of the legend key. Defaults to 4.
-#' @param legendtextsize A numeric indicating size of the legend text. Defaults to 3.
-#' @param legendmargin A numeric vector of length 4 indicating top, right, bottom and left margins of the legend.
+#' @param subtitleface A character indicating the font face of subtitle label. 
+#' One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. 
+#' Applicable only when \code{showsubtitle=TRUE}.
+#' @param subtitlespacer A numeric indicating the space below the subtitle. 
+#' Defaults to 1.2.
+#' @param subtitleangle A numeric indicating the angle/rotation of the subtitle. 
+#' Defaults to 0.
+#' @param grplabspacer A numeric indicating the space between the plot panels 
+#' and the group label area in cm. Defaults to 0cm. Applicable only when 
+#' \code{grplab} are in use.
+#' @param grplabheight A numeric indicating the height of the group label area 
+#' in cm. Defaults to 0.4cm. Multiple group sets are multiplied by 0.4. 
+#' Applicable only with \code{grplab}. See details.
+#' @param grplabpos A numeric indicating the y position of the group labels. 
+#' Applicable only with group labels. Defaults to 0.
+#' @param grplabsize A numeric indicating the size of the group labels. Default 
+#' range between 1.5 - 2.5 depending on number of individuals. This text size is 
+#' not affected by \code{basesize}.
+#' @param grplabangle A numeric indicating the angle/rotation of group labels. 
+#' 0 is horizontal while 90 is vertical. Default is 0.
+#' @param grplabjust A numeric indicating the justification of group labels. 
+#' Defaults to 0.5 if grplabangle=0  or 1 if grplabangle between 20 and 135.
+#' @param grplabcol A colour character for the colour of group labels. Defaults 
+#' to "grey30".
+#' @param grplabalpha A numeric between 0 and 1 denoting transparency of group 
+#' labels. Defaults to 1.
+#' @param grplabface A character specifying font face. Either 'plain', 'italic',
+#' 'bold' or 'bold.italic'.
+#' @param showindlab A logical indicating if individual labels must be shown. 
+#' See details.
+#' @param sharedindlab A logical indicating if only one set of shared individual 
+#' labels must be shown below all plots. Applicable only when 
+#' \code{imgoutput="join"}. Individual labels are visible only when 
+#' \code{showindlab=TRUE}.
+#' @param useindlab A logical indicating if individual labels must be read from 
+#' the rownames of qlist dataframes and used as individual labels. See details.
+#' @param indlabwithgrplab A logical indicating if individual labels must be 
+#' concatenated with grplab. Applies only when grplab is in use. Relevant for 
+#' sorting by label.
+#' @param indlabsep A character used as separator when concatenating individual 
+#' labels and group labels. Defaults to space \code{indlabsep=" "}.
+#' @param indlabheight A numeric indicating space below the individual label 
+#' panel. Increase to 0.1, 0.2 etc if labels are clipped off.
+#' @param indlabsize A numeric indicating the size of the individual labels. 
+#' Computed automatically when set to NULL.  Note that overall text size can be 
+#' controlled using \code{basesize}.
+#' @param indlabangle A numeric indicating the angle/rotation of individual 
+#' labels. 0 is horizontal while 90 is vertical. Defaults to 90.
+#' @param indlabvjust A numeric denoting vertical justification of the 
+#' individual labels. Defaults to 0.5.
+#' @param indlabhjust A numeric denoting the horizontal justification of the 
+#' individual labels. Defaults to 1.
+#' @param indlabcol A colour character for the colour of individual labels. 
+#' Defaults to "grey30".
+#' @param indlabspacer A numeric denoting space between the individual label 
+#' and the plot area. Default set to 0.
+#' @param pointsize A numeric indicating the size of points on label marker 
+#' line. Default range between 1.2 - 3.2 depending on number of individuals.
+#' @param pointcol A colour character for the colour of points on the label 
+#' marker line. Defaults to "grey30".
+#' @param pointbgcol A colour character for the background of marker point for 
+#' certain point types.
+#' @param pointtype A character or number for the type of points on the label 
+#' marker line. Defaults to |. Same as pch in standard R.
+#' @param pointalpha A numeric between 0 and 1 denoting transparency of the 
+#' points. Defaults to 1.
+#' @param linepos A numeric indicating the y position of the label marker line 
+#' and the points. Applicable only with group labels. Defaults to 1.
+#' @param linesize A numeric indicating the thickness of the label marker line. 
+#' Default range between 0.3 and 0.6 depending on number of individuals.
+#' @param linecol A colour character for the label marker line. Defaults to 
+#' "grey30".
+#' @param linetype A numeric indicating the type of line for marker line. Same 
+#' as lty in standard R. Default value is 1.
+#' @param linealpha A numeric between 0 and 1 denoting transparency of the 
+#' marker line. Defaults to 1.
+#' @param showdiv A logical indicating if divider lines between groups must be 
+#' drawn. Applicable only when group labels are in use.
+#' @param divgrp A character or character vector with one or more group label 
+#' titles denoting which groups are used to draw divider lines. This must be a 
+#' group label title used in \code{grplab}. If not provided, the value in 
+#' \code{selgrp} is used by default.
+#' @param divcol A character or hexadecimal colour denoting the colour of the 
+#' divider line. Default is white.
+#' @param divtype A numeric indicating the type of line for the divider line. 
+#' Same as lty in standard R. Default value is '21'.
+#' @param divsize A numeric indicating the thickness of the divider line. 
+#' Default is 0.25.
+#' @param divalpha A numeric between 0 and 1 denoting transparency of the 
+#' divider line. Defaults to 1.
+#' @param showlegend A logical indicating if legend denoting cluster colours 
+#' must be plotted. Defaults to FALSE.
+#' @param legendlab A character or character vector to for legend cluster 
+#' labels. Must be equal to max number of clusters.
+#' @param legendpos A character 'right' or 'left' denoting position of the 
+#' legend. Defaults to 'left'.
+#' @param legendkeysize A numeric indicating size of the legend key. Defaults 
+#' to 4.
+#' @param legendtextsize A numeric indicating size of the legend text. Defaults 
+#' to 3.
+#' @param legendmargin A numeric vector of length 4 indicating top, right, 
+#' bottom and left margins of the legend.
 #' @param barsize A numeric indicating the width of the bars. Defaults to 1.
-#' @param barbordersize A numeric indicating border size of bars. Defaults to 0. Visible only when \code{barbordercolour} is not NA.
-#' @param barbordercolour A single colour for bar border. Defaults to NA. Visible only when \code{barbordersize} is larger than zero and set to a colour other than NA.
-#' @param showyaxis A logical indicating if y-axis labels should be displayed or not. Defaults to FALSE. Y-axis size is same as \code{indlabsize}.
-#' @param showticks A logical indicating if ticks on axis should be displayed or not. Defaults to FALSE. Applies to x and y axis. Y-axis ticks are visible only when \code{showyaxis=TRUE}. Tick colour is same as \code{indlabcol}.
-#' @param ticksize A numeric indicating size of ticks. Defaults to 0.2. Applies to both x and y axis.
-#' @param ticklength A numeric indicating length of tick marks in cm. Defaults to 0.03. Applies to both x and y axis.
-#' @param outputfilename A character or character vector denoting output file name without file extension. See details.
-#' @param imgtype A character indicating output image file type. Possible options are "png","jpeg","tiff" or "pdf".
-#' @param height A numeric indicating the height of a single run panel. By default, automatically generated based on number of runs. Separate plots use 1.8cm and joined plots use 1.2cm for single panel. See details.
-#' @param width A numeric indicating the width of the whole plot. By default, automatically generated based on number of individuals. Ranges between 5cm and 30cm.
-#' @param dpi A numeric indicating the image resolution in pixels per inch (PPI). Defaults to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
-#' @param units A numeric indicating the units of height and width. Default set to "cm". Other options are 'px', 'in' or 'mm'.
-#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
-#' @param basesize A numeric indicating overall text size. Defaults to 5 suitable for export. Set to 11 for returned plot.
-#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
-#' @param na.rm A logical indicating if NAs are removed from data, else \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
+#' @param barbordersize A numeric indicating border size of bars. Defaults to 0. 
+#' Visible only when \code{barbordercolour} is not NA.
+#' @param barbordercolour A single colour for bar border. Defaults to NA. 
+#' Visible only when \code{barbordersize} is larger than zero and set to a 
+#' colour other than NA.
+#' @param showyaxis A logical indicating if y-axis labels should be displayed 
+#' or not. Defaults to FALSE. Y-axis size is same as \code{indlabsize}.
+#' @param showticks A logical indicating if ticks on axis should be displayed 
+#' or not. Defaults to FALSE. Applies to x and y axis. Y-axis ticks are visible 
+#' only when \code{showyaxis=TRUE}. Tick colour is same as \code{indlabcol}.
+#' @param ticksize A numeric indicating size of ticks. Defaults to 0.2. Applies 
+#' to both x and y axis.
+#' @param ticklength A numeric indicating length of tick marks in cm. Defaults 
+#' to 0.03. Applies to both x and y axis.
+#' @param outputfilename A character or character vector denoting output file 
+#' name without file extension. See details.
+#' @param imgtype A character indicating output image file type. Possible 
+#' options are "png","jpeg","tiff" or "pdf".
+#' @param height A numeric indicating the height of a single run panel. By 
+#' default, automatically generated based on number of runs. Separate plots use 
+#' 1.8cm and joined plots use 1.2cm for single panel. See details.
+#' @param width A numeric indicating the width of the whole plot. By default, 
+#' automatically generated based on number of individuals. Ranges between 5cm 
+#' and 30cm.
+#' @param dpi A numeric indicating the image resolution in pixels per inch 
+#' (PPI). Defaults to 300. If \code{imgtype="pdf"}, dpi is fixed at 300.
+#' @param units A numeric indicating the units of height and width. Default set 
+#' to "cm". Other options are 'px', 'in' or 'mm'.
+#' @param theme A character indicating ggplot theme to be used. Use like 
+#' "theme_grey", "theme_bw" etc.
+#' @param basesize A numeric indicating overall text size. Defaults to 5 
+#' suitable for export. Set to 11 for returned plot.
+#' @param font A character indicating font family to be used in the plots. Uses 
+#' default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as 
+#' default for pdf. Use package \code{extrafonts} to import custom fonts. See 
+#' vignette for examples.
+#' @param na.rm A logical indicating if NAs are removed from data, else 
+#' \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are 
+#' removed before plotting and \code{ggplot} NA warning is suppressed.
 #' @param quiet A logical indicating if any messages are printed to console.
-#' @param panelratio A two value integer vector denoting ratio of plot panel to grplab panel. Defaults to \code{c(3,1)}. Applicable only when \code{grplab} is in use.
-#' @param exportplot A logical indicating if a plot image must be exported into the working directory.
-#' @param returnplot A logical indicating if ggplot plot objects must be returned. See 'Value'.
-#' @param returndata A logical indicating if processed data must be returned. See 'Value'.
-#' @return When \code{returnplot=TRUE}, plot object(s) are returned. When \code{grplab=NA}, 
-#' a ggplot2 object is returned. When \code{grplab} is in use, a gtable (output from gridExtra::arrangeGrob()) 
-#' list is returned. When \code{returndata=TRUE}, the input qlist is modified (sorted, subsetted etc)
-#' and returned. If \code{grplab} is in use, a list of modified qlist and grplab is returned.
-#' If \code{returnplot=TRUE} and \code{returndata=TRUE} are both set, then a named list
-#' (plot,data) is returned. The plot item contains the ggplot2 object or gtable and 
-#' the data contains qlist (and grplab).
+#' @param panelratio A two value integer vector denoting ratio of plot panel to 
+#' grplab panel. Defaults to \code{c(3,1)}. Applicable only when \code{grplab} 
+#' is in use.
+#' @param exportplot A logical indicating if a plot image must be exported into 
+#' the working directory.
+#' @param returnplot A logical indicating if ggplot plot objects must be 
+#' returned. See 'Value'.
+#' @param returndata A logical indicating if processed data must be returned. 
+#' See 'Value'.
+#' @param exportpath A path to where content must be exported. For example,
+#' \code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+#' directory.
+#' @return When \code{returnplot=TRUE}, plot object(s) are returned. When 
+#' \code{grplab=NA}, 
+#' a ggplot2 object is returned. When \code{grplab} is in use, a gtable (output 
+#' from gridExtra::arrangeGrob()) 
+#' list is returned. When \code{returndata=TRUE}, the input qlist is modified 
+#' (sorted, subsetted etc)
+#' and returned. If \code{grplab} is in use, a list of modified qlist and grplab 
+#' is returned.
+#' If \code{returnplot=TRUE} and \code{returndata=TRUE} are both set, then a 
+#' named list
+#' (plot,data) is returned. The plot item contains the ggplot2 object or gtable 
+#' and the data contains qlist (and grplab).
 #' 
 #' @details 
 #' 
 #' \strong{sortind}\cr
 #' This argument takes one character as input.  Default NA means individuals are 
-#' plotted in the same order as input. Individuals can be ordered by any one cluster. 
-#' For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+#' plotted in the same order as input. Individuals can be ordered by any one 
+#' cluster. For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
 #' To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
 #' use \code{sortind="all"}. When using \code{sortind="label"}, individuals are
 #' sorted by individual labels (along with grplab if present). Individual
-#' labels can be displayed using \code{showindlab=T}. When using \code{sortind} 
+#' labels can be displayed using \code{showindlab=TRUE}. When using \code{sortind} 
 #' with \code{grplab}, individuals are sorted within the groups.\cr
 #' 
 #' \strong{grplab}\cr
-#' \code{grplab} must be a data.frame. One or more label sets can be provided. Each 
-#' label set must be a character vector equal to the number of individuals 
+#' \code{grplab} must be a data.frame. One or more label sets can be provided. 
+#' Each label set must be a character vector equal to the number of individuals 
 #' present in the qlist. 
 #' For example, we can provide one group label set as such:\cr
-#' \code{grplab=data.frame(labs=c("Grp A","Grp A","Grp B","Grp B"),stringsAsFactors=F)}\cr
+#' \code{grplab=data.frame(labs=c("Grp A","Grp A","Grp B","Grp B"),
+#' stringsAsFactors=FALSE)}\cr
 #' 
 #' Two group label sets can be provided as such:\cr
-#' \code{grplab=data.frame(labs=c("Grp A","Grp A","Grp B","Grp B"),loc=c("Loc 1","Loc 2","Loc 2","Loc 2"),stringsAsFactors=F)}\cr
+#' \code{grplab=data.frame(labs=c("Grp A","Grp A","Grp B","Grp B"),loc=
+#' c("Loc 1","Loc 2","Loc 2","Loc 2"),stringsAsFactors=FALSE)}\cr
 #' 
 #' \strong{selgrp}\cr
 #' When multiple group label sets are in use, \code{selgrp} defines which 
-#' group label set is used for group ordering (\code{ordergrp}), subsetting (\code{subsetgrp}) 
-#' and group mean (\code{grpmean}). \code{selgrp} is also used for plotting divider 
-#' lines and and sorting (\code{sortind}). If \code{selgrp} is not specified, 
-#' the first group label set is used by default.\cr
+#' group label set is used for group ordering (\code{ordergrp}), subsetting 
+#' (\code{subsetgrp}) and group mean (\code{grpmean}). \code{selgrp} is also 
+#' used for plotting divider lines and and sorting (\code{sortind}). If 
+#' \code{selgrp} is not specified, the first group label set is used by 
+#' default.\cr
 #'
 #' \strong{ordergrp}\cr
-#' When using \code{grplab}, labels may not be in contiguous blocks. Using \code{ordergrp=TRUE}, 
-#' regroups individuals into contiguous blocks for all group label sets starting with \code{selgrp}.\cr
+#' When using \code{grplab}, labels may not be in contiguous blocks. Using 
+#' \code{ordergrp=TRUE}, regroups individuals into contiguous blocks for all 
+#' group label sets starting with \code{selgrp}.\cr
 #'
 #' \strong{subsetgrp}\cr
-#' This argument takes one or more characters as input. Use only group labels used 
-#' in one of the group label sets in \code{grplab}. For ex. In case of a group label 
-#' set 'labs' with two grps in order 'Grp A' and 'Grp B', use \code{subsetgrp=c("Grp B","Grp A")} 
-#' to change order of groups. Use \code{subsetgrp="Grp B"} to subset only Grp B. 
-#' When using multiple group label sets, use \code{selgrp} to declare which group label set to subset.\cr
+#' This argument takes one or more characters as input. Use only group labels 
+#' used in one of the group label sets in \code{grplab}. For ex. In case of a 
+#' group label set 'labs' with two grps in order 'Grp A' and 'Grp B', use 
+#' \code{subsetgrp=c("Grp B","Grp A")} to change order of groups. Use 
+#' \code{subsetgrp="Grp B"} to subset only Grp B. When using multiple group 
+#' label sets, use \code{selgrp} to declare which group label set to subset.\cr
 #' 
 #' \strong{outputfilename}\cr
-#' Default is \code{outputfilename=NA} which means that output file names are automatically generated. 
-#' When \code{imgoutput="sep"}, the names of the qlist are used to create output labels. When \code{imgoutput="join"},
-#' one output label is created for all input files in this format: JoinedNFiles-YYYYMMDDHHMMSS, 
-#' where N stands for number of runs joined, and the ending stands for current system date and time. 
-#' If \code{outputfilename} is provided, when \code{imgoutput="sep"}, \code{outputfilename} must be 
-#' a character vector equal to length of input runs. When \code{imgoutput="join"}, \code{outputfilename} 
-#' must be a character of length one. File extensions like .png etc must not be provided.\cr
+#' Default is \code{outputfilename=NA} which means that output file names are 
+#' automatically generated. When \code{imgoutput="sep"}, the names of the qlist 
+#' are used to create output labels. When \code{imgoutput="join"}, one output 
+#' label is created for all input files in this format: 
+#' JoinedNFiles-YYYYMMDDHHMMSS, where N stands for number of runs joined, and 
+#' the ending stands for current system date and time. If \code{outputfilename} 
+#' is provided, when \code{imgoutput="sep"}, \code{outputfilename} must be a 
+#' character vector equal to length of input runs. When \code{imgoutput="join"}, 
+#' \code{outputfilename} must be a character of length one. File extensions 
+#' like .png etc must not be provided.\cr
 #' 
 #' \strong{height}\cr
-#' Argument \code{height} denotes the height of one run panel. With joined plots, the \code{height} is multiplied by number of runs. The height does not include label panel. The \code{grplabheight} is used to define the full height of the lab panel. If \code{grplabheight} is not provided, it is calculated based on the number of group label sets.
-#' final_image_height = (height*num_of_runs)+grplabheight
+#' Argument \code{height} denotes the height of one run panel. With joined 
+#' plots, the \code{height} is multiplied by number of runs. The height does 
+#' not include label panel. The \code{grplabheight} is used to define the full 
+#' height of the lab panel. If \code{grplabheight} is not provided, it is 
+#' calculated based on the number of group label sets.\cr
+#' final_image_height = (height*num_of_runs)+grplabheight\cr
 #' It is possible to set either height or width and leave other as default.\cr
 #' 
 #' \strong{indlab}\cr
-#' When \code{showindlab=T}, individual labels are shown/displayed. When \code{showindlab=F}, 
-#' individual labels are not shown/displayed on the graph, although they are present in the underlying data.
-#' Therefore, \code{showindlab} only control display of labels on the plot and nothing to 
-#' do with label control in the data.\cr
-#' The default \code{useindlab=F}, creates labels numerically in the 
-#' original order of data but with zero padding. For example, if there are 10 individuals,
-#' labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up
-#' to 100. Zero padding to ensure optimal sorting. When \code{useindlab=T}, labels
-#' are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if
-#' read in using \code{readQ()}. This can be an issue with sorting by labels \code{sortind="label"}.
-#' For STRUCTURE files with individual labels, they can be read
-#' in automatically using \code{readQ(indlabfromfile=T)}.\cr
+#' When \code{showindlab=TRUE}, individual labels are shown/displayed. When 
+#' \code{showindlab=FALSE}, 
+#' individual labels are not shown/displayed on the graph, although they are 
+#' present in the underlying data. Therefore, \code{showindlab} only control 
+#' display of labels on the plot and nothing to do with label control in the 
+#' data.\cr
+#' The default \code{useindlab=FALSE}, creates labels numerically in the 
+#' original order of data but with zero padding. For example, if there are 10 
+#' individuals, labels are 01, 02 up to 10. if there are 100 individuals, then 
+#' labels are 001, 002 up to 100. Zero padding to ensure optimal sorting. When 
+#' \code{useindlab=TRUE}, labels are used from rownames of qlist dataframes. They 
+#' are usually labelled 1,2,3.. if read in using \code{readQ()}. This can be an 
+#' issue with sorting by labels \code{sortind="label"}.For STRUCTURE files with 
+#' individual labels, they can be read in automatically using 
+#' \code{readQ(indlabfromfile=TRUE)}.\cr
 #' When group labels are in use, \code{grplab}, they are added to the individual
-#' labels in both cases \code{useindlab=T} and \code{useindlab=F} separated by \code{indlabsep}. 
-#' Default \code{indlabsep=" "} adds a space between individual label and grplab. For example,
-#' group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when \code{useindlab=F}
-#' and usually '1 popA', '2 popA'... when \code{useindlab=T}. When multiple group labels
-#' are in use, the are similarly concatenated one after the other to individual names
-#' in the order in which the group labels were provided.
+#' labels in both cases \code{useindlab=TRUE} and \code{useindlab=FALSE} separated by 
+#' \code{indlabsep}. Default \code{indlabsep=" "} adds a space between 
+#' individual label and grplab. For example, group labels 'popA', 'popA'... 
+#' will be '01 popA', '02 popA'... when \code{useindlab=FALSE} and usually '1 popA',
+#' '2 popA'... when \code{useindlab=TRUE}. When multiple group labels are in use, 
+#' the are similarly concatenated one after the other to individual names in the
+#' order in which the group labels were provided.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #' @seealso \code{\link{plotQMultiline}}
 #' @examples 
-#' slist <- readQ(list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE))
+#' slist <- readQ(list.files(path=system.file("files/structure",
+#' package="pophelper"),full.names=TRUE))
 #' 
 #' # plot one separate figure
 #' plotQ(qlist=slist[1])
@@ -2509,22 +2827,25 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' plotQ(qlist=slist[c(1,3)],sortind="all")
 #' plotQ(qlist=slist[c(1,3)],sortind="Cluster1")
 #' plotQ(qlist=slist[c(1,3)],sortind="label")
-#' plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join",sharedindlab=F)
+#' plotQ(qlist=slist[c(1,3)],sortind="all",imgoutput="join",sharedindlab=FALSE)
 #' 
 #' # read group labels
-#' md <- read.delim(system.file("files/metadata.txt", package="pophelper"), header=T,stringsAsFactors=F)
+#' md <- read.delim(system.file("files/metadata.txt", package="pophelper"),
+#' header=TRUE,stringsAsFactors=FALSE)
 #' 
 #' # plot with one group label set
-#' plotQ(qlist=slist[1],grplab=md[,2,drop=F])
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join")
+#' plotQ(qlist=slist[1],grplab=md[,2,drop=FALSE])
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=FALSE],imgoutput="join")
 #' 
 #' # sort within groups
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="all",sharedindlab=F)
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="Cluster1",sharedindlab=F)
-#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=F],imgoutput="join",sortind="label")
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=FALSE],imgoutput="join",sortind="all",
+#' sharedindlab=FALSE)
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=FALSE],imgoutput="join",
+#' sortind="Cluster1",sharedindlab=FALSE)
+#' plotQ(qlist=slist[1:2],grplab=md[,2,drop=FALSE],imgoutput="join",sortind="label")
 #' 
 #' # reorder groups
-#' plotQ(qlist=slist[1],grplab=md[,2,drop=F],subsetgrp=c("CatB","CatA"))
+#' plotQ(qlist=slist[1],grplab=md[,2,drop=FALSE],subsetgrp=c("CatB","CatA"))
 #' 
 #' # multiple group label sets and ordergrp
 #' plotQ(qlist=slist[1],grplab=md,ordergrp=TRUE)
@@ -2534,18 +2855,20 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' plotQ(qlist=slist[1],grplab=md,selgrp="cat",sortind="all")
 #' 
 #' # use default individual labels
-#' plotQ(slist[1],showindlab=T,width=15)
+#' plotQ(slist[1],showindlab=TRUE,width=15)
 #' 
 #' # use custom individual labels
-#' inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
+#' inds <- read.delim(system.file("files/structureindlabels.txt",
+#' package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
 #' rownames(slist[[1]]) <- inds$V1
-#' plotQ(slist[1],showindlab=T,useindlab=T,width=15)
+#' plotQ(slist[1],showindlab=TRUE,useindlab=TRUE,width=15)
 #' 
 #' # change cluster colours
 #' plotQ(slist[1],clustercol=c("steelblue","coral"))
 #' 
 #' # plot a custom dataframe
-#' temp <- list("custom"=data.frame(Cluster1=c(0.2,0.3,0.6,0.8),Cluster2=c(0.8,0.7,0.4,0.2)))
+#' temp <- list("custom"=data.frame(Cluster1=c(0.2,0.3,0.6,0.8),
+#' Cluster2=c(0.8,0.7,0.4,0.2)))
 #' plotQ(temp)
 #' 
 #' @import gtable
@@ -2554,7 +2877,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' @import tidyr
 #' @export
 #' 
-plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,selgrp=NA,ordergrp=FALSE,subsetgrp=NA,grpmean=FALSE,panelspacer=0.1,
+plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,selgrp=NA,ordergrp=FALSE,subsetgrp=NA,grpmean=FALSE,showgrplab=TRUE,panelspacer=0.1,
                     showsp=TRUE,sppos="right",splab=NA,splabsize=NULL,splabangle=NULL,splabcol="grey30",splabface="plain",spbgcol=NA,
                     showtitle=FALSE,titlelab=NA,titlehjust=0,titlevjust=0.5,titlesize=NULL,titlecol="grey30",titleface="plain",titlespacer=1.4,titleangle=0,
                     showsubtitle=FALSE,subtitlelab=NA,subtitlehjust=0,subtitlevjust=0.5,subtitlesize=NULL,subtitlecol="grey30",subtitleface="plain",subtitlespacer=1.5,subtitleangle=0,
@@ -2568,7 +2891,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
                     showyaxis=FALSE,showticks=FALSE,ticksize=0.1,ticklength=0.03,
                     outputfilename=NA,imgtype="png",height=NA,width=NA,dpi=300,units="cm",
                     theme="theme_grey",basesize=5,font="",na.rm=TRUE,quiet=FALSE,panelratio=c(3,1),
-                    exportplot=TRUE,returnplot=FALSE,returndata=FALSE)
+                    exportplot=TRUE,returnplot=FALSE,returndata=FALSE,exportpath=NULL)
 {
   # check qlist
   is.qlist(qlist)
@@ -2859,22 +3182,23 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,type="cairo",family=font)
-          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height1,width=width1,fonts=font)
+          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
           print(gg_plot_panel)
           dev.off()
-          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+          if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
         }
         if(returnplot) list_plot[[i]] <- gg_plot_panel
       }
       
       if(grplabcheck)
       {
+        # top panel
         # add grp divider lines only if 2 grps or more
         if(showdiv)
         {
@@ -2882,88 +3206,112 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
           if(nrow(div_position) > 2) gg_plot_panel <- gg_plot_panel+geom_vline(xintercept=div_position$divxpos[-c(1,length(div_position$divxpos))],colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
         }
         
-        ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=1,grplabsize=grplabsize,grplabangle=grplabangle,
-                                          grplabjust=grplabjust,pointsize=pointsize,linesize=linesize)
-
-        # fix facet labels in grplab plot
-        cnl <- function(str) {length(strsplit(str,"\n")[[1]])-1}
-        glabfacetnames <- names(grplabloop)
-        names(glabfacetnames) <- names(grplabloop)
-        gn <- max(as.vector(sapply(facetnames,cnl)))
-        if(gn>0)
+        if(!showgrplab)
         {
-          if(all(cnl(glabfacetnames)<gn))
+          if(exportplot)
           {
-            pfn <- function(x,n) paste0(x,paste0(rep("\n",n),collapse=""))
-            glabfacetnames <- as.vector(sapply(glabfacetnames,n=gn,pfn))
-            names(glabfacetnames) <- names(grplabloop)
+            if(!quiet) cat("Drawing plot ...\n")
+            if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+            if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+            if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+            if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
+            print(gg_plot_panel)
+            dev.off()
+            if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+            if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+            if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+            if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
           }
+          if(returnplot) list_plot[[i]] <- gg_plot_panel
         }
-
-        # create bottom plot with labels
-        gg_plot_grplab <- ggplot2::ggplot()+
-              geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
-              geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,size=ppar$grplabsize,angle=ppar$grplabangle,hjust=ppar$grplabjust,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
-              geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
-              geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
-              scale_x_continuous(expand=c(0,0))+
-              scale_y_continuous(expand=c(0,0),limits=c(0,1))+
-              labs(x=NULL,y=NULL)+
-              #facet_grid(count~.,switch=sppos,labeller=labeller(count=glabfacetnames))+
-              facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
-              get(theme)(base_family=font,base_size=basesize)+
-              theme(legend.position="none",
-                    panel.grid=element_blank(),
-                    panel.background=element_rect(fill="white"),
-                    axis.ticks=element_blank(),
-                    axis.text=element_blank(),
-                    axis.line=element_blank(),
-                    axis.title=element_blank(),
-                    strip.text.y=element_text(size=splabsize,colour=splabcol,face=splabface,angle=splabangle),
-                    strip.background=element_rect(colour=spbgcol,fill=spbgcol),
-                    plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0),"cm"),
-                    panel.spacing=grid::unit(panelspacer,"cm"))
         
-        # remove strip panels on right
-        if(!showsp) gg_plot_grplab <- gg_plot_grplab+theme(strip.text=element_blank())
-        
-        # add margin to left if y-axis is on
-        if(showyaxis) gg_plot_grplab <- gg_plot_grplab+theme(plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0.1),"cm"))
-
-        # gtable conversion
-        ggg_plot_panel <- ggplot2::ggplotGrob(gg_plot_panel)
-        ggg_plot_panel$layout$clip <- "off"
-        ggg_plot_grplab <- ggplot2::ggplotGrob(gg_plot_grplab)
-        ggg_plot_grplab$layout$clip <- "off"
-        
-        #set y-axis width same for bars and grplabs
-        maxWidth <- grid::unit.pmax(ggg_plot_panel$widths[2:5],ggg_plot_grplab$widths[2:5]) 
-        ggg_plot_panel$widths[2:5] <- as.list(maxWidth) 
-        ggg_plot_grplab$widths[2:5] <- as.list(maxWidth)
-        
-        # calculate size of panels
-        height2 <- height1 + grplabheight1
-
-        if(exportplot)
+        if(showgrplab)
         {
-          if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname,".png"),height=height2,width=width1,res=dpi,units=units1,type="cairo",family=font)
-          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height2,width=width1,fonts=font)
+          # bottom panel
+          ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=1,grplabsize=grplabsize,grplabangle=grplabangle,
+                                            grplabjust=grplabjust,pointsize=pointsize,linesize=linesize)
           
-          gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
-          dev.off()
+          # fix facet labels in grplab plot
+          cnl <- function(str) {length(strsplit(str,"\n")[[1]])-1}
+          glabfacetnames <- names(grplabloop)
+          names(glabfacetnames) <- names(grplabloop)
+          gn <- max(as.vector(sapply(facetnames,cnl)))
+          if(gn>0)
+          {
+            if(all(cnl(glabfacetnames)<gn))
+            {
+              pfn <- function(x,n) paste0(x,paste0(rep("\n",n),collapse=""))
+              glabfacetnames <- as.vector(sapply(glabfacetnames,n=gn,pfn))
+              names(glabfacetnames) <- names(grplabloop)
+            }
+          }
           
-          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+          # create bottom plot with labels
+          gg_plot_grplab <- ggplot2::ggplot()+
+            geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
+            geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,size=ppar$grplabsize,angle=ppar$grplabangle,hjust=ppar$grplabjust,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
+            geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+            geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
+            scale_x_continuous(expand=c(0,0))+
+            scale_y_continuous(expand=c(0,0),limits=c(0,1))+
+            labs(x=NULL,y=NULL)+
+            #facet_grid(count~.,switch=sppos,labeller=labeller(count=glabfacetnames))+
+            facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
+            get(theme)(base_family=font,base_size=basesize)+
+            theme(legend.position="none",
+                  panel.grid=element_blank(),
+                  panel.background=element_rect(fill="white"),
+                  axis.ticks=element_blank(),
+                  axis.text=element_blank(),
+                  axis.line=element_blank(),
+                  axis.title=element_blank(),
+                  strip.text.y=element_text(size=splabsize,colour=splabcol,face=splabface,angle=splabangle),
+                  strip.background=element_rect(colour=spbgcol,fill=spbgcol),
+                  plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0),"cm"),
+                  panel.spacing=grid::unit(panelspacer,"cm"))
+          
+          # remove strip panels on right
+          if(!showsp) gg_plot_grplab <- gg_plot_grplab+theme(strip.text=element_blank())
+          
+          # add margin to left if y-axis is on
+          if(showyaxis) gg_plot_grplab <- gg_plot_grplab+theme(plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0.1),"cm"))
+          
+          # gtable conversion
+          ggg_plot_panel <- ggplot2::ggplotGrob(gg_plot_panel)
+          ggg_plot_panel$layout$clip <- "off"
+          ggg_plot_grplab <- ggplot2::ggplotGrob(gg_plot_grplab)
+          ggg_plot_grplab$layout$clip <- "off"
+          
+          #set y-axis width same for bars and grplabs
+          maxWidth <- grid::unit.pmax(ggg_plot_panel$widths[2:5],ggg_plot_grplab$widths[2:5]) 
+          ggg_plot_panel$widths[2:5] <- as.list(maxWidth) 
+          ggg_plot_grplab$widths[2:5] <- as.list(maxWidth)
+          
+          # calculate size of panels
+          height2 <- height1 + grplabheight1
+          
+          if(exportplot)
+          {
+            if(!quiet) cat("Drawing plot ...\n")
+            if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+            if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
+            if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
+            if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
+            
+            gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
+            dev.off()
+            
+            if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+            if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+            if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+            if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
+          }
+          
+          px <- gridExtra::arrangeGrob(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
+          if(returnplot) list_plot[[i]] <- px
         }
-        
-        px <- gridExtra::arrangeGrob(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
-        if(returnplot) list_plot[[i]] <- px
       }
+        
     }
     
     if(returnplot && !returndata) return(list(plot=list_plot,data=list(qlist=NA,grplab=NA)))
@@ -3109,7 +3457,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(grplabcheck)
       {
         div_position <- marker_position[c(marker_position$count %in% divgrp),]
-        div_position <- div_position[seq(from=2,to=(nrow(div_position)-1)),c("count","divxpos"),drop=F]
+        div_position <- div_position[seq(from=2,to=(nrow(div_position)-1)),c("count","divxpos"),drop=FALSE]
         div_position$run <- i
         if(sortindcheck!="label" && sortindcheck!="empty") div_position$divxpos <- div_position$divxpos+(Ind*div_multiplier[i])
         div_position_list[[i]] <- div_position
@@ -3237,8 +3585,8 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(exportplot)
       {
         if(!quiet) cat("Drawing plot ...\n")
-        if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
-        if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,type="cairo",family=font)
+        if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+        if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
         if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
         if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height1,width=width1,fonts=font)
         print(gg_plot_panel)
@@ -3260,86 +3608,109 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(nrow(div_position) > 0) gg_plot_panel <- gg_plot_panel+geom_vline(data=div_position,aes(xintercept=divxpos),colour=divcol,linetype=divtype,size=divsize,alpha=divalpha)
       }
       
-      # plot with grp labels
-      ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=flen,grplabsize=grplabsize,grplabangle=grplabangle,grplabjust=grplabjust,
-                                        pointsize=pointsize,linesize=linesize)
-      
-      # fix facet labels in grplab plot
-      cnl <- function(str) {length(strsplit(str,"\n")[[1]])-1}
-      glabfacetnames <- names(grplabloop)
-      names(glabfacetnames) <- names(grplabloop)
-      gn <- max(as.vector(sapply(facetnames,cnl)))
-      if(gn>0)
+      if(!showgrplab)
       {
-        if(all(cnl(glabfacetnames)<gn))
+        if(exportplot)
         {
-          pfn <- function(x,n) paste0(x,paste0(rep("\n",n),collapse=""))
-          glabfacetnames <- as.vector(sapply(glabfacetnames,n=gn,pfn))
-          names(glabfacetnames) <- names(grplabloop)
+          if(!quiet) cat("Drawing plot ...\n")
+          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height1,width=width1,fonts=font)
+          print(gg_plot_panel)
+          dev.off()
+          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
         }
+        
+        if(returnplot) px <- gg_plot_panel
       }
       
-      # create bottom plot with labels
-      gg_plot_grplab <- ggplot2::ggplot()+
-        geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
-        geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,angle=ppar$grplabangle,hjust=ppar$grplabjust,size=ppar$grplabsize,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
-        geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
-        geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
-        scale_x_continuous(expand=c(0,0))+
-        scale_y_continuous(expand=c(0,0),limits=c(0,1))+
-        labs(x=NULL,y=NULL)+
-        facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
-        get(theme)(base_family=font,base_size=basesize)+
-        theme(legend.position="none",
-              panel.grid=element_blank(),
-              panel.background=element_blank(),
-              axis.ticks=element_blank(),
-              axis.text=element_blank(),
-              axis.line=element_blank(),
-              axis.title=element_blank(),
-              strip.text.y=element_text(size=splabsize,colour=splabcol,face=splabface,angle=splabangle),
-              strip.background=element_rect(colour=spbgcol,fill=spbgcol),
-              plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0),"cm"),
-              panel.spacing=grid::unit(panelspacer,"cm"))
-      
-      # remove strip panels on right
-      if(!showsp) gg_plot_grplab <- gg_plot_grplab+theme(strip.text=element_blank())
-      
-      # add margin on left if y-axis is on
-      if(showyaxis) gg_plot_grplab <- gg_plot_grplab+theme(plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0.1),"cm"))
-      
-      # gtable conversion
-      ggg_plot_panel <- ggplot2::ggplotGrob(gg_plot_panel)
-      ggg_plot_panel$layout$clip <- "off"
-      ggg_plot_grplab <- ggplot2::ggplotGrob(gg_plot_grplab)
-      ggg_plot_grplab$layout$clip <- "off"
-      
-      #set y-axis width same for bars and grplabs
-      maxWidth <- grid::unit.pmax(ggg_plot_panel$widths[2:5],ggg_plot_grplab$widths[2:5]) 
-      ggg_plot_panel$widths[2:5] <- as.list(maxWidth) 
-      ggg_plot_grplab$widths[2:5] <- as.list(maxWidth) 
-      
-      # calculate size of panels
-      height2 <- height1+grplabheight1
-      
-      if(exportplot)
+      if(showgrplab)
       {
-        if(!quiet) cat("Drawing plot ...\n")
-        if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,type="cairo",compression="lzw",family=font)
-        if(imgtype=="png") png(paste0(outname,".png"),height=height2,width=width1,res=dpi,units=units1,type="cairo",family=font)
-        if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
-        if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height2,width=width1,fonts=font)
+        # plot with grp labels
+        ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=flen,grplabsize=grplabsize,grplabangle=grplabangle,grplabjust=grplabjust,
+                                          pointsize=pointsize,linesize=linesize)
         
-        gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
-        dev.off()
+        # fix facet labels in grplab plot
+        cnl <- function(str) {length(strsplit(str,"\n")[[1]])-1}
+        glabfacetnames <- names(grplabloop)
+        names(glabfacetnames) <- names(grplabloop)
+        gn <- max(as.vector(sapply(facetnames,cnl)))
+        if(gn>0)
+        {
+          if(all(cnl(glabfacetnames)<gn))
+          {
+            pfn <- function(x,n) paste0(x,paste0(rep("\n",n),collapse=""))
+            glabfacetnames <- as.vector(sapply(glabfacetnames,n=gn,pfn))
+            names(glabfacetnames) <- names(grplabloop)
+          }
+        }
         
-        if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-        if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-        if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-        if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+        # create bottom plot with labels
+        gg_plot_grplab <- ggplot2::ggplot()+
+          geom_blank(data=label_position,aes(x=labxpos,y=labypos))+
+          geom_text(data=label_position,aes(x=labxpos,y=labypos),label=label_position$label,angle=ppar$grplabangle,hjust=ppar$grplabjust,size=ppar$grplabsize,colour=grplabcol,alpha=grplabalpha,family=font,fontface=grplabface)+
+          geom_line(data=marker_position,aes(x=markerxpos,y=markerypos),colour=linecol,size=ppar$linesize,linetype=linetype,alpha=linealpha)+
+          geom_point(data=marker_position,aes(x=markerxpos,y=markerypos),size=ppar$pointsize,colour=pointcol,shape=pointtype,fill=pointbgcol,alpha=pointalpha)+
+          scale_x_continuous(expand=c(0,0))+
+          scale_y_continuous(expand=c(0,0),limits=c(0,1))+
+          labs(x=NULL,y=NULL)+
+          facet_wrap(~count,labeller=labeller(count=glabfacetnames),strip.position=sppos,scales="fixed",nrow=length(unique(label_position$count)))+
+          get(theme)(base_family=font,base_size=basesize)+
+          theme(legend.position="none",
+                panel.grid=element_blank(),
+                panel.background=element_blank(),
+                axis.ticks=element_blank(),
+                axis.text=element_blank(),
+                axis.line=element_blank(),
+                axis.title=element_blank(),
+                strip.text.y=element_text(size=splabsize,colour=splabcol,face=splabface,angle=splabangle),
+                strip.background=element_rect(colour=spbgcol,fill=spbgcol),
+                plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0),"cm"),
+                panel.spacing=grid::unit(panelspacer,"cm"))
+        
+        # remove strip panels on right
+        if(!showsp) gg_plot_grplab <- gg_plot_grplab+theme(strip.text=element_blank())
+        
+        # add margin on left if y-axis is on
+        if(showyaxis) gg_plot_grplab <- gg_plot_grplab+theme(plot.margin=grid::unit(c(grplabspacer,0.05,0.05,0.1),"cm"))
+        
+        # gtable conversion
+        ggg_plot_panel <- ggplot2::ggplotGrob(gg_plot_panel)
+        ggg_plot_panel$layout$clip <- "off"
+        ggg_plot_grplab <- ggplot2::ggplotGrob(gg_plot_grplab)
+        ggg_plot_grplab$layout$clip <- "off"
+        
+        #set y-axis width same for bars and grplabs
+        maxWidth <- grid::unit.pmax(ggg_plot_panel$widths[2:5],ggg_plot_grplab$widths[2:5]) 
+        ggg_plot_panel$widths[2:5] <- as.list(maxWidth) 
+        ggg_plot_grplab$widths[2:5] <- as.list(maxWidth) 
+        
+        # calculate size of panels
+        height2 <- height1+grplabheight1
+        
+        if(exportplot)
+        {
+          if(!quiet) cat("Drawing plot ...\n")
+          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height2,width=width1,fonts=font)
+          
+          gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
+          dev.off()
+          
+          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+        }
+        
+        if(returnplot) px <- gridExtra::arrangeGrob(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
       }
-      
-      if(returnplot) px <- gridExtra::arrangeGrob(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
     }
     
     if(returnplot && !returndata) return(list(plot=list(px),data=list(qlist=NA,grplab=NA)))
@@ -3356,91 +3727,190 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' @param spl An integer indicating samples per line. Defaults to 60.
 #' @param lpp An integer indicating lines per page. Defaults to 11.
 #' @param clustercol A character vector of colours for clusters.
-#' @param sortind A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'label' (sorting by individual labels). See details.
-#' @param grplab A dataframe with one or more columns (group label sets), and rows equal to the number of individuals. See details.
-#' @param selgrp A single character denoting a selected group label set. The selected label must be a group label title used in \code{grplab}. See details.
-#' @param ordergrp A logical indicating if individuals must be grouped into contiguous blocks based on \code{grplab} starting with \code{selgrp}.
-#' @param subsetgrp A character or character vector with group names to subset or reorder groups. Only applicable when \code{grplab} is in use. Default is NA. See details.
-#' @param grpmean A logical indicating if q-matrix must be converted from individual values to group mean values. Applicable only when \code{grplab} is in use and mean is calculated over \code{selgrp}.
-#' @param showindlab A logical indicating if individual labels must be shown below the bars. To hide labels, set \code{showindlab=FALSE}. See details.
-#' @param useindlab A logical indicating if individual labels must be read from the rownames of qlist dataframes and used as labels. See details.
-#' @param indlabsep A character used as separator when concatenating individual labels and group labels. Defaults to space \code{indlabsep=" "}.
-#' @param indlabsize A numeric denoting size of the individual labels. Defaults to 5.
-#' @param indlabangle A numeric denoting the angle of the individual labels. Defaults to 90.
-#' @param indlabvjust A numeric denoting vertical justification of the individual labels. Defaults to 0.5.
-#' @param indlabhjust A numeric denoting the horizontal justification of the individual labels. Defaults to 1.
+#' @param sortind A character indicating how individuals are sorted. Default is 
+#' NA (Same order of individuals as in input file). Other options are 'all' 
+#' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 
+#' 'labels' (sorting by individual labels). See details.
+#' @param grplab A dataframe with one or more columns (group label sets), and 
+#' rows equal to the number of individuals. See details.
+#' @param selgrp A single character denoting a selected group label set. The 
+#' selected label must be a group label title used in \code{grplab}. See details.
+#' @param ordergrp A logical indicating if individuals must be grouped into 
+#' contiguous blocks based on \code{grplab} starting with \code{selgrp}.
+#' @param subsetgrp A character or character vector with group names to subset 
+#' or reorder groups. Only applicable when \code{grplab} is in use. Default is 
+#' NA. See details.
+#' @param grpmean A logical indicating if q-matrix must be converted from 
+#' individual values to group mean values. Applicable only when \code{grplab} 
+#' is in use and mean is calculated over \code{selgrp}.
+#' @param showindlab A logical indicating if individual labels must be shown 
+#' below the bars. To hide labels, set \code{showindlab=FALSE}. See details.
+#' @param useindlab A logical indicating if individual labels must be read from 
+#' the rownames of qlist dataframes and used as labels. See details.
+#' @param indlabwithgrplab A logical indicating if individual labels must be 
+#' concatenated with grplab. Applies only when grplab is in use. Relevant for 
+#' sorting by label.
+#' @param indlabsep A character used as separator when concatenating individual 
+#' labels and group labels. Defaults to space \code{indlabsep=" "}.
+#' @param indlabsize A numeric denoting size of the individual labels. Defaults 
+#' to 5.
+#' @param indlabangle A numeric denoting the angle of the individual labels. 
+#' Defaults to 90.
+#' @param indlabvjust A numeric denoting vertical justification of the 
+#' individual labels. Defaults to 0.5.
+#' @param indlabhjust A numeric denoting the horizontal justification of the 
+#' individual labels. Defaults to 1.
 #' @param indlabcol A colour for individual labels. Defaults to 'grey30'.
-#' @param indlabspacer A numeric denoting space between the individual label and the plot area. Default set to 0.
-#' @param showgrplab A logical indicating if group labels \code{grplab} must be displayed on the plot.
+#' @param indlabspacer A numeric denoting space between the individual label 
+#' and the plot area. Default set to 0.
+#' @param showgrplab A logical indicating if group labels \code{grplab} must be 
+#' displayed on the plot.
 #' @param grplabsize A numeric denoting size of the group labels. Defaults to 7.
 #' @param grplabcol A colour for group labels. Defaults to 'grey30'.
 #' @param grplabbgcol A colour for group label background. Defaults to 'white'.
-#' @param titlelab A character or character vector for title text. Defaults to NA, and when \code{showtitle=TRUE} displays file name.
-#' @param titlehjust A numeric denoting the horizontal justification of the title. Defaults to 0 (left).
-#' @param titlevjust A numeric denoting the vertical justification of the title. Defaults to 0.5 (center).
-#' @param titlesize A numeric indicating the size of the title text. Defaults to 5 points.
+#' @param showtitle A logical indicating if plot title must be shown on the top. 
+#' Defaults to FALSE. If TRUE and \code{titlelab=NA}, file name is displayed by 
+#' default.
+#' @param titlelab A character or character vector for title text. Defaults to 
+#' NA, and when \code{showtitle=TRUE} displays file name.
+#' @param titlehjust A numeric denoting the horizontal justification of the 
+#' title. Defaults to 0 (left).
+#' @param titlevjust A numeric denoting the vertical justification of the title. 
+#' Defaults to 0.5 (center).
+#' @param titlesize A numeric indicating the size of the title text. Defaults 
+#' to 5 points.
 #' @param titlecol A colour character for title. Defaults to "grey30".
-#' @param titleface A character indicating the font face of title label. One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable only when \code{showtitle=T}.
-#' @param titlespacer A numeric indicating the space below the title. Defaults to 1.2.
-#' @param titleangle A numeric indicating the angle/rotation of the title. Defaults to 0.
-#' @param showsubtitle A logical indicating if plot subtitle must be shown on the top. Defaults to FALSE. If TRUE and \code{subtitlelab=NA}, file name is displayed by default.
-#' @param subtitlelab A character or character vector for subtitle text. Defaults to NA, and when \code{showsubtitle=TRUE} displays K value like K=2.
-#' @param subtitlehjust A numeric denoting the horizontal justification of the subtitle. Defaults to 0 (left).
-#' @param subtitlevjust A numeric denoting the vertical justification of the subtitle. Defaults to 0.5 (center).
-#' @param subtitlesize A numeric indicating the size of the subtitle text. Defaults to 5 points.
+#' @param titleface A character indicating the font face of title label. One of 
+#' 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable 
+#' only when \code{showtitle=TRUE}.
+#' @param titlespacer A numeric indicating the space below the title. Defaults 
+#' to 1.2.
+#' @param titleangle A numeric indicating the angle/rotation of the title. 
+#' Defaults to 0.
+#' @param showsubtitle A logical indicating if plot subtitle must be shown on 
+#' the top. Defaults to FALSE. If TRUE and \code{subtitlelab=NA}, file name is 
+#' displayed by default.
+#' @param subtitlelab A character or character vector for subtitle text. 
+#' Defaults to NA, and when \code{showsubtitle=TRUE} displays K value like K=2.
+#' @param subtitlehjust A numeric denoting the horizontal justification of the 
+#' subtitle. Defaults to 0 (left).
+#' @param subtitlevjust A numeric denoting the vertical justification of the 
+#' subtitle. Defaults to 0.5 (center).
+#' @param subtitlesize A numeric indicating the size of the subtitle text. 
+#' Defaults to 5 points.
 #' @param subtitlecol A colour character for subtitle. Defaults to "grey30".
-#' @param subtitleface A character indicating the font face of subtitle label. One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. Applicable only when \code{showsubtitle=T}.
-#' @param subtitlespacer A numeric indicating the space below the subtitle. Defaults to 1.2.
-#' @param subtitleangle A numeric indicating the angle/rotation of the subtitle. Defaults to 0.
+#' @param subtitleface A character indicating the font face of subtitle label. 
+#' One of 'plain', 'italic', 'bold' or 'bold.italic'. Defaults to 'plain'. 
+#' Applicable only when \code{showsubtitle=TRUE}.
+#' @param subtitlespacer A numeric indicating the space below the subtitle. 
+#' Defaults to 1.2.
+#' @param subtitleangle A numeric indicating the angle/rotation of the subtitle. 
+#' Defaults to 0.
+#' @param showlegend A logical indicating if legend denoting cluster colours 
+#' must be plotted. Defaults to FALSE.
+#' @param legendlab A character or character vector to for legend cluster 
+#' labels. Must be equal to max number of clusters.
+#' @param legendpos A character 'right' or 'left' denoting position of the 
+#' legend. Defaults to 'left'.
+#' @param legendkeysize A numeric indicating size of the legend key. Defaults 
+#' to 4.
+#' @param legendtextsize A numeric indicating size of the legend text. Defaults 
+#' to 3.
+#' @param legendmargin A numeric vector of length 4 indicating top, right, 
+#' bottom and left margins of the legend.
 #' @param barsize A numeric indicating the width of the bars. Defaults to 0.9.
-#' @param barbordersize A numeric indicating border size of bars. Defaults to 0. Visible only when \code{barbordercolour} is not NA.
-#' @param barbordercolour A single colour for bar border. Defaults to NA. Visible only when \code{barbordersize} is larger than zero and set to a colour other than NA.
-#' @param showticks A logical indicating if ticks on axis should be displayed or not. Defaults to FALSE.
-#' @param showyaxis A logical indicating if y-axis labels should be displayed or not. Defaults to FALSE.
-#' @param outputfilename A character or character vector denoting output file name without file extension. See details. 
-#' @param imgtype A character denoting figure output format. Options are 'png', 'jpeg', 'tiff' or 'pdf'.
-#' @param height A numeric denoting height of the full figure. If NA, height is set to 29.7cm (A4 height).
-#' @param width A numeric denoting width of the full figure. If NA, width is set to 21cm (A4 width).
-#' @param dpi A numeric denoting resolution of the figure. Default is 300. If \code{imgtype="pdf"}, dpi is fixed at 300 and does not have any effect..
-#' @param units A character denoting the units of dimension of the figure. Default is "cm". Other options are 'px', 'in' or 'mm'. 
-#' @param mar A four number vector denoting distance of top, right, bottom and left margins in \code{units}.
-#' @param theme A character indicating ggplot theme to be used. Use like "theme_grey", "theme_bw" etc.
-#' @param font A character indicating font family to be used in the plots. Uses default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as default for pdf. Use package \code{extrafonts} to import custom fonts. See vignette for examples.
-#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are removed before plotting and \code{ggplot} NA warning is suppressed.
-
-#' @details Figures are always created to A4 size. Any plotted row will span the width of the figure. 
-#' Note that this function is slow and may take several minutes when plotting mutiple runs.
+#' @param barbordersize A numeric indicating border size of bars. Defaults to 0. 
+#' Visible only when \code{barbordercolour} is not NA.
+#' @param barbordercolour A single colour for bar border. Defaults to NA. 
+#' Visible only when \code{barbordersize} is larger than zero and set to a 
+#' colour other than NA.
+#' @param showticks A logical indicating if ticks on axis should be displayed or 
+#' not. Defaults to FALSE.
+#' @param showyaxis A logical indicating if y-axis labels should be displayed or 
+#' not. Defaults to FALSE.
+#' @param ticksize A numeric indicating size of ticks. Defaults to 0.2. Applies 
+#' to both x and y axis.
+#' @param ticklength A numeric indicating length of tick marks in cm. Defaults 
+#' to 0.03. Applies to both x and y axis.
+#' @param outputfilename A character or character vector denoting output file 
+#' name without file extension. See details. 
+#' @param imgtype A character denoting figure output format. Options are 'png', 
+#' 'jpeg', 'tiff' or 'pdf'.
+#' @param height A numeric denoting height of the full figure. If NA, height is 
+#' set to 29.7cm (A4 height).
+#' @param width A numeric denoting width of the full figure. If NA, width is set 
+#' to 21cm (A4 width).
+#' @param dpi A numeric denoting resolution of the figure. Default is 300. If 
+#' \code{imgtype="pdf"}, dpi is fixed at 300 and does not have any effect..
+#' @param units A character denoting the units of dimension of the figure. 
+#' Default is "cm". Other options are 'px', 'in' or 'mm'. 
+#' @param mar A four number vector denoting distance of top, right, bottom and 
+#' left margins in \code{units}.
+#' @param theme A character indicating ggplot theme to be used. Use like 
+#' "theme_grey", "theme_bw" etc.
+#' @param basesize A numeric indicating overall text size. Defaults to 5 
+#' suitable for export. Set to 11 for returned plot.
+#' @param font A character indicating font family to be used in the plots. Uses 
+#' default system fonts by default for jpeg, png and tiff. Uses 'Helvetica' as 
+#' default for pdf. Use package \code{extrafonts} to import custom fonts. See 
+#' vignette for examples.
+#' @param na.rm Default set to FALSE. NAs are not removed from data, therefore 
+#' \code{ggplot} prints warning messages for NAs. If set to TRUE, NAs are 
+#' removed before plotting and \code{ggplot} NA warning is suppressed.
+#' @param quiet A logical indicating if any messages are printed to console.
+#' @param exportplot A logical indicating if a plot image must be exported into 
+#' the working directory.
+#' @param returnplot A logical indicating if ggplot plot objects must be 
+#' returned. See 'Value'.
+#' @param returndata A logical indicating if processed data must be returned. 
+#' See 'Value'.
+#' @return When \code{returnplot=TRUE}, plot object(s) are returned. When 
+#' \code{grplab=NA}, a ggplot2 object is returned. When \code{returndata=TRUE}, 
+#' the input qlist is modified (sorted, subsetted etc) and returned. If 
+#' \code{grplab} is in use, a list of modified qlist and grplab is returned.
+#' If \code{returnplot=TRUE} and \code{returndata=TRUE} are both set, then a 
+#' named list (plot,data) is returned. The plot item contains the ggplot2 object
+#' and the data contains qlist (and grplab).
+#' 
+#' @details Figures are always created to A4 size. Any plotted row will span the 
+#' width of the figure. \cr
+#' 
+#' Note that this function is slow and may take several minutes when plotting 
+#' mutiple runs.
 #' 
 #' \strong{indlab}\cr
-#' \code{plotQMultiline()} labels each individual separately. When \code{showindlab=T}, 
-#' individual labels are shown/displayed. When \code{showindlab=F}, individual labels are
-#' not shown/displayed on the graph, although they are present in the underlying data.
-#' Therefore, \code{showindlab} only control display of labels on the plot and nothing to 
-#' do with label control in the data.\cr
-#' The default \code{useindlab=F}, creates labels numerically in the 
-#' original order of data but with zero padding. For example, if there are 10 individuals,
-#' labels are 01, 02 up to 10. if there are 100 individuals, then labels are 001, 002 up
-#' to 100. Zero padding to ensure optimal sorting. When \code{useindlab=T}, labels
-#' are used from rownames of qlist dataframes. They are usually labelled 1,2,3.. if
-#' read in using \code{readQ()}. This can be an issue with sorting by labels \code{sortind="label"}.
-#' For STRUCTURE files with individual labels, they can be read
-#' in automatically using \code{readQ(indlabfromfile=T)}.\cr
+#' \code{plotQMultiline()} labels each individual separately. When 
+#' \code{showindlab=TRUE}, 
+#' individual labels are shown/displayed. When \code{showindlab=FALSE}, individual 
+#' labels are not shown/displayed on the graph, although they are present in the 
+#' underlying data. Therefore, \code{showindlab} only control display of labels 
+#' on the plot and nothing to do with label control in the data.\cr
+#' The default \code{useindlab=FALSE}, creates labels numerically in the 
+#' original order of data but with zero padding. For example, if there are 10 
+#' individuals, labels are 01, 02 up to 10. if there are 100 individuals, then 
+#' labels are 001, 002 upto 100. Zero padding to ensure optimal sorting. When 
+#' \code{useindlab=TRUE}, labels are used from rownames of qlist dataframes. They 
+#' are usually labelled 1,2,3.. if read in using \code{readQ()}. This can be an 
+#' issue with sorting by labels \code{sortind="label"}. For STRUCTURE files with 
+#' individual labels, they can be read in automatically using 
+#' \code{readQ(indlabfromfile=TRUE)}.\cr
 #' When group labels are in use, \code{grplab}, they are added to the individual
-#' labels in both cases \code{useindlab=T} and \code{useindlab=F} separated by \code{indlabsep}. 
-#' Default \code{indlabsep=" "} adds a space between individual label and grplab. For example,
-#' group labels 'popA', 'popA'... will be '01 popA', '02 popA'... when \code{useindlab=F}
-#' and usually '1 popA', '2 popA'... when \code{useindlab=T}. When multiple group labels
-#' are in use, the are similarly concatenated one after the other to individual names
-#' in the order in which the group labels were provided.
+#' labels in both cases \code{useindlab=TRUE} and \code{useindlab=FALSE} separated by 
+#' \code{indlabsep}. Default \code{indlabsep=" "} adds a space between 
+#' individual label and grplab. For example, group labels 'popA', 'popA'... will 
+#' be '01 popA', '02 popA'... when \code{useindlab=FALSE} and usually '1 popA', 
+#' '2 popA'... when \code{useindlab=TRUE}. When multiple group labels are in use, 
+#' the are similarly concatenated one after the other to individual names in the
+#'  order in which the group labels were provided.
 #' 
 #' \strong{sortind}\cr
 #' This argument takes one character as input.  Default NA means individuals are 
-#' plotted in the same order as input. Individuals can be ordered by any one cluster. 
-#' For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
+#' plotted in the same order as input. Individuals can be ordered by any one 
+#' cluster. For ex. \code{sortind="Cluster1"} or \code{sortind="Cluster2"}.
 #' To order by all clusters as the 'Sort by Q' option in STRUCTURE software, 
-#' use \code{sortind="all"}. To order by individual labels, use \code{sortind="label"}.
-#' When using \code{sortind} with \code{grplab}, individuals
-#' are sorted within the groups.\cr
+#' use \code{sortind="all"}. To order by individual labels, use 
+#' \code{sortind="label"}. When using \code{sortind} with \code{grplab}, 
+#' individuals are sorted within the groups.\cr
 #' 
 #' \strong{grplab}\cr
 #' \code{grplab} must be a list. One or more label sets can be provided. Each 
@@ -3461,17 +3931,20 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' order of groups. Use \code{subsetgrp="Pop B"} to subset only Pop B.\cr
 #' 
 #' \strong{outputfilename}\cr
-#' Output file names are created automatically by default using the input qlist names.
-#' When number of individuals exceed one page and extra pages are created, incremental 
-#' numbers are added to the run name like so: -1, -2 etc. Custom file name can be provided
-#' to \code{outputfilename}. The number of labels must be equal to the number of input 
-#' runs. Incremental numbers are still added if extra pages are created.
+#' Output file names are created automatically by default using the input qlist 
+#' names. When number of individuals exceed one page and extra pages are 
+#' created, incremental numbers are added to the run name like so: -1, -2 etc. 
+#' Custom file name can be provided to \code{outputfilename}. The number of 
+#' labels must be equal to the number of input runs. Incremental numbers are 
+#' still added if extra pages are created.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #' @examples 
 #' \dontrun{
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' slist <- readQ(sfiles)
 #' 
 #' # basic
@@ -3491,9 +3964,10 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' plotQMultiline(slist[1],sortind="label")
 #' 
 #' # use custom individual labels
-#' inds <- read.delim(system.file("files/structureindlabels.txt",package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
+#' inds <- read.delim(system.file("files/structureindlabels.txt",
+#' package="pophelper"),header=FALSE,stringsAsFactors=FALSE)
 #' rownames(slist[[1]]) <- inds$V1
-#' plotQMultiline(slist[1],useindlab=T)
+#' plotQMultiline(slist[1],useindlab=TRUE)
 #' 
 #' # change cluster colours
 #' plotQMultiline(slist[1],clustercol=c("steelblue","coral"))
@@ -3502,20 +3976,22 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' plotQMultiline(slist[1],barsize=1,spl=149,indlabsize=3,height=5)
 #' 
 #' # read group labels
-#' md <- read.delim(system.file("files/metadata.txt", package="pophelper"), header=T,stringsAsFactors=F)
+#' md <- read.delim(system.file("files/metadata.txt", package="pophelper"),
+#' header=TRUE,stringsAsFactors=FALSE)
 #' 
 #' # plot with one group label set
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F])
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],useindlab=T)
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE])
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],useindlab=TRUE)
 #' 
 #' # sort ind within groups
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],sortind="Cluster1")
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],sortind="all")
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],sortind="label")
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],sortind="Cluster1")
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],sortind="all")
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],sortind="label")
 #' 
 #' # subset or reorder groups
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],subsetgrp=c("CatB"))
-#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=F],subsetgrp=c("Cat B","CatA"))
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],subsetgrp=c("CatB"))
+#' plotQMultiline(qlist=slist[1],grplab=md[,2,drop=FALSE],
+#' subsetgrp=c("Cat B","CatA"))
 #' 
 #' # using multiple group label sets
 #' plotQMultiline(qlist=slist[1],grplab=md,ordergrp=TRUE)
@@ -3859,8 +4335,8 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname1,".tiff"),height=height,width=width,res=dpi,units=units,type="cairo",compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname1,".png"),height=height,width=width,res=dpi,units=units,type="cairo",family=font)
+          if(imgtype=="tiff") tiff(paste0(outname1,".tiff"),height=height,width=width,res=dpi,units=units,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(outname1,".png"),height=height,width=width,res=dpi,units=units,family=font)
           if(imgtype=="jpeg") jpeg(paste0(outname1,".jpg"),height=height,width=width,res=dpi,units=units,quality=100,family=font)
           if(imgtype=="pdf") pdf(paste0(outname1,".pdf"),height=height,width=width,fonts=font)
           
@@ -3894,35 +4370,56 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
 
 # analyseQ ------------------------------------------------------------------
 
-#' @title Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around several smaller functions.
-#' @description A single function to analyse STRUCTURE, TESS, BAPS or BASIC text runs. Converts runs to a qlist, then tabulate, summarise, perform evanno method, export clumpp and plots runs.
-#' @param files A character or character vector of one or more STRUCTURE, TESS, BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose interactively.
-#' @param evannomethod A logical indicating if evanno method should be performed. Applies only to STRUCTURE runs.
-#' @param clumppexport A logical indicating if files must be exported for clumpp.
-#' @param plotruns A logical indicating if selected files should be exported as barplots.
-#' @param imgoutput A character indicating if files are plotted as separate image files ("sep") or joined into a single image ("join").
-#' @param grplab A dataframe with one or more columns (group label sets), and rows equal to the number of individuals.
-#' @param clustercol A character vector of colours for colouring clusters. If NA, colours are automatically generated. K 1 to 12 are custom unique colours while K>12 are coloured by function \code{rich.color()}.
-#' @param writetable A logical T or F. Setting to TRUE writes the output table to the working directory.
-#' @param sorttable A logical indicating if the output table must be sorted. Sorts table by loci, ind and K when available.
-#' @details The function \code{analyseQ} is a wrapper around several other \code{pophelper} functions. All arguments for all these other functions are not available. If more arguments/options are required, consider running the functions separately.
+#' @title Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around 
+#' several smaller functions.
+#' @description A single function to analyse STRUCTURE, TESS, BAPS or BASIC 
+#' text runs. Converts runs to a qlist, then tabulate, summarise, perform 
+#' evanno method, export clumpp and plots runs.
+#' @param files A character or character vector of one or more STRUCTURE, TESS, 
+#' BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose 
+#' interactively.
+#' @param evannomethod A logical indicating if evanno method should be 
+#' performed. Applies only to STRUCTURE runs.
+#' @param clumppexport A logical indicating if files must be exported for 
+#' clumpp.
+#' @param plotruns A logical indicating if selected files should be exported as 
+#' barplots.
+#' @param imgoutput A character indicating if files are plotted as separate 
+#' image files ("sep") or joined into a single image ("join").
+#' @param grplab A dataframe with one or more columns (group label sets), and 
+#' rows equal to the number of individuals.
+#' @param clustercol A character vector of colours for colouring clusters. If 
+#' NA, colours are automatically generated. K 1 to 12 are custom unique colours 
+#' while K>12 are coloured by function \code{rich.color()}.
+#' @param writetable A logical T or F. Setting to TRUE writes the output table 
+#' to the working directory.
+#' @param sorttable A logical indicating if the output table must be sorted. 
+#' Sorts table by loci, ind and K when available.
+#' @details The function \code{analyseQ} is a wrapper around several other 
+#' \code{pophelper} functions. All arguments for all these other functions are 
+#' not available. If more arguments/options are required, consider running the 
+#' functions separately.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #' @return If a single file is selected, a single dataframe is returned. If 
 #' multiple files are selected, a list with multiple dataframes is returned.
 #' @examples 
 #' \dontrun{
 #' # structure files
-#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+#' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+#' full.names=TRUE)
 #' analyseQ(sfiles)
 #' 
 #' # tess files
-#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+#' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+#' full.names=TRUE)
 #' analyseQ(tfiles)
 #' 
 #' # admixture files
-#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+#' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+#' full.names=TRUE)
 #' analyseQ(afiles)
 #' }
 #' @export
@@ -3968,40 +4465,65 @@ analyseQ <- analyzeQ <- function(files=NULL,evannomethod=TRUE,clumppexport=TRUE,
 #' @title Generate files for DISTRUCT.
 #' @description Create DISTRUCT input files from a qlist.
 #' @param qlist A qlist (list of dataframes). An output from \code{\link{readQ}}.
-#' @param grplabbottom A character vector of group labels to be plotted below the plot. The vector must be the same length as number of individuals. See details.
-#' @param grplabtop An optional character vector of group labels to be plotted above the plot. The vector must be the same length as number of individuals. See details.
-#' @param grpmean A logical indicating if individual values are to be plotted (F) or group means are to be plotted (T).
-#' @param overwritedirs A logical indicating if existing directories must be overwritten (T) automatically or not (F).
-#' @param printtitle A logical indicating if the filename must be printed as the title on the plot.
-#' @param clustercol A character vector of colours equal to the number of clusters. Note these are not R colours. Use \code{distructColours()} or refer to DISTRUCT manual for colours.  
-#' With multiple files, number of colours must equal input file with highest number of clusters. 
+#' @param grplabbottom A character vector of group labels to be plotted below 
+#' the plot. The vector must be the same length as number of individuals. See 
+#' details.
+#' @param grplabtop An optional character vector of group labels to be plotted 
+#' above the plot. The vector must be the same length as number of individuals. 
+#' See details.
+#' @param grpmean A logical indicating if individual values are to be plotted 
+#' (F) or group means are to be plotted (T).
+#' @param overwritedirs A logical indicating if existing directories must be 
+#' overwritten (T) automatically or not (F).
+#' @param printtitle A logical indicating if the filename must be printed as the
+#'  title on the plot.
+#' @param clustercol A character vector of colours equal to the number of 
+#' clusters. Note these are not R colours. Use \code{distructColours()} or refer 
+#' to DISTRUCT manual for colours.  
+#' With multiple files, number of colours must equal input file with highest 
+#' number of clusters. 
 #' @param grayscale A logical indicating if clusters must be shown in grayscale.
-#' @param printcolorbrewer A logical indicating if the colours provided in \code{clustercol} are ColorBrewer colours. See details.
-#' @param sepline A logical indicating if divider lines must be drawn between groups (T).
+#' @param printcolorbrewer A logical indicating if the colours provided in 
+#' \code{clustercol} are ColorBrewer colours. See details.
+#' @param sepline A logical indicating if divider lines must be drawn between 
+#' groups (T).
 #' @param seplinewidth A numeric indicating width of sepline.
 #' @param borderlinewidth A numeric indicating width of border around the plot.
-#' @param indlinewidth A numeric indicating width of border around individual bars and ticks.
+#' @param indlinewidth A numeric indicating width of border around individual 
+#' bars and ticks.
 #' @param fontsize A numeric indicating font size of group labels.
-#' @param topdist A numeric indicating distance of top labels from the top edge of the plot.
-#' @param bottomdist A numeric indicating distance of bottom labels from the bottom edge of the plot. Usually a negative number.
+#' @param topdist A numeric indicating distance of top labels from the top edge 
+#' of the plot.
+#' @param bottomdist A numeric indicating distance of bottom labels from the 
+#' bottom edge of the plot. Usually a negative number.
 #' @param figheight A numeric indicating height of the plot.
-#' @param indwidth A numeric indicating width of each individual bar. The width of the plot depends on this value.
-#' @param orientation An integer (0,1,2,3) indicating orientation of the plot. See details.
-#' @param xorigin A numeric indicating lower left x-coordinate of the plot. See details.
-#' @param yorigin A numeric indicating lower left y-coordinate of the plot. See details.
+#' @param indwidth A numeric indicating width of each individual bar. The width 
+#' of the plot depends on this value.
+#' @param orientation An integer (0,1,2,3) indicating orientation of the plot. 
+#' See details.
+#' @param xorigin A numeric indicating lower left x-coordinate of the plot. See 
+#' details.
+#' @param yorigin A numeric indicating lower left y-coordinate of the plot. See 
+#' details.
 #' @param xscale A numeric indicating scaling for the x direction.
 #' @param yscale A numeric indicating scaling for the y direction.
 #' @param toplabangle A numeric between 0 and 180 indicating angle of top labels. 
-#' @param bottomlabangle A numeric between 0 and 180 indicating angle of bottom labels. 
+#' @param bottomlabangle A numeric between 0 and 180 indicating angle of bottom 
+#' labels. 
 #' @param echodata A logical. Not really sure what this does.
-#' @param printdata A logical indicating if head and tail of data must be shown in display on running DISTRUCT.
-#' @param quiet A logical TRUE or FALSE. Set to TRUE by default to print verbose statements to screen.
-#' @param useexe A logical indicating if DISTRUCT executable is automatically run based on system OS (experimental). Does not work on UNIX systems.
-#' @return The function does not return anything. The function creates directories for each input file and 
-#' populates it with files necessary to run DISTRUCT. The files are individual q-matrix file (xx-indq.txt),
-#' population q-matrix file (xx-popq.txt), a cluster colour file (xx-colours.txt) and drawparams file. If 
-#' group labels were defined, then (xx-poplab-bottom.txt) or (xx-poplab-top.txt) are also exported. The
-#' DISTRUCT executable is run in this directory to generate an xx.ps file.
+#' @param printdata A logical indicating if head and tail of data must be shown 
+#' in display on running DISTRUCT.
+#' @param quiet A logical TRUE or FALSE. Set to TRUE by default to print verbose 
+#' statements to screen.
+#' @param useexe A logical indicating if DISTRUCT executable is automatically 
+#' run based on system OS (experimental). Does not work on UNIX systems.
+#' @return The function does not return anything. The function creates 
+#' directories for each input file and populates it with files necessary to run 
+#' DISTRUCT. The files are individual q-matrix file (xx-indq.txt), population 
+#' q-matrix file (xx-popq.txt), a cluster colour file (xx-colours.txt) and 
+#' drawparams file. If group labels were defined, then (xx-poplab-bottom.txt) or 
+#' (xx-poplab-top.txt) are also exported. The DISTRUCT executable is run in this 
+#' directory to generate an xx.ps file.
 #' @details
 #' \strong{Orientation} \cr
 #' 0 for horizontal orientation (default) \cr
@@ -4016,26 +4538,35 @@ analyseQ <- analyzeQ <- function(files=NULL,evannomethod=TRUE,clumppexport=TRUE,
 #' 1,360,72 \cr
 #' 2,540,504 \cr
 #' 3,288,720 \cr
-#' If plot exceeds canvas size, consider shifting \code{xorigin} to the left and/or decreasing \code{indwidth}.\cr
+#' If plot exceeds canvas size, consider shifting \code{xorigin} to the left 
+#' and/or decreasing \code{indwidth}.\cr
 #' \cr
 #' \strong{Colorbrewer colours} \cr
-#' Colorbrewer colours are not automatically generated for now. Refer to DISTRUCT manual for colour names. \cr
-#' Replace the colour names in xx-colours.txt output file with selected colorbrewer colours (ex: Accent_3_qual_1). \cr
+#' Colorbrewer colours are not automatically generated for now. Refer to 
+#' DISTRUCT manual for colour names. \cr
+#' Replace the colour names in xx-colours.txt output file with selected 
+#' colorbrewer colours (ex: Accent_3_qual_1). \cr
 #' \cr
 #' \strong{useexe}\cr
-#' This option automatically runs the DISTRUCT executable that is provided with this package. 
-#' Note that the executable is 64bit LSB requiring a 64bit system. The DISTRUCT executable was obtained from 
-#' here \url{https://web.stanford.edu/group/rosenberglab/distruct.html}. Remember to cite DISTRUCT if this option is used.\cr
+#' This option automatically runs the DISTRUCT executable that is provided with 
+#' this package. Note that the executable is 64bit LSB requiring a 64bit system. 
+#' The DISTRUCT executable was obtained from here 
+#' \url{https://web.stanford.edu/group/rosenberglab/distruct.html}. Remember to 
+#' cite DISTRUCT if this option is used.\cr
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+#' details.
 #' 
 #  @import xlsx
 #' @examples 
 #' \dontrun{
 #' # read some data
-#' slist <- readQ(list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE))
-#' grps1 <- read.delim(system.file("files/structuregrplabels.txt",package="pophelper"),header=FALSE, stringsAsFactor=F)
-#' grps2 <- read.delim(system.file("files/structuregrplabels2.txt",package="pophelper"),header=FALSE, stringsAsFactor=F)
+#' slist <- readQ(list.files(path=system.file("files/structure",
+#' package="pophelper"),full.names=TRUE))
+#' grps1 <- read.delim(system.file("files/structuregrplabels.txt",
+#' package="pophelper"),header=FALSE, stringsAsFactor=FALSE)
+#' grps2 <- read.delim(system.file("files/structuregrplabels2.txt",
+#' package="pophelper"),header=FALSE, stringsAsFactor=FALSE)
 #' 
 #' # plot without labels
 #' distructExport(slist[1])
@@ -4047,17 +4578,17 @@ analyseQ <- analyzeQ <- function(files=NULL,evannomethod=TRUE,clumppexport=TRUE,
 #' distructExport(slist[1],grplabtop=grps2$V1)
 #' 
 #' # plot group mean values
-#' distructExport(slist[1],grplabbottom=grps1$V1,grpmean=T)
+#' distructExport(slist[1],grplabbottom=grps1$V1,grpmean=TRUE)
 #' 
 #' # automatically run DESTRUCT
-#' distructExport(slist[1],useexe=T)
+#' distructExport(slist[1],useexe=TRUE)
 #' }
 #' @import tidyr
 #' @export
 #' 
 distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE,overwritedirs=FALSE,
                            printtitle=FALSE,clustercol=NA,grayscale=FALSE,printcolorbrewer=FALSE,
-                           sepline=T,seplinewidth=0.2,borderlinewidth=1.2,indlinewidth=0.2,
+                           sepline=TRUE,seplinewidth=0.2,borderlinewidth=1.2,indlinewidth=0.2,
                            fontsize=6,topdist=5,bottomdist=-7,figheight=36,indwidth=1,
                            orientation=0,xorigin=NA,yorigin=NA,xscale=1,yscale=1,toplabangle=60,bottomlabangle=60,
                            echodata=TRUE,printdata=FALSE,quiet=FALSE,useexe=FALSE)
@@ -4133,40 +4664,40 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
         inames <- sprintf("%08.0f",1:nrow(df))
         indq <- cbind(data.frame(id1=1:nrow(df),sample=inames,id2=1:nrow(df),
                                  grp=sprintf("%06.0f",as.numeric(as.character(facb))),
-                                 colon=rep(":",nrow(df)),stringsAsFactors=F),df)
+                                 colon=rep(":",nrow(df)),stringsAsFactors=FALSE),df)
         
         # grpq
         dfb <- df
         dfb$grp <- facb
         dfb1 <- tidyr::gather(dfb,"variable","value",-grp)
-        dfb2 <- cbind(aggregate(value~grp+variable,data=dfb1,FUN=mean),aggregate(value~grp+variable,data=dfb1,FUN=length)[,3,drop=F])
+        dfb2 <- cbind(aggregate(value~grp+variable,data=dfb1,FUN=mean),aggregate(value~grp+variable,data=dfb1,FUN=length)[,3,drop=FALSE])
         colnames(dfb2) <- c("grp","variable","mean","len")
         dfb3 <- tidyr::spread(dfb2,"variable","mean")
         rm(dfb1,dfb2)
         dfb3$length <- dfb3$len
         dfb3 <- dfb3[,!(colnames(dfb3) %in% c("grp","len"))]
         pnames <- sprintf("%06.0f",1:nrow(dfb3))
-        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=F),dfb3)
+        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=FALSE),dfb3)
         
         # bottomlabels
-        plb <- data.frame(sample=pnames,label=rlevalb$values,stringsAsFactors=F)
+        plb <- data.frame(sample=pnames,label=rlevalb$values,stringsAsFactors=FALSE)
         dop_m <- nrow(plb)
         
         # grpq
         dft <- df
         dft$grp <- facb
         dft1 <- tidyr::gather(dft,"variable","value",-grp)
-        dft2 <- cbind(aggregate(value~grp+variable,data=dft1,FUN=mean),aggregate(value~grp+variable,data=dft1,FUN=length)[,3,drop=F])
+        dft2 <- cbind(aggregate(value~grp+variable,data=dft1,FUN=mean),aggregate(value~grp+variable,data=dft1,FUN=length)[,3,drop=FALSE])
         colnames(dft2) <- c("grp","variable","mean","len")
         dft3 <- tidyr::spread(dft2,"variable","mean")
         rm(dft1,dft2)
         dft3$length <- dft3$len
         dft3 <- dft3[,!(colnames(dft3) %in% c("grp","len"))]
         pnamest <- sprintf("%06.0f",1:nrow(dft3))
-        # grpq <- cbind(data.frame(sample=paste0(pnamesb,":"),stringsAsFactors=F),dft3)
+        # grpq <- cbind(data.frame(sample=paste0(pnamesb,":"),stringsAsFactors=FALSE),dft3)
         
         # tolabels
-        plt <- data.frame(sample=pnamest,label=rlevalt$values,stringsAsFactors=F)
+        plt <- data.frame(sample=pnamest,label=rlevalt$values,stringsAsFactors=FALSE)
         #dop_m <- nrow(plb)
         fname_plb <- paste0(fname,"-grplab-bottom.txt")
         fname_plt <- paste0(fname,"-grplab-top.txt")
@@ -4187,22 +4718,22 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
         inames <- sprintf("%08.0f",1:nrow(df))
         indq <- cbind(data.frame(id1=1:nrow(df),sample=inames,id2=1:nrow(df),
                                  grp=sprintf("%06.0f",as.numeric(as.character(fac))),
-                                 colon=rep(":",nrow(df)),stringsAsFactors=F),df)
+                                 colon=rep(":",nrow(df)),stringsAsFactors=FALSE),df)
         
         # grpq
         df$grp <- fac
         df1 <- tidyr::gather(df,"variable","value",-grp)
-        df2 <- cbind(aggregate(value~grp+variable,data=df1,FUN=mean),aggregate(value~grp+variable,data=df1,FUN=length)[,3,drop=F])
+        df2 <- cbind(aggregate(value~grp+variable,data=df1,FUN=mean),aggregate(value~grp+variable,data=df1,FUN=length)[,3,drop=FALSE])
         colnames(df2) <- c("grp","variable","mean","len")
         df3 <- tidyr::spread(df2,"variable","mean")
         rm(df1,df2)
         df3$length <- df3$len
         df3 <- df3[,!(colnames(df3) %in% c("grp","len"))]
         pnames <- sprintf("%06.0f",1:nrow(df3))
-        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=F),df3)
+        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=FALSE),df3)
         
         # bottomlabels
-        plb <- data.frame(sample=pnames,label=rleval$values,stringsAsFactors=F)
+        plb <- data.frame(sample=pnames,label=rleval$values,stringsAsFactors=FALSE)
         dop_m <- nrow(plb)
         
         fname_plb <- paste0(fname,"-grplab-bottom.txt")
@@ -4225,22 +4756,22 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
         inames <- sprintf("%08.0f",1:nrow(df))
         indq <- cbind(data.frame(id1=1:nrow(df),sample=inames,id2=1:nrow(df),
                                  grp=sprintf("%06.0f",as.numeric(as.character(fac))),
-                                 colon=rep(":",nrow(df)),stringsAsFactors=F),df)
+                                 colon=rep(":",nrow(df)),stringsAsFactors=FALSE),df)
         
         # grpq
         df$grp <- fac
         df1 <- tidyr::gather(df,"variable","value",-grp)
-        df2 <- cbind(aggregate(value~grp+variable,data=df1,FUN=mean),aggregate(value~grp+variable,data=df1,FUN=length)[,3,drop=F])
+        df2 <- cbind(aggregate(value~grp+variable,data=df1,FUN=mean),aggregate(value~grp+variable,data=df1,FUN=length)[,3,drop=FALSE])
         colnames(df2) <- c("grp","variable","mean","len")
         df3 <- tidyr::spread(df2,"variable","mean")
         rm(df1,df2)
         df3$length <- df3$len
         df3 <- df3[,!(colnames(df3) %in% c("grp","len"))]
         pnames <- sprintf("%06.0f",1:nrow(df3))
-        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=F),df3)
+        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=FALSE),df3)
         
         # toplabels
-        plt <- data.frame(sample=pnames,label=rleval$values,stringsAsFactors=F)
+        plt <- data.frame(sample=pnames,label=rleval$values,stringsAsFactors=FALSE)
         dop_m <- nrow(plt)
         
         fname_plb <- "null"
@@ -4255,10 +4786,10 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
         inames <- sprintf("%08.0f",1:nrow(df))
         indq <- cbind(data.frame(id1=1:nrow(df),sample=inames,id2=1:nrow(df),
                                  grp=sprintf("%06.0f",as.numeric(as.character(rep(1,nrow(df))))),
-                                 colon=rep(":",nrow(df)),stringsAsFactors=F),df)
+                                 colon=rep(":",nrow(df)),stringsAsFactors=FALSE),df)
         
         df1 <- tidyr::gather(df,"variable","value")
-        df2 <- cbind(aggregate(value~variable,data=df1,FUN=mean),aggregate(value~variable,data=df1,FUN=length)[,2,drop=F])
+        df2 <- cbind(aggregate(value~variable,data=df1,FUN=mean),aggregate(value~variable,data=df1,FUN=length)[,2,drop=FALSE])
         colnames(df2) <- c("variable","mean","len")
         df3 <- tidyr::spread(df2,"variable","mean")
         
@@ -4266,7 +4797,7 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
         df3$length <- df3$len
         df3 <- df3[,!(colnames(df3) %in% c("len"))]
         pnames <- sprintf("%06.0f",1:nrow(df3))
-        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=F),df3)
+        grpq <- cbind(data.frame(sample=paste0(pnames,":"),stringsAsFactors=FALSE),df3)
         
         dop_m <- 1
         dop_toplabel <- FALSE
@@ -4277,11 +4808,11 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
       
       # colours
       if(any(is.na(clustercol))){
-        colsdf <- data.frame(sample=1:dop_k,cols=pophelper:::distructColours()[1:dop_k],stringsAsFactors=F)
+        colsdf <- data.frame(sample=1:dop_k,cols=pophelper:::distructColours()[1:dop_k],stringsAsFactors=FALSE)
       }else{
         if(length(clustercol) != length(pnames)) stop(paste0("distructExport: Length of colours (",length(clustercol),") not equal to length of groups (",length(pnames),"). Change number of colours in 'clustercol' or set 'clustercol=NA'."))
         #if(any(!clustercol %in% pophelper:::distructColours())) stop(paste0("distructExport: One or more colours provided (",clustercol[which(!clustercol %in% pophelper:::distructColours())],") is not a standard Distruct colour."))
-        colsdf <- data.frame(sample=pnames,cols=clustercol,stringsAsFactors=F)
+        colsdf <- data.frame(sample=pnames,cols=clustercol,stringsAsFactors=FALSE)
       }
       
       # grayscale
@@ -4291,7 +4822,7 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
           x <- round(seq(0,1,by=1/n),nchar(n))
           x[round(seq(1,length(x),length.out=n))]
         }
-        colsdf <- data.frame(sample=1:dop_k,cols=fngray(dop_k),stringsAsFactors=F)
+        colsdf <- data.frame(sample=1:dop_k,cols=fngray(dop_k),stringsAsFactors=FALSE)
       }
       
       # xorigin
@@ -4425,21 +4956,21 @@ distructExport <- function(qlist=NULL,grplabbottom=NA,grplabtop=NA,grpmean=FALSE
       setwd(paste0(currwd,"/",dirname))
       if(as.numeric(file.access(paste0(currwd,"/",dirname),2))==-1) stop(paste0("distructExport: Directory ",paste0(currwd,"/",dirname)," has no write permission."))
       
-      write.table(grpq,fname_grpq,row.names=F,col.names=F,quote=F,dec=".",sep="\t")
+      write.table(grpq,fname_grpq,row.names=FALSE,col.names=FALSE,quote=FALSE,dec=".",sep="\t")
       if(!quiet) cat(paste0(fname_grpq," exported.\n"))
-      write.table(indq,fname_indq,row.names=F,col.names=F,quote=F,dec=".",sep="\t")
+      write.table(indq,fname_indq,row.names=FALSE,col.names=FALSE,quote=FALSE,dec=".",sep="\t")
       if(!quiet) cat(paste0(fname_indq," exported.\n"))
       if(!any(is.na(grplabbottom))) 
       {
-        write.table(plb,fname_plb,row.names=F,col.names=F,quote=F,dec=".",sep="\t")
+        write.table(plb,fname_plb,row.names=FALSE,col.names=FALSE,quote=FALSE,dec=".",sep="\t")
         if(!quiet) cat(paste0(fname_plb," exported.\n"))
       }
       if(!any(is.na(grplabtop))) 
       {
-        write.table(plt,fname_plt,row.names=F,col.names=F,quote=F,dec=".",sep="\t")
+        write.table(plt,fname_plt,row.names=FALSE,col.names=FALSE,quote=FALSE,dec=".",sep="\t")
         if(!quiet) cat(paste0(fname_plt," exported.\n"))
       } 
-      write.table(colsdf,fname_col,row.names=F,col.names=F,quote=F,dec=".",sep="\t")
+      write.table(colsdf,fname_col,row.names=FALSE,col.names=FALSE,quote=FALSE,dec=".",sep="\t")
       if(!quiet) cat(paste0(fname_col," exported.\n"))
       writeLines(params,"drawparams")
       if(!quiet) cat(paste0("drawparams exported.\n"))
@@ -4507,7 +5038,8 @@ distructColours <- distructColors <- function()
 
 #' @title Internal: Find current OS
 #' @description Find current OS
-#' @return Returns a character in lowercase with OS name 'windows', 'mac' or 'linux'.
+#' @return Returns a character in lowercase with OS name 'windows', 'mac' or 
+#' 'linux'.
 #' 
 getOS <- function() {
   if(tolower(.Platform$OS.type)=="windows") { 
@@ -4528,7 +5060,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.7 ready.")
+  packageStartupMessage("pophelper v2.2.8 ready.")
 }
 
 # End --------------------------------------------------------------------------

@@ -35,5 +35,6 @@ getDim(ind = NA, units = NA, height = NA, width = NA, dpi = NA,
 a vector with height and width.
 }
 \description{
-Internal: Generate height and width of figure based on number of individuals.
+Internal: Generate height and width of figure based on number 
+of individuals.
 }

@@ -7,12 +7,16 @@
 checkQ(files = NULL, warn = FALSE)
 }
 \arguments{
-\item{files}{A character or character vector of one or more input text files or a list of dataframes.}
+\item{files}{A character or character vector of one or more input text files 
+or a list of dataframes.}
 
-\item{warn}{A logical indicating if a warning must be displayed for file those are not STRUCTURE, TESS or BASIC file.}
+\item{warn}{A logical indicating if a warning must be displayed for file 
+those are not STRUCTURE, TESS or BASIC file.}
 }
 \value{
-A character or character vector indicating input type 'STRUCTURE', 'TESS', 'BASIC', 'CLUMPP', 'list', 'data.frame', 'UNIDENTIFIED' for all selected files.
+A character or character vector indicating input type 'STRUCTURE', 
+'TESS', 'BASIC', 'CLUMPP', 'list', 'data.frame', 'UNIDENTIFIED' for all 
+selected files.
 }
 \description{
 Internal: Check input filetype.

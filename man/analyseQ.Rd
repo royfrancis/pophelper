@@ -2,55 +2,76 @@
 % Please edit documentation in R/pophelper.R
 \name{analyseQ}
 \alias{analyseQ}
-\title{Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around several smaller functions.}
+\title{Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around 
+several smaller functions.}
 \usage{
 analyseQ(files = NULL, evannomethod = TRUE, clumppexport = TRUE,
   plotruns = TRUE, imgoutput = "sep", grplab = NA, clustercol = NA,
   writetable = TRUE, sorttable = TRUE)
 }
 \arguments{
-\item{files}{A character or character vector of one or more STRUCTURE, TESS, BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose interactively.}
+\item{files}{A character or character vector of one or more STRUCTURE, TESS, 
+BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose 
+interactively.}
 
-\item{evannomethod}{A logical indicating if evanno method should be performed. Applies only to STRUCTURE runs.}
+\item{evannomethod}{A logical indicating if evanno method should be 
+performed. Applies only to STRUCTURE runs.}
 
-\item{clumppexport}{A logical indicating if files must be exported for clumpp.}
+\item{clumppexport}{A logical indicating if files must be exported for 
+clumpp.}
 
-\item{plotruns}{A logical indicating if selected files should be exported as barplots.}
+\item{plotruns}{A logical indicating if selected files should be exported as 
+barplots.}
 
-\item{imgoutput}{A character indicating if files are plotted as separate image files ("sep") or joined into a single image ("join").}
+\item{imgoutput}{A character indicating if files are plotted as separate 
+image files ("sep") or joined into a single image ("join").}
 
-\item{grplab}{A dataframe with one or more columns (group label sets), and rows equal to the number of individuals.}
+\item{grplab}{A dataframe with one or more columns (group label sets), and 
+rows equal to the number of individuals.}
 
-\item{clustercol}{A character vector of colours for colouring clusters. If NA, colours are automatically generated. K 1 to 12 are custom unique colours while K>12 are coloured by function \code{rich.color()}.}
+\item{clustercol}{A character vector of colours for colouring clusters. If 
+NA, colours are automatically generated. K 1 to 12 are custom unique colours 
+while K>12 are coloured by function \code{rich.color()}.}
 
-\item{writetable}{A logical T or F. Setting to TRUE writes the output table to the working directory.}
+\item{writetable}{A logical T or F. Setting to TRUE writes the output table 
+to the working directory.}
 
-\item{sorttable}{A logical indicating if the output table must be sorted. Sorts table by loci, ind and K when available.}
+\item{sorttable}{A logical indicating if the output table must be sorted. 
+Sorts table by loci, ind and K when available.}
 }
 \value{
 If a single file is selected, a single dataframe is returned. If 
 multiple files are selected, a list with multiple dataframes is returned.
 }
 \description{
-A single function to analyse STRUCTURE, TESS, BAPS or BASIC text runs. Converts runs to a qlist, then tabulate, summarise, perform evanno method, export clumpp and plots runs.
+A single function to analyse STRUCTURE, TESS, BAPS or BASIC 
+text runs. Converts runs to a qlist, then tabulate, summarise, perform 
+evanno method, export clumpp and plots runs.
 }
 \details{
-The function \code{analyseQ} is a wrapper around several other \code{pophelper} functions. All arguments for all these other functions are not available. If more arguments/options are required, consider running the functions separately.
+The function \code{analyseQ} is a wrapper around several other 
+\code{pophelper} functions. All arguments for all these other functions are 
+not available. If more arguments/options are required, consider running the 
+functions separately.
 
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+details.
 }
 \examples{
 \dontrun{
 # structure files
-sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+full.names=TRUE)
 analyseQ(sfiles)
 
 # tess files
-tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+full.names=TRUE)
 analyseQ(tfiles)
 
 # admixture files
-afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+full.names=TRUE)
 analyseQ(afiles)
 }
 }

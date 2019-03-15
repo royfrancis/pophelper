@@ -7,21 +7,24 @@
 readQBaps(files = NULL)
 }
 \arguments{
-\item{files}{A character or character vector of one or more BAPS cluster run files. Use \code{choose.files(multi=TRUE)} 
-to select interactively.}
+\item{files}{A character or character vector of one or more BAPS cluster run 
+files. Use \code{choose.files(multi=TRUE)} to select interactively.}
 }
 \value{
-A list of lists with dataframes is returned. List items are named by input filename.
+A list of lists with dataframes is returned. List items are named by 
+input filename.
 }
 \description{
 Takes one or more BAPS cluster run files and converts them to a 
 list of dataframes.
 }
 \details{
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
+more details.
 }
 \examples{
-bfiles <- list.files(path=system.file("files/baps",package="pophelper"),full.names=TRUE)
+bfiles <- list.files(path=system.file("files/baps",package="pophelper"),
+full.names=TRUE)
 # create a qlist
 readQBaps(bfiles)
 }

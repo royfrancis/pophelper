@@ -12,11 +12,16 @@ sortInd(dframe = NULL, grplab = NA, selgrp = NA, ordergrp = FALSE,
 
 \item{grplab}{A dataframe with group labels}
 
-\item{selgrp}{A single character denoting selected group label set. See details.}
+\item{selgrp}{A single character denoting selected group label set. 
+See details.}
 
-\item{ordergrp}{A logical indicating if individuals must be ordered by all group labels}
+\item{ordergrp}{A logical indicating if individuals must be ordered by all 
+group labels}
 
-\item{sortind}{A character indicating how individuals are sorted. Default is NA (Same order of individuals as in input file). Other options are 'all' (sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 'labels' (sorting by individual labels).}
+\item{sortind}{A character indicating how individuals are sorted. Default is 
+NA (Same order of individuals as in input file). Other options are 'all' 
+(sorting by values of all clusters), by any one cluster (eg. 'Cluster1') or 
+'labels' (sorting by individual labels).}
 
 \item{grplabpos}{A numeric indicating y-axis position of labels}
 
@@ -29,9 +34,10 @@ Returns a list with ordered q-matrix dataframe and ordered grplab.
 Internal: Handles individual sorting
 }
 \details{
-When multiple group label sets are in use, \code{selgrp} defines which 
-group label set is used for group ordering (\code{ordergrp}), subsetting (\code{subsetgrp}) 
-and group mean (\code{grpmean}). \code{selgrp} is also used for plotting divider 
-lines and and sorting (\code{sortind}). If \code{selgrp} is not specified, the 
-first group label set is used by default.
+When multiple group label sets are in use, \code{selgrp} defines 
+which group label set is used for group ordering (\code{ordergrp}), 
+subsetting (\code{subsetgrp}) and group mean (\code{grpmean}). \code{selgrp} 
+is also used for plotting divider lines and and sorting (\code{sortind}). 
+If \code{selgrp} is not specified, the first group label set is used by 
+default.
 }

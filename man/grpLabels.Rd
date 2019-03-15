@@ -9,33 +9,38 @@ grpLabels(dframe = NULL, grplab = NA, selgrp = NA, subsetgrp = NA,
   indlabwithgrplab = TRUE, indlabsep = "_", runid = NULL)
 }
 \arguments{
+\item{dframe}{A q-matrix dataframe}
+
 \item{grplab}{A dataframe with group labels}
 
 \item{selgrp}{A character denoting selected group label set}
 
-\item{subsetgrp}{A character or character vector of grp name(s) to subset/reorder}
+\item{subsetgrp}{A character or character vector of grp name(s) to 
+subset/reorder}
 
-\item{ordergrp}{A logical indicating if individuals must be ordered by group labels}
+\item{ordergrp}{A logical indicating if individuals must be ordered by group 
+labels}
 
-\item{grpmean}{A logical indicating if q-matrix must be converted from individual to group mean}
+\item{grpmean}{A logical indicating if q-matrix must be converted from 
+individual to group mean}
 
 \item{grplabpos}{A numeric indicating y-axis position of labels}
 
 \item{linepos}{A numeric indicating y-axis position of label line}
 
-\item{indlabwithgrplab}{A logical indicating if grp labels are added to indlab}
+\item{indlabwithgrplab}{A logical indicating if grp labels are added to 
+indlab}
 
 \item{indlabsep}{A character specifying seperation in indlab}
 
 \item{runid}{A numeric indicating run ID}
-
-\item{df}{A q-matrix dataframe}
 }
 \value{
 Returns a list with subsetted/reordered q-matrix, a character vector 
 of original/subsetted/reordered grplab dataframe, grplabpos and linepos.
 }
 \description{
-Internal: Takes a q-matrix dataframe along with grp labels. Pop labels
-can be reordered or subsetted. The function also creates label_position and marker_position dfs.
+Internal: Takes a q-matrix dataframe along with group labels. 
+Group labels can be reordered or subsetted. The function also creates 
+label_position and marker_position dfs.
 }

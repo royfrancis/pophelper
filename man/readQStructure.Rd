@@ -4,30 +4,41 @@
 \alias{readQStructure}
 \title{Convert STRUCTURE run files to qlist.}
 \usage{
-readQStructure(files = NULL, indlabfromfile = FALSE)
+readQStructure(files = NULL, indlabfromfile = FALSE, readci = FALSE)
 }
 \arguments{
-\item{files}{A character or character vector of one or more STRUCTURE run files. Use \code{choose.files(multi=TRUE)} 
+\item{files}{A character or character vector of one or more STRUCTURE run 
+files. Use \code{choose.files(multi=TRUE)} 
 to select interactively.}
 
-\item{indlabfromfile}{A logical indicating if individual labels must be read from input file and used as row names for resulting dataframe. Spaces in labels may be replaced with _.}
+\item{indlabfromfile}{A logical indicating if individual labels must be read 
+from input file and used as row names for resulting dataframe. Spaces in 
+labels may be replaced with _.}
+
+\item{readci}{A logical indicating if confidence intervals from the structure
+file (if available) should be read. Set to FALSE by default as it take up 
+excess space.}
 }
 \value{
 A list of lists with dataframes is returned. If individual labels are 
-present in the STRUCTURE file, they are added to the dataframe as row names. Structure
-metadata including loci, burnin, reps, elpd, mvll, and vll is added as attributes 
-to each dataframe. List items are named by input filenames.
+present in the STRUCTURE file, they are added to the dataframe as row names. 
+Structure metadata including loci, burnin, reps, elpd, mvll, and vll is added 
+as attributes to each dataframe. When \code{readci=TRUE} and if CI data is
+available, it is read in and attached as attribute named ci. List items are 
+named by input filenames.
 }
 \description{
-Takes one or more STRUCTURE run files and converts them to a list of dataframes.
+Takes one or more STRUCTURE run files and converts them to a 
+list of dataframes.
 }
 \examples{
-sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+full.names=TRUE)
 # create a qlist of all runs
 slist <- readQStructure(sfiles)
 
 # use ind names from file
-readQStructure(sfiles[1],indlabfromfile=T)
+readQStructure(sfiles[1],indlabfromfile=TRUE)
 
 # access the first run
 readQStructure(sfiles)[[1]]

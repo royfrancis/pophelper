@@ -7,11 +7,12 @@
 readQTess(files = NULL)
 }
 \arguments{
-\item{files}{A character or character vector of one or more TESS cluster run files. Use \code{choose.files(multi=TRUE)} 
-to select interactively.}
+\item{files}{A character or character vector of one or more TESS cluster run 
+files. Use \code{choose.files(multi=TRUE)} to select interactively.}
 }
 \value{
-A list of lists with dataframes is returned. List items are named by input filename.
+A list of lists with dataframes is returned. List items are named by 
+input filename.
 }
 \description{
 Takes one or more TESS cluster run files and converts them to a 
@@ -21,7 +22,8 @@ list of dataframes.
 Use collectRunsTess() to collect TESS runs into one directory.
 }
 \examples{
-tfiles <- list.files(path=system.file("files/tess",package="pophelper"),full.names=TRUE)
+tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
+full.names=TRUE)
 # create a qlist
 readQTess(tfiles)
 }

@@ -4,21 +4,24 @@
 \alias{clumppExport}
 \title{Generate CLUMPP output from a qlist}
 \usage{
-clumppExport(qlist = NULL, prefix = NA, parammode = NA, paramrep = NA,
-  useexe = FALSE)
+clumppExport(qlist = NULL, prefix = NA, parammode = NA,
+  paramrep = NA, useexe = FALSE)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
 
 \item{prefix}{A character prefix for folder names. By default, set to 'pop'.}
 
-\item{parammode}{A numeric 1, 2 or 3 indicating the algorithm option for CLUMPP paramfile. Calculated 
-automatically by default. Set this value to 3 if CLUMPP runs too long. See details.}
+\item{parammode}{A numeric 1, 2 or 3 indicating the algorithm option for 
+CLUMPP paramfile. Calculated automatically by default. Set this value to 3 if 
+CLUMPP runs too long. See details.}
 
-\item{paramrep}{A numeric indicating the number of repeats for CLUMPP paramfile. Calculated 
-automatically by default. See details.}
+\item{paramrep}{A numeric indicating the number of repeats for CLUMPP 
+paramfile. Calculated automatically by default. See details.}
 
-\item{useexe}{A logical indicating if CLUMPP executable must be run automatically based on system OS (experimental). May not work on all OS and versions.}
+\item{useexe}{A logical indicating if CLUMPP executable must be run 
+automatically based on system OS (experimental). May not work on all OS and 
+versions.}
 }
 \value{
 The combined file and paramfile are written into respective folders 
@@ -28,7 +31,7 @@ named by K.
 Takes a qlist and combines several repeats for each K into a 
 single file along with a parameter file suitable for input to CLUMPP. The two 
 output files are organised into folders by K. CLUMPP is executed automatically 
-when \code{useexe=T}, else the CLUMPP executable file can be copied to the 
+when \code{useexe=TRUE}, else the CLUMPP executable file can be copied to the 
 output directories and run to reorder the clusters for each K.
 }
 \details{
@@ -46,11 +49,12 @@ structure. Bioinformatics, 23(14), 1801-1806.\cr
 \strong{parammode}\cr
 The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch' 
 (takes the longest time), option 2 is 'Greedy' and option 3 is 'LargeKGreedy'
-(fastest). If clumpp takes more than a few minutes, consider changing parammode
-to a higher number (ex. from 2 to 3), or open the exported paramfile and manually
-change GREEDY_OPTION to 3.\cr
+(fastest). If clumpp takes more than a few minutes, consider changing 
+parammode to a higher number (ex. from 2 to 3), or open the exported 
+paramfile and manually change GREEDY_OPTION to 3.\cr
 \cr
-The parammode and paramrep for CLUMPP paramfile is set based on this calculation.
+The parammode and paramrep for CLUMPP paramfile is set based on this 
+calculation.
 T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
 populations, runs is number of runs for k and ind is number of individuals.
 If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
@@ -60,25 +64,29 @@ To find out more about parammode (algorithm type) and paramrep (repeats),
 refer to CLUMPP documentation.\cr
 
 \strong{useexe}\cr
-This option automatically runs the CLUMPP executable that is provided with this package. 
-The CLUMPP executable was obtained from \url{https://web.stanford.edu/group/rosenberglab/clumpp.html}.
+This option automatically runs the CLUMPP executable that is provided with 
+this package. The CLUMPP executable was obtained from 
+\url{https://web.stanford.edu/group/rosenberglab/clumpp.html}.
 Remember to cite CLUMPP if this option is used.\cr
 
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+details.
 }
 \examples{
 
 \dontrun{
 
 # generate input files for CLUMPP from STRUCTURE files
-sfiles <- list.files(path=system.file("files/structure",package="pophelper"),full.names=TRUE)
+sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
+full.names=TRUE)
 clumppExport(readQ(sfiles))
 
 # auto execute CLUMPP
 clumppExport(readQ(sfiles),useexe=TRUE)
 
 # generate input files for CLUMPP from ADMIXTURE files
-afiles <- list.files(path=system.file("files/admixture",package="pophelper"),full.names=TRUE)
+afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
+full.names=TRUE)
 clumppExport(readQ(afiles))
 
 }

@@ -9,8 +9,8 @@ STRUCTURE by Pritchard, Stephens and Donnelly (2000)
 
 
 
-Command line arguments:   bin\structure -m C:\Users\jota.blanco\Desktop\SAmer_reduc\OC_SA2\pop250y500mil\mainparams -e C:\Users\jota.blanco\Desktop\SAmer_reduc\OC_SA2\pop250y500mil\extraparams 
-Input File:    C:\Users\jota.blanco\Desktop\SAmer_reduc\OC_SA2\project_data
+Command line arguments:   bin\structure -m C:\Users\mainparams -e C:\Users\extraparams 
+Input File:    C:\Users\project_data
 
 Run parameters:
    551 individuals

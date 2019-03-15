@@ -1,6 +1,6 @@
 # Test Script
-# v2.2.7
-# 23-May-2018
+# v2.2.8
+# 15-Mar-2018
 
 library(testthat)
 library(pophelper)
@@ -156,6 +156,40 @@ for(i in seq_along(ftype))
     expect_error(pophelper::readQTess3())
     expect_error(pophelper::readQBaps())
     expect_error(readQ())
+    
+    # readq confidence intervals
+    # no ci readci false
+    q1 <- pophelper::readQ(sfiles)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # no ci readci true
+    expect_warning(q1 <- pophelper::readQ(sfiles,readci=T))
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # ci readci false
+    q1 <- pophelper::readQ(sfiles1)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # ci readci true
+    q1 <- pophelper::readQ(sfiles1,readci=T)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),TRUE)
+    
+    # readq structure confidence intervals
+    # no ci readci false
+    q1 <- pophelper::readQStructure(sfiles)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # no ci readci true
+    expect_warning(q1 <- pophelper::readQStructure(sfiles,readci=T))
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # ci readci false
+    q1 <- pophelper::readQStructure(sfiles1)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),FALSE)
+    # ci readci true
+    q1 <- pophelper::readQStructure(sfiles1,readci=T)
+    expect_equal(any("ci" %in% unlist(lapply(q1,function(x) names(attributes(x))))),TRUE)
+    
+    # ci dimensions
+    c1 <- attributes(q1[[1]])$ci
+    expect_equal(nrow(c1),551)
+    expect_equal(ncol(c1),4)
+    rm(c1)
     
     ql <- pophelper::readQ(files)
     
@@ -723,8 +757,6 @@ for(i in seq_along(imgout))
     plotQ(slist[1:2],imgoutput=imgo,showindlab=T,sharedindlab=T,grplab=grplabs,subsetgrp=c("b","a"),width=16,outputfilename="joined")
     #error sharedindlab error
     expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,showindlab=T,sortind="Cluster1"))
-    #error ordergrp error
-    expect_error(plotQ(slist[1:2],imgoutput=imgo,grplab=grplabs,showindlab=T,sortind="Cluster1",sharedindlab=F))
   }
   
   #showyaxis
@@ -1356,5 +1388,5 @@ if(pophelper:::getOS()!="unix64")
 # End --------------------------------------------------------------------------
 
 setwd(currwd)
-if(deleteoutput) unlink("pophelper-demo",recursive = T,force = T)
+if(deleteoutput) unlink("pophelper-demo",recursive=T,force=T)
 

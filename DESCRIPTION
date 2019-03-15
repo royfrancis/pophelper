@@ -2,8 +2,8 @@ Package: pophelper
 Type: Package
 Title: Tabulate, analyse and visualise admixture proportions from STRUCTURE, TESS, BAPS, ADMIXTURE and tab-delimited q-matrices
     files
-Version: 2.2.7
-Date: 2018-05-23
+Version: 2.2.8
+Date: 2019-03-15
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
@@ -14,7 +14,6 @@ Description: A set of useful functions for processing admixture proportion files
 URL: https://github.com/royfrancis/pophelper
 Depends:
     R(>= 3.4.0),
-    Cairo,
     ggplot2
 Imports:
     grid,
@@ -22,9 +21,10 @@ Imports:
     gtable,
     tidyr
 Suggests:
+    Cairo,
     knitr,
     testthat
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
