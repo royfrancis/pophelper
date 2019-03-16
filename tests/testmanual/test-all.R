@@ -1,6 +1,5 @@
 # Test Script
-# v2.2.8
-# 15-Mar-2018
+# v2.2.8.1
 
 library(testthat)
 library(pophelper)

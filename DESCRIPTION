@@ -2,8 +2,8 @@ Package: pophelper
 Type: Package
 Title: Tabulate, analyse and visualise admixture proportions from STRUCTURE, TESS, BAPS, ADMIXTURE and tab-delimited q-matrices
     files
-Version: 2.2.8
-Date: 2019-03-15
+Version: 2.2.8.1
+Date: 2019-03-16
 Author: Roy Mathew Francis
 Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
@@ -13,7 +13,7 @@ Description: A set of useful functions for processing admixture proportion files
     K using Evanno method, export clumpp files, export distruct files and generate barplots.
 URL: https://github.com/royfrancis/pophelper
 Depends:
-    R(>= 3.4.0),
+    R(>= 3.5.0),
     ggplot2
 Imports:
     grid,

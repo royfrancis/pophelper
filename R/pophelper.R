@@ -1,8 +1,7 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.8
+# pophelper v2.2.8.1
 # Functions
-# 15-Mar-2019
 
 # check packages
 pkgs <- c("grid","gridExtra","ggplot2","gtable","tidyr")
@@ -994,6 +993,9 @@ readQBaps <- function(files=NULL)
 #' as a tab-delimited text file in the working directory.
 #' @param sorttable A logical indicating if output table is to be sorted. Sorts 
 #' table by ind and K.
+#' @param exportpath A path to where content must be exported. For example,
+#' \code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+#' directory.
 #' @return Returns a dataframe with filenames (if list is not named, then 
 #' sample1, sample2 etc. is used), K and number of individuals of all runs 
 #' sorted by ind and K (if \code{sorttable=TRUE}). The row numbers of the output 
@@ -1032,7 +1034,7 @@ readQBaps <- function(files=NULL)
 #  @import xlsx
 #' @export
 #'
-tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
+tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE,exportpath=NULL)
 {
   
   # check input
@@ -1114,7 +1116,7 @@ tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
   if(sorttable) main <- main[with(main,order(ind,k)),]
   
   # write table if opted
-  if(writetable) write.table(main,"tabulateQ.txt",quote=FALSE,row.names=FALSE,sep="\t",dec=".")
+  if(writetable) write.table(main,paste0(exportpath,"tabulateQ.txt"),quote=FALSE,row.names=FALSE,sep="\t",dec=".")
 
   return(main)
 }
@@ -1128,6 +1130,9 @@ tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
 #' Must have minimum 2 columns named k and ind.
 #' @param writetable A logical indicating if the output table is to be exported 
 #' as a tab-delimited text file in the working directory.
+#' @param exportpath A path to where content must be exported. For example,
+#' \code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+#' directory.
 #' @return Returns a dataframe with all values of K sorted by K. The table has 
 #' 3 columns namely value of K, number of runs for each K and number of 
 #' individuals.
@@ -1155,7 +1160,7 @@ tabulateQ <- function(qlist=NULL,writetable=FALSE,sorttable=TRUE)
 #' 
 #' @export
 #' 
-summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
+summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE,exportpath=NULL)
 {
   # does df data contain any data?
   if(is.null(data) || length(data)==0) stop("summariseQ: No input files.")
@@ -1185,7 +1190,7 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
   }
   
   # write table if opted
-  if(writetable) write.table(dframe1,"summariseQ.txt",quote=FALSE,row.names=FALSE,sep="\t",dec=".")
+  if(writetable) write.table(dframe1,paste0(exportpath,"summariseQ.txt"),quote=FALSE,row.names=FALSE,sep="\t",dec=".")
   
   return(dframe1)
 }
@@ -1259,6 +1264,9 @@ summariseQ <- summarizeQ <- function(data=NULL,writetable=FALSE)
 #' @param quiet A logical indicating if messages must be printed to console.
 #' @param outputfilename A character indicating output file name. Defaults to 
 #' 'evannoMethodStructure'.
+#' @param exportpath A path to where content must be exported. For example,
+#' \code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+#' directory.
 #' @return When \code{returndata=TRUE} and \code{returnplot=FALSE}, a data.frame is 
 #' returned.
 #' When \code{returndata=FALSE} and \code{returnplot=TRUE}, a gtable plot object is 
@@ -1308,7 +1316,7 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
                                   ebwidth=0.2,ebcol="grey30",
                                   textcol="grey30",xaxisbreaks=waiver(),xaxislabels=waiver(),basesize=6,gridsize=NA,
                                   imgtype="png",height=NA,width=NA,dpi=300,units="cm",
-                                  theme="theme_bw",font="",na.rm=TRUE,quiet=TRUE,outputfilename="evannoMethodStructure")
+                                  theme="theme_bw",font="",na.rm=TRUE,quiet=TRUE,outputfilename="evannoMethodStructure",exportpath=NULL)
 {
   # does df data contain any data?
   if(is.null(data) || length(data)==0) stop("evannoMethodStructure: No input files.")
@@ -1405,18 +1413,18 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
       if(exportplot)
       {
         # check image imgtype
-        if(imgtype=="pdf") pdf(paste0(outputfilename,".pdf"),height=height1,width=width1,fonts=font)
-        if(imgtype=="png") png(paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
-        if(imgtype=="jpeg") jpeg(paste0(outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
-        if(imgtype=="tiff") tiff(paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
+        if(imgtype=="pdf") pdf(paste0(exportpath,outputfilename,".pdf"),height=height1,width=width1,fonts=font)
+        if(imgtype=="png") png(paste0(exportpath,outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
+        if(imgtype=="jpeg") jpeg(paste0(exportpath,outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
+        if(imgtype=="tiff") tiff(paste0(exportpath,outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
         
         print(plist[[1]])
         dev.off()
         
-        if(imgtype=="tiff" && !quiet) cat(paste0(outputfilename,".tiff exported.\n"))
-        if(imgtype=="pdf" && !quiet) cat(paste0(outputfilename,".pdf exported.\n"))
-        if(imgtype=="png" && !quiet) cat(paste0(outputfilename,".png exported.\n"))
-        if(imgtype=="jpeg" && !quiet) cat(paste0(outputfilename,".jpg exported.\n"))
+        if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outputfilename,".tiff exported.\n"))
+        if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outputfilename,".pdf exported.\n"))
+        if(imgtype=="png" && !quiet) cat(paste0(exportpath,outputfilename,".png exported.\n"))
+        if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outputfilename,".jpg exported.\n"))
       }
 
     }
@@ -1470,8 +1478,8 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
   # write table if opted
   if(writetable)
   {
-    write.table(data,paste0(outputfilename,".txt"),quote=FALSE,row.names=FALSE,sep="\t",dec=".")
-    if(!quiet) cat(paste0(outputfilename,".txt exported. \n"))
+    write.table(data,paste0(exportpath,outputfilename,".txt"),quote=FALSE,row.names=FALSE,sep="\t",dec=".")
+    if(!quiet) cat(paste0(exportpath,outputfilename,".txt exported. \n"))
   }
   
   # show plot
@@ -1551,19 +1559,19 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
     if(exportplot)
     {
       # check image imgtype  
-      if(imgtype=="pdf") pdf(paste0(outputfilename,".pdf"),height=height1,width=width1,fonts=font)
-      if(imgtype =="png") png(paste0(outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
-      if(imgtype =="tiff") tiff(paste0(outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
-      if(imgtype=="jpeg") jpeg(paste0(outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
+      if(imgtype=="pdf") pdf(paste0(exportpath,outputfilename,".pdf"),height=height1,width=width1,fonts=font)
+      if(imgtype =="png") png(paste0(exportpath,outputfilename,".png"),height=height1,width=width1,res=dpi,units=units,family=font)
+      if(imgtype =="tiff") tiff(paste0(exportpath,outputfilename,".tiff"),height=height1,width=width1,res=dpi,units=units,compression="lzw",family=font)
+      if(imgtype=="jpeg") jpeg(paste0(exportpath,outputfilename,".jpg"),height=height1,width=width1,res=dpi,units=units,quality=100,family=font)
       
       if(plen==3) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]],ncol=2,nrow=2)
       if(plen==4) gridExtra::grid.arrange(plist[[1]],plist[[2]],plist[[3]],plist[[4]],ncol=2,nrow=2)
       dev.off()
       
-      if(imgtype=="tiff" && !quiet) cat(paste0(outputfilename,".tiff exported.\n"))
-      if(imgtype=="pdf" && !quiet) cat(paste0(outputfilename,".pdf exported.\n"))
-      if(imgtype=="png" && !quiet) cat(paste0(outputfilename,".png exported.\n"))
-      if(imgtype=="jpeg" && !quiet) cat(paste0(outputfilename,".jpg exported.\n"))
+      if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outputfilename,".tiff exported.\n"))
+      if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outputfilename,".pdf exported.\n"))
+      if(imgtype=="png" && !quiet) cat(paste0(exportpath,outputfilename,".png exported.\n"))
+      if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outputfilename,".jpg exported.\n"))
     }
     
     if(returnplot)
@@ -1578,7 +1586,6 @@ evannoMethodStructure <- function(data=NULL,writetable=FALSE,exportplot=FALSE,re
   if(!returndata && returnplot) return(p)
   if(returndata && returnplot) return(list(data=data,plot=p))
 }
-
 
 # clumppExport -----------------------------------------------------------------
 
@@ -3585,16 +3592,16 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(exportplot)
       {
         if(!quiet) cat("Drawing plot ...\n")
-        if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-        if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-        if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-        if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height1,width=width1,fonts=font)
+        if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+        if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+        if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+        if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
         print(gg_plot_panel)
         dev.off()
-        if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-        if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-        if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-        if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+        if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+        if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+        if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+        if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
       }
 
       if(returnplot) px <- gg_plot_panel
@@ -3613,16 +3620,16 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height1,width=width1,fonts=font)
+          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
           print(gg_plot_panel)
           dev.off()
-          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+          if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
         }
         
         if(returnplot) px <- gg_plot_panel
@@ -3695,18 +3702,18 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(outname,".pdf"),height=height2,width=width1,fonts=font)
+          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
           
           gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
           dev.off()
           
-          if(imgtype=="tiff" && !quiet) cat(paste0(outname,".tiff exported.\n"))
-          if(imgtype=="png" && !quiet) cat(paste0(outname,".png exported.\n"))
-          if(imgtype=="jpeg" && !quiet) cat(paste0(outname,".jpg exported.\n"))
-          if(imgtype=="pdf" && !quiet) cat(paste0(outname,".pdf exported.\n"))
+          if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname,".pdf exported.\n"))
         }
         
         if(returnplot) px <- gridExtra::arrangeGrob(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
@@ -3864,6 +3871,9 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' returned. See 'Value'.
 #' @param returndata A logical indicating if processed data must be returned. 
 #' See 'Value'.
+#' @param exportpath A path to where content must be exported. For example,
+#' \code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+#' directory.
 #' @return When \code{returnplot=TRUE}, plot object(s) are returned. When 
 #' \code{grplab=NA}, a ggplot2 object is returned. When \code{returndata=TRUE}, 
 #' the input qlist is modified (sorted, subsetted etc) and returned. If 
@@ -4015,7 +4025,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
                             showticks=FALSE,showyaxis=FALSE,ticksize=0.1,ticklength=0.03,
                             outputfilename=NA,imgtype="png",height=NA,width=NA,dpi=300,units="cm",mar=c(0.1,0.5,0.1,0.5),
                             theme="theme_grey",basesize=5,font="",na.rm=FALSE,quiet=FALSE,
-                           exportplot=TRUE,returnplot=FALSE,returndata=FALSE)
+                           exportplot=TRUE,returnplot=FALSE,returndata=FALSE,exportpath=NULL)
 {
   # check input
   is.qlist(qlist)
@@ -4335,18 +4345,18 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(outname1,".tiff"),height=height,width=width,res=dpi,units=units,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(outname1,".png"),height=height,width=width,res=dpi,units=units,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(outname1,".jpg"),height=height,width=width,res=dpi,units=units,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(outname1,".pdf"),height=height,width=width,fonts=font)
+          if(imgtype=="tiff") tiff(paste0(exportpath,outname1,".tiff"),height=height,width=width,res=dpi,units=units,compression="lzw",family=font)
+          if(imgtype=="png") png(paste0(exportpath,outname1,".png"),height=height,width=width,res=dpi,units=units,family=font)
+          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname1,".jpg"),height=height,width=width,res=dpi,units=units,quality=100,family=font)
+          if(imgtype=="pdf") pdf(paste0(exportpath,outname1,".pdf"),height=height,width=width,fonts=font)
           
           do.call(gridExtra::grid.arrange,alist)
           dev.off()
           
-          if(imgtype=="tiff" && !quiet) cat(paste0(outname1,".tiff exported.\n"))
-          if(imgtype=="png" && !quiet) cat(paste0(outname1,".png exported.\n"))
-          if(imgtype=="jpeg" && !quiet) cat(paste0(outname1,".jpg exported.\n"))
-          if(imgtype=="pdf" && !quiet) cat(paste0(outname1,".pdf exported.\n"))
+          if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname1,".tiff exported.\n"))
+          if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname1,".png exported.\n"))
+          if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname1,".jpg exported.\n"))
+          if(imgtype=="pdf" && !quiet) cat(paste0(exportpath,outname1,".pdf exported.\n"))
         }
 
         if(returnplot) 
@@ -5060,7 +5070,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.8 ready.")
+  packageStartupMessage("pophelper v2.2.8.1 ready.")
 }
 
 # End --------------------------------------------------------------------------

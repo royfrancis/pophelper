@@ -1,5 +1,5 @@
 ---
-title: "Pophelper 2.2.8"
+title: "Pophelper 2.2.8.1"
 output: 
   bookdown::html_document2: 
     code_folding: "none"
@@ -1643,7 +1643,7 @@ The argument `basesize` can be used to change text size of most text objects. Th
 
 __Exporting and returning__
 
-By default, when plotting, an image is exported into the working directory. This is the intended behaviour and the plot element sizes is tuned for export. Exporting can be turned off by `exportplot=FALSE`. By setting `returnplot=TRUE`, the plot object can be returned and saved as a variable for plotting later or further customisation. By setting `returndata=TRUE`, the internally processed data (qlist and grplab) can be returned to be saved to a variable. The returned object is a list and has the following structure:
+By default, when plotting, an image is exported into the working directory. This is the intended behaviour and the plot element sizes is tuned for export. A location other than the current working directory can be specified using `exportpath`. Exporting can be turned off by `exportplot=FALSE`. By setting `returnplot=TRUE`, the plot object can be returned and saved as a variable for plotting later or further customisation. By setting `returndata=TRUE`, the internally processed data (qlist and grplab) can be returned to be saved to a variable. The returned object is a list and has the following structure:
 
 ```
 $list
@@ -2035,7 +2035,7 @@ p <- plotQMultiline(slist[1],exportplot=F,returnplot=T)
 print(p)
 ```
 
-The returned object is a list with slots: plot and data. The plot slot contains a gtable plot object (result from gridExtra::arrangeGrob()) and the data slot contains two slots: qlist and grplab. The qlist contains the processed qlist and the grplab contains processed group labels. In the above example, only the plot slot is filled because only `returnplot=T` was used. The data is also returned if `returndata=T` is used.
+The returned object is a list with slots: plot and data. The plot slot contains a gtable plot object (result from gridExtra::arrangeGrob()) and the data slot contains two slots: qlist and grplab. The qlist contains the processed qlist and the grplab contains processed group labels. In the above example, only the plot slot is filled because only `returnplot=T` was used. The data is also returned if `returndata=T` is used. When exporting the image, a location other than the current working directory can be specified using `exportpath`.
 
 Note that this function can be slow and takes several minutes to run depending on number of individuals and number of files selected.
 
@@ -2082,7 +2082,7 @@ A schematic data structure of a two run 'qlist' would look like below:
 ```{r,eval=FALSE}
 $list
 +--$list
-+  +--$data.frame
+|  +--$data.frame
 +--$list
    +--$data.frame
 ```
@@ -2272,5 +2272,4 @@ The `pophelper` R package is offered free and without warranty of any kind, eith
 # Contact
 
 If you have any comments, suggestions or issues, report on the [Github issues page](https://github.com/royfrancis/pophelper/issues).  
-  
-__End of Document.__  
+

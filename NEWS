@@ -1,3 +1,11 @@
+pophelper 2.2.8.1
+===========
+* 16-Mar-2019
+* Fixed 'exportpath' issues in plotQ()
+* Added 'exportpath' to plotQMultiline() and evannoMethod()
+* Added 'exportpath' to tabulateQ()
+* Added 'exportpath' to summariseQ()
+
 pophelper 2.2.8
 ===========
 * 15-Mar-2019
