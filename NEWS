@@ -9,6 +9,7 @@ pophelper 2.2.8.1
 pophelper 2.2.8
 ===========
 * 15-Mar-2019
+* R dependency set to >=3.5.0
 * Dropped dependency on package cairo
 * summariseQ() accepts single run tabulated input
 * evannoMethodStructure(): Argument 'file' incorrectly specified for pdf as 'filename'. Fixed
