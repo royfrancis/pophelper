@@ -1,6 +1,6 @@
 # Begin ------------------------------------------------------------------------
 
-# pophelper v2.2.8.1
+# pophelper v2.2.9
 # Functions
 
 # check packages
@@ -3077,7 +3077,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       k <- ncol(df1)
       Ind <- nrow(df1)
       df1$ind <- as.character(rownames(df1))
-      df1$run <- factor(rep(i,nrow(df1)))
+      df1$run <- as.integer(rep(i,nrow(df1)))
       df1$order_ind <- seq(from=1,to=Ind)
       df2 <- tidyr::gather(df1,"variable","value",-c(ind,run,order_ind))
       
@@ -3424,7 +3424,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       Ind <- nrow(df1)
       #df1$ind <- factor(rownames(df1),levels=rownames(df1))
       df1$ind <- as.character(rownames(df1))
-      df1$run <- factor(rep(i,nrow(df1)))
+      df1$run <- as.integer(rep(i,nrow(df1)))
       df1$order_ind <- seq(from=1,to=Ind)
 
       # cumulative numbering
@@ -5070,7 +5070,7 @@ summarizeQ <- summariseQ
 
 #ON LOAD
 .onLoad <- function(...) {
-  packageStartupMessage("pophelper v2.2.8.1 ready.")
+  packageStartupMessage("pophelper v2.2.9 ready.")
 }
 
 # End --------------------------------------------------------------------------

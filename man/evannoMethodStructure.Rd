@@ -12,7 +12,8 @@ evannoMethodStructure(data = NULL, writetable = FALSE,
   xaxislabels = waiver(), basesize = 6, gridsize = NA,
   imgtype = "png", height = NA, width = NA, dpi = 300,
   units = "cm", theme = "theme_bw", font = "", na.rm = TRUE,
-  quiet = TRUE, outputfilename = "evannoMethodStructure")
+  quiet = TRUE, outputfilename = "evannoMethodStructure",
+  exportpath = NULL)
 }
 \arguments{
 \item{data}{A dataframe with summarised runs. An output from 
@@ -103,6 +104,10 @@ plotting and warning messages from \code{ggplot} are avoided.}
 
 \item{outputfilename}{A character indicating output file name. Defaults to 
 'evannoMethodStructure'.}
+
+\item{exportpath}{A path to where content must be exported. For example,
+\code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+directory.}
 }
 \value{
 When \code{returndata=TRUE} and \code{returnplot=FALSE}, a data.frame is 

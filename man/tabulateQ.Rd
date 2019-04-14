@@ -4,7 +4,8 @@
 \alias{tabulateQ}
 \title{Tabulate runs from a qlist}
 \usage{
-tabulateQ(qlist = NULL, writetable = FALSE, sorttable = TRUE)
+tabulateQ(qlist = NULL, writetable = FALSE, sorttable = TRUE,
+  exportpath = NULL)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
@@ -14,6 +15,10 @@ as a tab-delimited text file in the working directory.}
 
 \item{sorttable}{A logical indicating if output table is to be sorted. Sorts 
 table by ind and K.}
+
+\item{exportpath}{A path to where content must be exported. For example,
+\code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+directory.}
 }
 \value{
 Returns a dataframe with filenames (if list is not named, then 

@@ -1,5 +1,5 @@
 ---
-title: "Pophelper 2.2.8.1"
+title: "Pophelper 2.2.9"
 output: 
   bookdown::html_document2: 
     code_folding: "none"
@@ -21,7 +21,7 @@ vignette: >
 
 __Roy M Francis__ | `r format(Sys.time(),"%d-%b-%Y")`
 
-```{r,echo=FALSE,message=FALSE,results='hide',warning=FALSE,eval=TRUE}
+```{r,include=FALSE}
 options(rpubs.upload.method="internal")
 knitr::opts_chunk$set(collapse=TRUE)
 #source("D:/Data/Dropbox/Rwork/pophelperRpackage/pophelper/R/pophelper.R")
@@ -29,6 +29,7 @@ library(pophelper)
 library(captioner)
 library(gridExtra)
 library(extrafont)
+library(ggpubr)
 
 tc <- captioner::captioner(prefix="Tab. ")
 fc <- captioner::captioner(prefix="Fig. ")
@@ -1676,11 +1677,36 @@ __Using RMarkdown__
 As explained in the prvious section, plots can be returned and saved. This can be handy when creating a report using RMarkdown. The returned plot(s) can be drawn using `gridExtra::grid.arrange()`.
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
+library(gridExtra)
+
 # return plot and data (withgrplab)
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,grplab=onelabset1,
             grplabsize=3.5,linesize=0.8,pointsize=3)
 grid.arrange(p1$plot[[1]])
 ```
+
+R package `ggpubr` has a useful function `ggarrange()` for plotting a list of ggplot objects.
+
+```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
+library(ggpubr)
+
+# return plot and data (withgrplab)
+p1 <- plotQ(slist1[1:2],returnplot=T,exportplot=F,grplab=onelabset1,
+            grplabsize=3.5,linesize=0.8,pointsize=3,basesize=8)
+ggarrange(plotlist=p1$plot,nrow=2,ncol=1)
+```
+
+`r fc(name="fc_ggpubr_sep",caption="_Two separate plots with group labels plotted together using ggarrange()._")` 
+
+```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6}
+# return plot and data (withgrplab)
+p1 <- plotQ(slist1[1:2],returnplot=T,exportplot=F,grplab=onelabset1,
+            grplabsize=3.5,linesize=0.8,pointsize=3,basesize=8,
+            imgoutput="join")
+ggarrange(plotlist=p1$plot)
+```
+
+`r fc(name="fc_ggpubr_join",caption="_A joined plot with group labels plotted using ggarrange()._")` 
 
 __Export dimensions and resolution__
 
@@ -2263,6 +2289,13 @@ Many of the functionalities in this package have been implented in the online to
 
 ---
 
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+
 # Disclaimer
 
 The `pophelper` R package is offered free and without warranty of any kind, either expressed or implied. I will not be held liable to you for any damage arising out of the use, modification or inability to use this program. `pophelper` R package can be used, redistributed and/or modified freely for non-commercial purposes subject to the original source being properly cited. Licensed under GPL-3. Please make sure you verify all your results.  
@@ -2272,4 +2305,8 @@ The `pophelper` R package is offered free and without warranty of any kind, eith
 # Contact
 
 If you have any comments, suggestions or issues, report on the [Github issues page](https://github.com/royfrancis/pophelper/issues).  
+
+```{r,eval=FALSE,include=FALSE}
+rmarkdown::render("vignette.Rmd")
+```
 

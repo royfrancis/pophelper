@@ -25,7 +25,8 @@ plotQMultiline(qlist = NULL, spl = NA, lpp = NA, clustercol = NA,
   imgtype = "png", height = NA, width = NA, dpi = 300,
   units = "cm", mar = c(0.1, 0.5, 0.1, 0.5), theme = "theme_grey",
   basesize = 5, font = "", na.rm = FALSE, quiet = FALSE,
-  exportplot = TRUE, returnplot = FALSE, returndata = FALSE)
+  exportplot = TRUE, returnplot = FALSE, returndata = FALSE,
+  exportpath = NULL)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
@@ -238,6 +239,10 @@ returned. See 'Value'.}
 
 \item{returndata}{A logical indicating if processed data must be returned. 
 See 'Value'.}
+
+\item{exportpath}{A path to where content must be exported. For example,
+\code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+directory.}
 }
 \value{
 When \code{returnplot=TRUE}, plot object(s) are returned. When 

@@ -5,7 +5,7 @@
 \alias{summarizeQ}
 \title{Summarise a tabulated dataframe}
 \usage{
-summariseQ(data = NULL, writetable = FALSE)
+summariseQ(data = NULL, writetable = FALSE, exportpath = NULL)
 }
 \arguments{
 \item{data}{A dataframe with tabulated runs. An output from \code{tabulateQ()}. 
@@ -13,6 +13,10 @@ Must have minimum 2 columns named k and ind.}
 
 \item{writetable}{A logical indicating if the output table is to be exported 
 as a tab-delimited text file in the working directory.}
+
+\item{exportpath}{A path to where content must be exported. For example,
+\code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+directory.}
 }
 \value{
 Returns a dataframe with all values of K sorted by K. The table has 
