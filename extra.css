@@ -298,10 +298,14 @@ div.block-title {
 .navbar .navbar-nav > li > a:hover,
 .navbar .navbar-nav > li > a:focus,
 .navbar .navbar-nav > .active > a:hover,
-.navbar .navbar-nav > .active > a:focus,
-.navbar .navbar-link > .active > a:hover,
-.navbar .navbar-link > .active > a:focus {
+.navbar .navbar-nav > .active > a:focus {
     color: lightgray;
+}
+
+.navbar-inverse .navbar-brand:hover, 
+.navbar-inverse .navbar-brand:focus {
+  background-color: transparent;
+  color: white;
 }
 
 body {
