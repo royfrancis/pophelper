@@ -1,4 +1,5 @@
 <img src="man/figures/hexagon-128.png" align="right" width="96" height="96">
+
 # pophelper
 
 `pophelper` is an R package and web app to analyse and visualise population structure. See the [project website](http://royfrancis.github.io/pophelper/articles/index.html) for more details.
