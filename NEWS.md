@@ -1,0 +1,497 @@
+# pophelper 2.3.0
+
+* 11-Aug-2019
+* Built on R-3.6.0
+* Removed CLUMPP and DISTRUCT executables
+* 'useexe' argument in ClumppExport() deprecated.
+* Added alignK() function for label switching within and between K
+* Argument 'clumppexport' in analyseQ() removed and replaced with 'align'
+* New dependency package label.swiching
+* Updated function is.qlist()
+* Added function as.qlist() to correctly format a qlist object
+* Added function joinQ() to combine multiple qlist objects
+* Added function sortQ() to sort runs in a qlist by a run attribute
+* Added function mergeQ() to merge replicate runs within K
+* Added function splitQ() to split a qlist object by an attribute
+
+# pophelper 2.2.9
+
+* 14-Apr-2019
+* plotQ(): Order of runs in a joined plot was incorrect when k>10 and grplab in use. Fixed.
+
+# pophelper 2.2.8.1
+
+* 16-Mar-2019
+* Fixed 'exportpath' issues in plotQ()
+* Added 'exportpath' to plotQMultiline() and evannoMethod()
+* Added 'exportpath' to tabulateQ()
+* Added 'exportpath' to summariseQ()
+
+# pophelper 2.2.8
+
+* 15-Mar-2019
+* Dropped dependency on package cairo
+* summariseQ() accepts single run tabulated input
+* evannoMethodStructure(): Argument 'file' incorrectly specified for pdf as 'filename'. Fixed
+* plotQMultiline(): Several undocumented arguments added to documentation
+* Minor corrections to documentation
+* Adjustments to getDim()
+* add argument exportpath to all functions
+* plotQ(): Added argument 'showgrplab'
+* readQ() and readQStructure(): Reads confidence intervals from structure files if available
+
+# pophelper 2.2.7
+
+* 23-May-2018
+* With joined plots, group labels and sorting, div lines were incorrectly printed causing plots to be misaligned. This has been resolved
+* Removed restriction of setting 'ordergrp=T' when sorting by cluster or 'all'
+
+# pophelper 2.2.6
+
+* 02-May-2018
+* getDim() adjusted better for shared and unshared individual labels
+* Argument 'grplabface' added to plotQ() to adjust font face of group labels
+* plotQ(): Div lines are printed with joined plots, group labels and sorting
+* plotQ(): With joined plots and group labels with multiple label sets, when sorting, argument 'ordergrp' must be set to TRUE. Individuals and group labels were not correctly matched with joined output, group labels and sorting. This has been corrected. Group labels are sorted by all labels started with selgrp
+* for-loops in all functions changed to seq_along()
+* sortInd() gets a new argument 'ordergrp' which orders group labels when sorting
+
+# pophelper 2.2.5.1
+
+* 19-Jan-2018
+* Added arguments 'xaxisbreaks' and 'xaxislabels' to evannoMethodStructure()
+
+# pophelper 2.2.5
+
+* 11-Jan-2018
+* A bug in plotQ() caused strip labels to be incorrect. This has been fixed
+* plotQMultiline() subtitle by default prints the K value of the run
+* plotQ() and plotQMultiline() prints 'Drawing plot ...' when exporting plot
+
+# pophelper 2.2.4
+
+* 07-Jan-2018
+* Function readQBaps() added to convert BAPS run files to qlist
+* Function readQ() modified to read BAPS run files
+* Function checkQ() modified to identify BAPS run files
+* Open textConnection() fixed in readQStructure()
+* Function readQTess() modified to use textConnection()
+* Functions readQStructure(),readQTess(),readQBasic() and readQClumpp() 
+  are now exported to the namespace.
+* tabulateQ() has 'quiet=T' set as default
+* summariseQ has 'quiet=T' set as default
+* Changes to plotQ()
+  + Argument 'sharedindlab' added to control separate vs common labels in 'join' plots
+  + Argument 'indlabwithgrplab' added to control if grp labels are concatenated to ind lab
+  + Argument 'showyaxis' added to turn y-axis on/off
+  + Argument 'showticks' added to turn x and y axes ticks on/off
+  + Argument 'ticksize' added to adjust tick size
+  + Argument 'ticklength' added to adjust tick length
+  + Argument 'basesize' added to adjust text size of all theme elements
+  + Argument 'panelratio' added to adjust plot panel to grplab panel ratio
+  + Argument 'legendmargin' added to adjust margin around the legend
+  + Argument 'exportplot' added to export plot
+  + Argument 'returnplot' added to return plot object
+  + Argument 'returndata' added to return processed data
+  + Default individual labels are added before sorting, subsetting etc
+    therefore, individual labels now reflect change is sorting.
+  + Fixed a bug in sorting where sorting by 'label' didn't work
+  + Argument 'quiet' added to turn off messages
+  + Facets are plotted by facet_wrap rather than facet_grid
+  + Minor adjustments to margins
+  + Div lines are not drawn with 'join' plot, when sorting by all or cluster. (Bug to be fixed)
+* Changes to plotQMultiline()
+  + Argument 'indlabwithgrplab' added to control if grp labels are concatenated to ind lab
+  + Arguments 'showlegend','legendlab','legendpos','legendkeysize','legendtextsize','legendmargin' added
+  + Argument 'ticksize' added to adjust tick size
+  + Argument 'ticklength' added to adjust tick length
+  + Argument 'basesize' added to adjust text size of all theme elements
+  + Argument 'quiet' added to turn off messages
+  + Argument 'exportplot' added to export plot
+  + Argument 'returnplot' added to return plot object
+  + Argument 'returndata' added to return processed data
+  + Fixed a bug in sorting where sorting by 'label' didn't work
+* Changes to evannoMethodStructure()
+  + Argument 'returnplot' added to return plot object
+  + Argument 'returndata' added to return processed data
+  + Argument 'quiet' added to turn off messages
+  + Argument 'outputfilename' added to specify custom file name
+  + kPlot is no longer shown by default to the current print device
+* Arguments 'showindlab' and 'sharedindlab' added to getDim() to adjust plot height
+* grpLabels(): Arguments 'lndlabwithgrplab' and 'indlabsep' added
+* sortInd(): Fixed a bug in sorting where sorting by 'label' didn't work
+
+# pophelper 2.2.3
+
+* 01-Sep-2017
+* Function readQTess3() added to convert TESS 3 R object to qlist
+* Minor changes in tabulateQ()
+
+# pophelper 2.2.2
+
+* 25-Aug-2017
+* Fixed an issue where 'barbordersize' could not be turned off
+* Changes to plotQ()
+  + Argument 'barbordersize' set to 0 as default
+  + Argument 'barbordercolour' set to NA as default
+* Changes to plotQMultiline()
+  + Argument 'barbordersize' set to 0 as default
+  + Argument 'barbordercolour' set to NA as default
+  
+# pophelper 2.2.1
+
+* 04-Aug-2017
+* Changes to plotQ()
+  + Order of arguments changed in plotQ
+  + Argument 'barbordersize' added to adjust border size on bars
+  + Argument 'barbordercolour' added to adjust colour of bar borders
+  + Argument 'indlabspacer' added to control spacing between individual labels and plot area
+  + Argument 'splabangle' added to control angle of strip panel labels (requested by Gang Liu)
+  + Argument 'showtitle' added to show/hide plot title
+  + Argument 'titlelab' added to provide custom title (requested by Gang Liu)
+  + Argument 'titlehjust' added to adjust horizontal justification of the title
+  + Argument 'titlevjust' added to adjust vertical justification of the title
+  + Argument 'titlesize' added to adjust size of the title
+  + Argument 'titlecol' added to adjust the colour of the title
+  + Argument 'titleface' added to adjust the font face of the title
+  + Argument 'titlespacer' added to adjust the space below the title
+  + Argument 'titleangle' added to adjust the angle of the title
+  + Argument 'showsubtitle' added to show/hide plot subtitle
+  + Argument 'subtitlelab' added to provide custom subtitle
+  + Argument 'subtitlehjust' added to adjust horizontal justification of the subtitle
+  + Argument 'subtitlevjust' added to adjust vertical justification of the subtitle
+  + Argument 'subtitlesize' added to adjust size of the subtitle
+  + Argument 'subtitlecol' added to adjust the colour of the subtitle
+  + Argument 'subtitleface' added to adjust the font face of the subtitle
+  + Argument 'subtitlespacer' added to adjust the space below the subtitle
+  + Argument 'subtitleangle' added to adjust the angle of the subtitle
+* Changes to plotQMultiline()
+  + Order of arguments changed in plotQMultiline. 
+  + Argument 'barbordersize' added to adjust border size on bars
+  + Argument 'barbordercolour' added to adjust colour of bar borders
+  + Argument 'indlabspacer' added to control spacing between individual labels and plot area.
+  + Argument 'showtitle' added to show/hide plot title
+  + Argument 'titlelab' added to provide custom title (requested by Gang Liu)
+  + Argument 'titlehjust' added to adjust horizontal justification of the title
+  + Argument 'titlevjust' added to adjust vertical justification of the title
+  + Argument 'titlesize' added to adjust size of the title
+  + Argument 'titlecol' added to adjust the colour of the title
+  + Argument 'titleface' added to adjust the font face of the title
+  + Argument 'titlespacer' added to adjust the space below the title
+  + Argument 'titleangle' added to adjust the angle of the title
+  + Argument 'showsubtitle' added to show/hide plot subtitle
+  + Argument 'subtitlelab' added to provide custom subtitle
+  + Argument 'subtitlehjust' added to adjust horizontal justification of the subtitle
+  + Argument 'subtitlevjust' added to adjust vertical justification of the subtitle
+  + Argument 'subtitlesize' added to adjust size of the subtitle
+  + Argument 'subtitlecol' added to adjust the colour of the subtitle
+  + Argument 'subtitleface' added to adjust the font face of the subtitle
+  + Argument 'subtitlespacer' added to adjust the space below the subtitle
+  + Argument 'subtitleangle' added to adjust the angle of the subtitle
+
+# pophelper 2.2.0
+
+* 17-May-2017
+* is.qlist() modified to produce error if input does not meet qlist requirements
+* readQ() argument 'indlabfromfile' did not work (fixed)
+* evannoMethodStructure() font did not work for pdfs (fixed)
+* Changes to plotQ()
+  + Order of arguments changed in plotQ 
+  + Argument 'grplab' must be data.frame  
+  + Argument 'sp' changed to 'showsp'
+  + Argument 'div' changed to 'showdiv'
+  + Argument 'legend' changed to 'showlegend'
+  + Argument 'labspacer' changed to 'grplabspacer'
+  + Argument 'labpanelheight' changed to 'grplabheight'
+  + Argument 'labpos' changed to 'grplabpos'
+  + Argument 'labsize' changed to 'grplabsize'
+  + Argument 'labangle' changed to 'grplabangle'
+  + Argument 'labjust' changed to 'grplabjust'
+  + Argument 'labcol' changed to 'grplabcol'
+  + Argument 'labalpha' changed to 'grplabalpha'
+  + Argument 'labsep' changed to 'indlabsep'
+  + Argument 'showindlab' added to turn individual labels on/off
+  + Argument 'indlabheight' added to adjust panel height of individual labels
+  + Argument 'indlabsize' added to adjust size of individual labels
+  + Argument 'indlabangle' added to adjust angle of individual labels
+  + Argument 'indlabvjust' added to adjust vertical adjustment of individual labels
+  + Argument 'indlabhjust' added to adjust horizontal adjustment of individual labels
+  + Argument 'indlabcol' added to adjust colour of individual labels
+  + Argument 'selgrp' added to select active group label set from multiple group label sets
+  + Argument 'ordergrp' added to reorder group labels
+  + Argument 'outputfilename' added to name exported files
+  + Clipping of markers along the edges (fixed)
+  + New lines in the grplab titles (strip labels) automatically adjust to number of new lines in splab
+* Changes to plotQMultiline()
+  + Argument 'grplab' takes a dataframe
+  + Argument 'indlab' changed to 'showindlab'
+  + Argument 'labsep' changed to 'indlabsep'
+  + Argument 'labsize' changed to 'indlabsize'
+  + Argument 'labangle' changed to 'indlabangle'
+  + Argument 'labvjust' changed to 'indlabvjust'
+  + Argument 'labhjust' changed to 'indlabhjust'
+  + Argument 'ticks' changed to 'showticks'
+  + Argument 'yaxislabs' changed to 'showyaxis'
+  + Argument 'selgrp' added to select active group label set from multiple group label sets
+  + Argument 'ordergrp' added to reorder group labels
+  + Argument 'showgrplab' added to turn group labels on/off
+  + Argument 'indlabcol' added to adjust colour of individual labels
+  + Argument 'grplabsize' added to adjust size of group labels
+  + Argument 'grplabcol' added to adjust colour of group labels
+  + Argument 'grplabbgcol' added to adjust background colour of group label panel
+  + Argument 'outputfilename' added to name exported files
+
+# pophelper 2.1.0
+
+* 17-Apr-2017
+* Changes to plotQMultiline()
+  + Argument 'grplab' added
+  + Argument 'grpmean' added
+  + Argument 'subsetgrp' added
+  + Argument 'sortind' has extra option 'label' to sort by individual labels
+  + Argument 'labsep' added
+  + tiff option added to 'imgtype'
+  + Argument 'theme' added
+  + Argument 'font' added
+  + Argument 'barwidth' changed to 'barsize'
+  + Arguments 'height' and 'width' must always be in specified units. No special change for pdf
+  + Argument 'res' changed to 'dpi' to be consistent with other functions in the package
+  + Uses function is.qlist() to test qlist input validity
+* Changes to plotQ()
+  + Argument 'sortind' has extra option 'label' to sort by individual labels
+  + Argument 'theme' added 
+  + Argument 'font' added
+  + Argument 'useindlab' added
+  + Argument 'labsep' added
+  + Argument 'barsize' added
+  + tiff option added to 'imgtype'
+  + Uses is.qlist() to test qlist input validity
+  + Argument 'linethick' deprecated and replaced with linesize
+  + Argument 'divthick' deprecated and replaced with divsize
+* tabulateQ() uses is.qlist() to test qlist input validity
+* clumppExport() uses is.qlist() to test qlist input validity
+* distructExport() uses is.qlist() to test qlist input validity
+* Changes to evannoMethodStructure()
+  + Argument 'pointsize' added
+  + Argument 'pointtype' added
+  + Argument 'pointcol' added
+  + Argument 'linesize' added
+  + Argument 'linecol' added
+  + Argument 'ebwidth' added
+  + Argument 'ebcol' added
+  + Argument 'textcol' added
+  + Argument 'gridsize' added
+  + Argument 'theme' added
+  + Argument 'font' added
+  + Argument 'res' changed to dpi
+  + Arguments 'height' and 'width' must always be in specified units. No special change for pdf
+  + tiff option added to 'imgtype'
+  + Default margins slightly increased
+  + Minor grid lines removed to reduce clutter
+
+# pophelper 2.0.0
+
+* 19-Dec-2016
+* checkRuns modified
+* clumppExport.. 'usexe' path issue corrected
+* Erroneous warning messages in clumppExport.. fixed
+* File name matching issue in clumppExport.. fixed
+* tabulateRunsStructure() deprecated
+* tabulateRunsTess() deprecated
+* tabulateRunsMatrix() deprecated
+* summariseRunsStructure() deprecated
+* summariseRunsTess() deprecated
+* summariseRunsMatrix() deprecated
+* clumppExportStructure() deprecated
+* clumppExportTess() deprecated
+* clumppExportMatrix() deprecated
+* runsToDfStructure() deprecated
+* runsToDfTess() deprecated
+* runsToDfMatrix() deprecated
+* readQ() added
+  + Input files are converted to a qlist.
+  + Structure specific values such as elpd, mvll etc are preserved as dataframe attributes
+  + For CLUMPP, multiple runs within a file are suffixed with -1, -2 etc
+* tabulateQ() added
+  + Argument 'qlist' added to accept a qlist input
+  + Argument 'quiet' removed
+* summariseQ() added
+* clumppExport() added
+  + Argument 'qlist' added to accept a qlist input
+* plotRuns() error when using subsetpops 'length of poplabels not equal to number of individuals' fixed.
+* plotRuns() renamed to plotQ().
+  + Argument 'qlist' added to accept a qlist input
+  + plotRuns() 'imgoutput' argument has two options 'sep' or 'join'
+  + Argument 'popcol' changed to clustercol
+  + Argument 'popmean' changed to grpmean
+  + Argument 'poplab' changed to grplab
+  + Argument 'grplab' must now be a named list to allow more than one label sets
+  + Argument 'flab' changed to 'sp'
+  + Argument 'splab' added to provide custom labels to strip panels
+  + Argument 'flabsize' changed to 'splabsize'
+  + Argument 'flabcol' changed to 'splabcol'
+  + Argument 'flabbackcol' changed to 'spbgcol'
+  + Argument 'divgrp' added to define which label set(s) must be divider lines based on
+  + Argument 'labalpha' added to adjust transparency of labels
+  + Argument 'linealpha' added to adjust transparency of line
+  + Argument 'pointalpha' added to adjust transparency of points
+  + Argument 'divalpha' added to adjust transparency of divider line
+  + Argument 'legend' added to display legend for cluster colours
+  + Argument 'legendlab' added to provide custom cluster labels
+  + Argument 'legendpos' added for legend justification
+  + Argument 'legendkeysize' added to adjust legend key size
+  + Argument 'legendtextsize' added to adjust legend text size
+* plotMultiline() renamed to plotQMultiline()
+* plotQMultiline() modified to accept qlist input
+* distructExport() modified to accept qlist input
+* Deprecated functions show error messages
+* analyseRuns() renamed to analyseQ()
+* checkRuns() renamed to checkQ()
+* Functions related to spatial, plotRunsInterpolate() and plotRunsSpatial() renamed to plotQInterpolate() and plotQSpatial() and moved to a different package pophelperSpatial
+
+# pophelper 1.2.1
+
+* 05-Sep-2016
+* Fixed a critical bug during parsing in runsToDfStructure() when K=1. Thanks to Emily Humble for reporting this.
+
+# pophelper 1.2.0
+
+* 25-July-2016
+* exportDistruct() added to generate input files for software DISTRUCT from STRUCTURE, TESS, MATRIX or TAB files.
+* Argument 'indlabfromfile' added to runsToDfStructure() to read individual labels from structure file if available and adds as row names.
+* Argument 'indlabfromfile' added to plotMultiline() to read individual labels from structure file if available and use as labels.
+* Argument 'indlab' added to plotMultiline() to provide individual labels externally.
+* Argument 'popmean' added to plotRuns() to plot population mean values rather than individual values. Applicable only when pop labels are in use.
+* plotRuns() is able to handle duplicated contiguous block of pop labels except when using argument 'subsetpops'.
+* clumppExportStructure(), clumppExportTess() and clumppExportMatrix() now checks for directory write permission before creating directory.
+* Argument 'useexe' added to clumppExportStructure(), clumppExportTess() and clumppExportMatrix() to automatically run CLUMPP.
+* Incorrect error messages were reported when some logical arguments were incorrectly set. This has been corrected for tabulateRunsStructure(), tabulateRunsTess(),tabulateRunsMatrix().
+* Dependency on plyr and reshape removed. 
+* New dependency on tidyr.
+
+# pophelper 1.1.9
+
+* 31-May-2016
+* For structure files, 'Mean value of alpha' is no longer reported in tabulateRunsStructure(). Reporting of 'Mean value of alpha' and 'Mean value of Fst' may be reimplemented in future if users think it might be be useful.  
+
+# pophelper 1.1.8
+
+* 19-May-2016
+* In structure files, when more than one line of 'Mean value of alpha' is present, 'mva' was reported as NA. Now, the mean of the values is reported as 'mva'. Thanks to J A Blanco Aguiar for pointing out this issue.
+
+# pophelper 1.1.7
+
+* 18-May-2016
+* runsToDfStructure() produced NA columns when STRUCTURE file contains probability intervals. Fixed. Thanks to J A Blanco Aguiar for pointing out this issue.  
+* plotMultiline() has a new argument sortlabels to show x-axis labels in the original sort order.
+* A critical loop variable issue fixed in plotMultiline().  
+
+# pophelper 1.1.6
+
+* 02-Jan-2016
+* Sort individuals by one or all clusters in plotRuns() or plotMultiline().  
+* Subset/reorder populations when using pop labels in plotRuns().  
+* runsToDfMatrix(), tabulateRunsMatrix(), summariseRunsMatrix(), clumppExportMatrix() implemented for tabular data.  
+* runsToDfAdmixture(), tabulateRunsAdmixture(), summariseRunsAdmixture(), clumppExportAdmixture() deprecated.  
+* Argument 'barwidth' deprecated from plotMultiline().  
+* Fixed space, labeller for compatibility with ggplot2 2.0.0.  
+
+# pophelper 1.1.5
+
+* 18-Oct-2015
+* Handling of Admixture files.  
+* checkRuns modified to use grepl instead of grep and checks for Admixture files too.
+* plotRuns() handles ADMIXTURE files.  
+* plotMultiline() handles ADMIXTURE files.  
+* plotRunsInterpolate() handles ADMIXTURE files.  
+* Code optimisation.  
+
+# pophelper 1.1.4
+
+* 27-Sep-2015
+* Fixed runsToDfStructure() error when the structure file has 'Estimated Allele Frequencies in each population' rather than 'each cluster'.
+
+# pophelper 1.1.3
+
+* 27-Sep-2015
+* Error in plotMultiline() with table files corrected.
+
+# pophelper 1.1.2
+
+* 17-Sep-2015
+* Error fixed in evannoMethodStructure() when using writetable=T.  
+Error in vapply(x, format, "", ...) : values must be length 1,
+ but FUN(X[[1]]) result is length 6
+* Same error fixed in tabulateRunsStructure().  
+* Same error fixed in tabulateRunsTess().  
+* Same error fixed in summariseRunsStructure().  
+* Same error fixed in summariseRunsTess().  
+* Error fixed in plotRunsInterpolate().  
+Error in theme(legend.key.size = unit(legendsize, "cm")) : 
+  could not find function "unit"
+
+# pophelper 1.1.1
+
+* 31-Mar-2015
+* Function plotRuns() modified.
+    + Spacing between bottom plot and second plot was larger than spacing between other plots. This has been corrected.
+    + New code to plotting labels
+    + Arguments to control label panel height (labpanelheight), spacing between plots (panelspacer), spacing between label area and plots (labspacer).
+    + Argument to include or exclude side panels on right side (flab).
+    + Argument to include a divider line between populations (flab). Further arguments to modify the divider line.
+    + Figure dimensions and conversions have been improved. Old dimension settings (length, height, res etc) may give different plot dimension in this version.
+* Internal helper functions for plotRuns() modified.
+* Function evannoMethodStructure() modified.
+    + Argument doplot is removed. Set plot off using exportplot=F.
+    + Argument basesize added to generally control size of figure elements.
+    + Conversion between units and dimensions have been modified.
+
+# pophelper 1.1.0
+
+* 16-Mar-2015
+* Several changes in code to enable faster runtime.
+* New HTML vignette created.
+* Corrections to NAMESPACE and DESCRIPTION
+* Function tabulateRunsStructure() modified.
+* Function tabulateRunsTess() modified.
+* Function summariseRunsStructure() function modified. 2.5x faster.
+    + ddply() from plyr() package used to summarise table.
+    + na.rm argument added for summarising table. na.rm is passed to min(), max(), mean() and sd() functions.
+    + Output table variable order changed. Current column order is loci, ind, k, runs, elpdmean, elpdsd, elpdmin, elpdmax.
+* Function summariseRunsTess() function modified.
+    + Function ddply() from plyr() package used to summarise table.
+    + Output table variable order changed. Current column order is ind, k, runs.
+* evannoMethodStructure() has an improved plot theme.
+* Function plotRuns() modified.
+    + Argument 'labcol' didn't change colour of labels. Fixed.
+    + Argument 'pointbgcol' added for background colour of marker points
+    + Argument 'linetype' added for changing line type of marker line
+* Function analyseRuns() function added. A wrapper for several other functions. Performs a tabulation of runs, summarising of runs, perform Evanno method (for STRUCTURE runs only), exports clumpp output and generates barplots.
+
+# pophelper 1.0.4
+
+* 18-May-2014
+* Cairo plotting for png exports. Better anti-aliasing.
+* fig aspect ratio issue fixed in function plotRunsInterpolate()
+* Namespace error resolved for some functions.
+* Minor changes to plotRunsInterpolate().
+* plotRunsSpatial() function added. STRUCTURE and TESS runs can be used with a coordinate file to spatially plot the points and colour them into clusters based on the highest probability value. The coordinates can be transformed to UTM coordinates for a better spatial representation.
+
+# pophelper 1.0.3
+ 
+* 11-May-2014
+* Function plotRunsInterpolate() added. STRUCTURE and TESS run files can be used with a coordinate file to spatially interpolate clusters using several interpolation methods such as thin splines, inverse distance weighting and kriging.
+
+# pophelper 1.0.2
+
+* 25-Apr-2014
+* A bug in functions clumppExportStructure() and clumppExportTess() produced a 'No input' error. This has been fixed. Thanks to Micheal Panasci for pointing this out.
+
+# pophelper 1.0.1
+
+* parameter sorttable added to functions tabulateRunsStructure() and tabulateRunsTess(). Useful if unsorted table is required.
+
+# pophelper 1.0.0
+
+* 16-Feb-2014
+* the first version of the `pophelper` package
