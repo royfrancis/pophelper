@@ -1,4 +1,4 @@
-<img src="man/figures/hexagon-128.png" align="right" width="96" height="96">
+<img src="man/figures/logo.png" align="right" width="96" height="96">
 
 # pophelper
 
