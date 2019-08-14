@@ -39,7 +39,7 @@ fc <- captioner::captioner(prefix="Fig. ")
 
 This vignette/tutorial aims to demonstrate the use of R package `pophelper`. This package contains functions that are useful for processing output results from programs used in the analysis of population structure such as ADMIXTURE^1^, FASTSTRUCTURE^6^, STRUCTURE^5^, TESS^3^, BAPS^8^ and any q-matrix output as a numeric tabular delimited file.
 
-These softwares are popular programs used to discriminate populations, to determine population structure and to reveal the genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a pre-defined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file, cluster file or q-matrix file. `pophelper` has a set of functions that include reading into R, tabulating, summarising and plotting these run files. 
+These software are popular programs used to discriminate populations, to determine population structure and to reveal the genetic composition of individuals using molecular markers. These programs generally use allelic frequency information to assign individuals to a pre-defined number of populations (*K*). The assignment is usually run for a range of *K* such as from *K*=2 to *K*=10. Multiple repeats are also usually carried out for each *K*. Each output file for each repeat of *K* showing the assignment probabilities of all individuals is referred to as the run file, cluster file or q-matrix file. `pophelper` has a set of functions that include reading into R, tabulating, summarising and plotting these run files. 
 
 This vignette covers the use of all important functions in the `pophelper` package. The demonstration is ordered in the manner of a typical workflow. Input and output codes are printed in a font different from body text like `this`.  
 
@@ -816,7 +816,7 @@ sapply(slist1[c(1,3)],ncol)
 # modified for this document
 p1 <- plotQ(slist1[1],returnplot=T,exportplot=F,quiet=T,basesize=11,
             showlegend=T, legendlab=c("group1","group2"),
-            legendkeysize=10,legendtextsize=10,legendmargin=c(2,2,2,0))
+            legendkeysize=10,legendtextsize=10,legendmargin=c(2,2,2,0),legendrow=1)
 
 p2 <- plotQ(slist1[c(1,3)],imgoutput="join",returnplot=T,exportplot=F,quiet=T,basesize=11,
             showlegend=T, legendlab=c("group1","group2","group3"),

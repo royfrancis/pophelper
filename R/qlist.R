@@ -5,7 +5,7 @@
 #' @param qlist A qlist object.
 #' @return Nothing.
 #' @details Returns error if the object is not a list, contents are not data.frames or NA list elements or missing run labels. Warnings are generated for non standard column labels or missing attributes 'ind' and 'k'. Warnings can be fixed by running \code{\link{as.qlist}}.
-#' @example 
+#' @examples 
 #' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
 #' full.names=TRUE)
 #' slist <- readQ(sfiles)

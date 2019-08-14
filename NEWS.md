@@ -1,7 +1,7 @@
 # pophelper 2.3.0
 
 * 11-Aug-2019
-* Built on R-3.6.0
+* Built on R-3.6.0. Min req R-3.5.0.
 * Removed CLUMPP and DISTRUCT executables
 * 'useexe' argument in ClumppExport() deprecated.
 * Added alignK() function for label switching within and between K
@@ -13,6 +13,8 @@
 * Added function sortQ() to sort runs in a qlist by a run attribute
 * Added function mergeQ() to merge replicate runs within K
 * Added function splitQ() to split a qlist object by an attribute
+* 14-Aug-2019
+* Added arguments 'legendspacing' and 'legendrow' to plotQ()
 
 # pophelper 2.2.9
 

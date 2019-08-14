@@ -29,14 +29,14 @@ plotQ(qlist = NULL, imgoutput = "sep", clustercol = NA,
   divgrp = NA, divcol = "white", divtype = "21", divsize = 0.25,
   divalpha = 1, showlegend = FALSE, legendlab = NA,
   legendpos = "right", legendkeysize = 4, legendtextsize = 3,
-  legendmargin = c(0.5, 0.5, 0.5, 0), barsize = 1, barbordersize = 0,
-  barbordercolour = NA, showyaxis = FALSE, showticks = FALSE,
-  ticksize = 0.1, ticklength = 0.03, outputfilename = NA,
-  imgtype = "png", height = NA, width = NA, dpi = 300,
-  units = "cm", theme = "theme_grey", basesize = 5, font = "",
-  na.rm = TRUE, quiet = FALSE, panelratio = c(3, 1),
-  exportplot = TRUE, returnplot = FALSE, returndata = FALSE,
-  exportpath = NULL)
+  legendspacing = 2, legendrow = NULL, legendmargin = c(0.5, 0.5,
+  0.5, 0), barsize = 1, barbordersize = 0, barbordercolour = NA,
+  showyaxis = FALSE, showticks = FALSE, ticksize = 0.1,
+  ticklength = 0.03, outputfilename = NA, imgtype = "png",
+  height = NA, width = NA, dpi = 300, units = "cm",
+  theme = "theme_grey", basesize = 5, font = "", na.rm = TRUE,
+  quiet = FALSE, panelratio = c(3, 1), exportplot = TRUE,
+  returnplot = FALSE, returndata = FALSE, exportpath = NULL)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
@@ -296,6 +296,10 @@ to 4.}
 
 \item{legendtextsize}{A numeric indicating size of the legend text. Defaults 
 to 3.}
+
+\item{legendspacing}{Spacing between legend items.}
+
+\item{legendrow}{Number of rows of legend.}
 
 \item{legendmargin}{A numeric vector of length 4 indicating top, right, 
 bottom and left margins of the legend.}

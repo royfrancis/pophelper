@@ -686,6 +686,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' to 4.
 #' @param legendtextsize A numeric indicating size of the legend text. Defaults 
 #' to 3.
+#' @param legendspacing Spacing between legend items.
+#' @param legendrow Number of rows of legend.
 #' @param legendmargin A numeric vector of length 4 indicating top, right, 
 #' bottom and left margins of the legend.
 #' @param barsize A numeric indicating the width of the bars. Defaults to 1.
@@ -924,7 +926,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
                   pointsize=NA,pointcol="grey30",pointbgcol="grey30",pointtype="|",pointalpha=1,
                   linepos=0.75,linesize=NA,linecol="grey30",linetype=1,linealpha=1,
                   showdiv=TRUE,divgrp=NA,divcol="white",divtype="21",divsize=0.25,divalpha=1,
-                  showlegend=FALSE,legendlab=NA,legendpos="right",legendkeysize=4,legendtextsize=3,legendmargin=c(0.5,0.5,0.5,0),
+                  showlegend=FALSE,legendlab=NA,legendpos="right",legendkeysize=4,legendtextsize=3,legendspacing=2,legendrow=NULL,legendmargin=c(0.5,0.5,0.5,0),
                   barsize=1,barbordersize=0,barbordercolour=NA,
                   showyaxis=FALSE,showticks=FALSE,ticksize=0.1,ticklength=0.03,
                   outputfilename=NA,imgtype="png",height=NA,width=NA,dpi=300,units="cm",
@@ -1154,6 +1156,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         scale_x_continuous(breaks=df2$order_ind,labels=df2$ind,expand=c(0,0))+
         scale_y_continuous(expand=c(0,0))+
         scale_fill_manual(values=coll,labels=legendlab1)+
+        guides(fill=guide_legend(nrow=legendrow,byrow=TRUE))+
         facet_wrap(~run,labeller=labeller(run=facetnames),strip.position=sppos,scales="fixed",nrow=1)+
         get(theme)(base_family=font,base_size=basesize)
       
@@ -1163,6 +1166,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
               legend.title=element_blank(),
               legend.key.size=grid::unit(legendkeysize,"points"),
               legend.text=element_text(size=legendtextsize,colour=indlabcol),
+              legend.spacing.x=grid::unit(legendspacing,"points"),
               legend.spacing=grid::unit(0,"points"),
               legend.justification=legendpos,
               legend.margin=margin(legendmargin[1],legendmargin[2],legendmargin[3],legendmargin[4],"points"),
@@ -1543,6 +1547,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         scale_x_continuous(breaks=df3$order_ind,labels=df3$ind,expand=c(0,0))+
         scale_y_continuous(expand=c(0,0))+
         scale_fill_manual(values=coll,labels=legendlab1)+
+        guides(fill=guide_legend(nrow=legendrow,byrow=TRUE))+
         get(theme)(base_family=font,base_size=basesize)
     }else{
       gg_plot_panel <- ggplot2::ggplot(data=df3,aes(x=order_cumulative,y=value,fill=variable))+
@@ -1550,6 +1555,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         scale_x_continuous(breaks=df3$order_cumulative,labels=df3$ind,expand=c(0,0))+
         scale_y_continuous(expand=c(0,0))+
         scale_fill_manual(values=coll,labels=legendlab1)+
+        guides(fill=guide_legend(nrow=legendrow,byrow=TRUE))+
         get(theme)(base_family=font,base_size=basesize)
     }
     
@@ -1566,6 +1572,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
             legend.title=element_blank(),
             legend.key.size=grid::unit(legendkeysize,"points"),
             legend.text=element_text(size=legendtextsize,colour=indlabcol),
+            legend.spacing.x=grid::unit(legendspacing,"points"),
             legend.spacing=grid::unit(0,"points"),
             legend.justification=legendpos,
             legend.margin=margin(legendmargin[1],legendmargin[2],legendmargin[3],legendmargin[4],"points"),
