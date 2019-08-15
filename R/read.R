@@ -662,9 +662,6 @@ readQClumpp <- function(files=NULL)
 #' dataframe.
 #' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
 #' more details.
-#' @examples 
-#' t3obj <- readRDS(system.file("files/tess3.rds",package="pophelper"))
-#' t3list <- readQTess3(t3obj)
 #' @export
 #' 
 readQTess3 <- function(t3list=NULL,progressbar=FALSE)

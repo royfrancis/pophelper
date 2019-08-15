@@ -172,12 +172,13 @@ getPlotParams <- function(grplab=NA,plotnum=1,grplabsize=NA,grplabangle=NA,grpla
 #' indlab
 #' @param indlabsep A character specifying seperation in indlab
 #' @param runid A numeric indicating run ID
+#' @param corder current order of individuals
 #' @return Returns a list with subsetted/reordered q-matrix, a character vector 
 #' of original/subsetted/reordered grplab dataframe, grplabpos and linepos.
 #' @noRd
 #' @keywords internal
 #' 
-grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALSE,grpmean=FALSE,grplabpos=NA,linepos=NA,indlabwithgrplab=TRUE,indlabsep="_",runid=NULL)
+grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALSE,grpmean=FALSE,grplabpos=NA,linepos=NA,indlabwithgrplab=TRUE,indlabsep="_",runid=NULL,corder=NA)
 {
   if(is.null(dframe)) stop("grpLabels: Argument 'dframe' is empty.")
   if(!is.data.frame(dframe)) stop("grpLabels: Argument 'dframe' is not a data.frame datatype.")
@@ -200,14 +201,21 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   gnames <- names(grplab)
   onames <- setdiff(gnames,selgrp)
   
+  # get original order
+  if(any(is.na(corder))) corder <- 1:nrow(dframe)
+  if(length(corder)!=nrow(dframe)) stop("grpLabels: Length of 'corder' not equal to number of individuals.")
+  
   # order groups
   # orders dframe and all labels by selgrp
   if(ordergrp)
   {
     dfwork1 <- cbind(dframe,grplab)
     #dfwork1 <- dfwork1[order(dfwork1[,selgrp]),]
+    dfwork1$corder <- corder
     dfwork1 <- dfwork1[do.call(order,dfwork1[,c(selgrp,onames),drop=FALSE]),,drop=FALSE]
     
+    corder <- dfwork1$corder
+    dfwork1$corder <- NULL
     grplab1 <- dfwork1[,gnames,drop=FALSE]
     dfwork1[,gnames] <- NULL
   }else{
@@ -243,7 +251,10 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
     
     if(length(intersect(colnames(dfwork1),colnames(grplab1)))!=0) stop(paste0("grpLabels: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dfwork1),colnames(grplab1)),collapse=", "),")."))
     dfwork2 <- cbind(dfwork1,grplab1)
+    dfwork2$corder <- corder
     dfwork2 <- dfwork2[posvec,,drop=FALSE]
+    corder <- dfwork2$corder
+    dfwork2$corder <- NULL
     dfwork1 <- dfwork2
     dfwork1[,gnames] <- NULL
     grplab1 <- dfwork2[,gnames,drop=FALSE]
@@ -283,7 +294,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   marker_position$run <- runid
   
   return(list(dframe=dfwork1,grplab=grplab1,label_position=label_position,
-              marker_position=marker_position))
+              marker_position=marker_position,corder=corder))
 }
 
 # sortInd ----------------------------------------------------------------------
@@ -302,6 +313,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
 #' 'labels' (sorting by individual labels).
 #' @param grplabpos A numeric indicating y-axis position of labels
 #' @param linepos A numeric indicating y-axis position of label line
+#' @param corder Current order of individuals
 #' @return Returns a list with ordered q-matrix dataframe and ordered grplab.
 #' @details When multiple group label sets are in use, \code{selgrp} defines 
 #' which group label set is used for group ordering (\code{ordergrp}), 
@@ -312,7 +324,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
 #' @noRd
 #' @keywords internal
 #' 
-sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,grplabpos=NA,linepos=NA)
+sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,grplabpos=NA,linepos=NA,corder=NA)
 {
   if(is.null(dframe)) stop("sortInd: Argument 'dframe' is empty.")
   if(!all(is.na(grplab))) 
@@ -330,6 +342,9 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
   if(is.na(grplabpos)) grplabpos <- 0.25
   if(is.na(linepos)) linepos <- 0.75
   
+  # get original order
+  if(any(is.na(corder))) corder <- 1:nrow(dframe)
+  if(length(corder)!=nrow(dframe)) stop("grpLabels: Length of 'corder' not equal to number of individuals.")
   # sorting without grplab
   if(any(is.na(grplab)))
   {
@@ -340,17 +355,30 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
         dftemp <- dframe
         dftemp$maxval <- as.numeric(apply(dframe,1,max))
         dftemp$matchval <- as.numeric(apply(dframe,1,FUN=function(x) match(max(x),x)))
+        dframe$corder <- corder
         dframe <- dframe[with(dftemp,order(matchval,-maxval)),,drop=FALSE]
+        corder <- dframe$corder
+        dframe$corder <- NULL
         rm(dftemp)
       }
       
-      if(sortind=="label") dframe <- dframe[order(rownames(dframe)),,drop=FALSE]
+      if(sortind=="label")
+      {
+        dframe$corder <- corder
+        dframe <- dframe[order(rownames(dframe)),,drop=FALSE]
+        corder <- dframe$corder
+        dframe$corder <- NULL
+      }
       
       if(sortind!="all" && sortind!="label")
       {
         if(!(sortind %in% colnames(dframe))) stop(paste0("sortInd: 'sortind' value (",sortind,") not found in file header (",paste0(colnames(dframe),collapse=", "),")."))
+        dframe$corder <- corder
         dframe <- dframe[order(dframe[[sortind]]),,drop=FALSE]
+        corder <- dframe$corder
+        dframe$corder <- NULL
       }
+      
     }
     label_position <- NA
     marker_position <- NA
@@ -372,6 +400,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
         dftemp$maxval <- as.numeric(apply(dframe,1,max))
         # pick cluster with max value
         dftemp$matchval <- as.numeric(apply(dframe,1,FUN=function(x) match(max(x),x)))
+        dftemp$corder <- corder
         
         if(length(intersect(colnames(dftemp),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dftemp),colnames(grplab)),collapse=", "),")."))
         dftemp <- cbind(dftemp,grplab)
@@ -396,6 +425,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
           dframe <- do.call("rbind",dftemplist)
         }
         
+        corder <- dframe$corder
+        dframe$corder <- NULL
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
         dframe$maxval <- NULL
@@ -407,6 +438,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
       {
         if(length(intersect(colnames(dframe),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dframe),colnames(grplab)),collapse=", "),")."))
         dftemp <- cbind(dframe,grplab)
+        dftemp$corder <- corder
         
         if(ordergrp)
         {
@@ -429,6 +461,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
           dframe <- do.call("rbind",dftemplist)
         }
         
+        corder <- dframe$corder
+        dframe$corder <- NULL
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
       }
@@ -440,6 +474,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
         # checks if sortind variable is a column in dframe
         if(length(intersect(colnames(dframe),colnames(grplab)))!=0) stop(paste0("sortInd: One or more header labels in the run file are duplicated in grplab header. Change labels to be unique. Following are the duplicate label(s): (",paste0(intersect(colnames(dframe),colnames(grplab)),collapse=", "),")."))
         dftemp <- cbind(dframe,grplab)
+        dftemp$corder <- corder
         
         if(ordergrp)
         {
@@ -460,6 +495,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
           dframe <- do.call("rbind",dftemplist)
         }
         
+        corder <- dframe$corder
+        dframe$corder <- NULL
         grplab <- dframe[,gnames,drop=FALSE]
         dframe[,gnames] <- NULL
       }
@@ -500,7 +537,8 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
   
   
   
-  return(list(dframe=dframe,grplab=grplab,label_position=label_position,marker_position=marker_position))
+  return(list(dframe=dframe,grplab=grplab,label_position=label_position,
+              marker_position=marker_position,corder=corder))
 }
 
 # plotQ ---------------------------------------------------------------------

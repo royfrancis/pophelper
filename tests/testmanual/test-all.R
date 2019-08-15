@@ -286,8 +286,9 @@ for(i in seq_along(ftype))
 context("readQTess3")
 #cat("readQTess3 ---------------------------------------------------------------\n")
 
-t3obj <- readRDS(system.file("files/tess3.rds",package="pophelper"))
-t3list <- readQTess3(t3obj)
+# tess3 files removed due to large size
+#t3obj <- readRDS(system.file("files/tess3.rds",package="pophelper"))
+#t3list <- readQTess3(t3obj)
 
 # is.qlist ---------------------------------------------------------------------
 
