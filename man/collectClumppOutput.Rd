@@ -4,43 +4,48 @@
 \alias{collectClumppOutput}
 \title{Collect CLUMPP output files from multiple folders}
 \usage{
-collectClumppOutput(prefix = "pop", filetype = "aligned",
-  runsdir = NA, newdir = NA, quiet = FALSE)
+collectClumppOutput(
+  prefix = "pop",
+  filetype = "aligned",
+  runsdir = NA,
+  newdir = NA,
+  quiet = FALSE
+)
 }
 \arguments{
-\item{prefix}{A character indicating the prefix of the CLUMPP directories 
-before the underscore. For ex. if the directories are pop_K2, then prefix 
+\item{prefix}{A character indicating the prefix of the CLUMPP directories
+before the underscore. For ex. if the directories are pop_K2, then prefix
 is pop.}
 
-\item{filetype}{A character indicating the type of file to be copied. 
-Options are 'aligned' to copy aligned files only, 'merged' to copy merged 
+\item{filetype}{A character indicating the type of file to be copied.
+Options are 'aligned' to copy aligned files only, 'merged' to copy merged
 files only and 'both' to copy both files.}
 
-\item{runsdir}{A character denoting the directory containing CLUMPP output 
-files in multiple directories. Use \code{choose.dir()} for interactively 
+\item{runsdir}{A character denoting the directory containing CLUMPP output
+files in multiple directories. Use \code{choose.dir()} for interactively
 selecting the directory. If NA, the current working directory is used.}
 
-\item{newdir}{A character indicating the name of the new directory to be 
-created with the collected runs. IF NA, the a directory name joining prefix 
+\item{newdir}{A character indicating the name of the new directory to be
+created with the collected runs. IF NA, the a directory name joining prefix
 and filetype is created.}
 
-\item{quiet}{A logical indicating if a message is to be displayed showing 
+\item{quiet}{A logical indicating if a message is to be displayed showing
 the number of folders processed and number of files processed.}
 }
 \value{
-Two integers are ruturned. The first denotes the number of 
+Two integers are ruturned. The first denotes the number of
 directories processed. The second number denotes the number files copied.
 }
 \description{
 Collect CLUMPP output files from multiple folders to one folder
 }
 \details{
-Within each CLUMPP output folder, the function searches for 
-filenames containing combination of prefix and filetype. This file is 
-copied to the new folder. Therefore, do not manually rename CLUMPP output 
+Within each CLUMPP output folder, the function searches for
+filenames containing combination of prefix and filetype. This file is
+copied to the new folder. Therefore, do not manually rename CLUMPP output
 files or output directories.
 
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more
 details.
 }
 \examples{

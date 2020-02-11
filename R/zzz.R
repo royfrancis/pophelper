@@ -1,9 +1,7 @@
-# On Load ----------------------------------------------------------------------
 
-.onLoad <- function(...){
-  packageStartupMessage("pophelper v2.3.0 ready.")
+globalVariables(c("grp","k","elpdmean","elpdmax","elpdmin","lnk1","lnk1max","lnk1min","lnk2","lnk2max","lnk2min","deltaK","ind","run","order_ind","value","variable","labxpos","labypos","markerxpos","markerypos","divxpos","s2","grplab","order_cumulative"))
+
+.onAttach <- function(...){
+  packageStartupMessage("pophelper v2.3.1 ready.")
 }
 
-#' @importFrom grDevices colorRampPalette dev.off jpeg pdf png tiff
-#' @importFrom stats aggregate as.formula ave sd
-#' @importFrom utils packageDescription read.delim read.table setTxtProgressBar str txtProgressBar write.table

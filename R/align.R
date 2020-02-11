@@ -58,10 +58,10 @@ alignWithinK <- function(qlist,method="stephens") {
   pophelper::is.qlist(qlist)
   # if all runs have same K, align as is
   if(diff(range(as.integer(pophelper::tabulateQ(qlist)$k)))==0) {
-    x <- pophelper:::alignKStephens(qlist)
+    x <- alignKStephens(qlist)
   }else{
     # if runs have different K, split them and align within sublists
-    x <- unlist(lapply(splitQ(qlist),pophelper:::alignKStephens),recursive=FALSE)
+    x <- unlist(lapply(splitQ(qlist),alignKStephens),recursive=FALSE)
     names(x) <- sub("^[0-9]+[\\.]","",names(x)) 
   }
   
@@ -82,7 +82,7 @@ alignAcrossK <- function(qlist,debug=FALSE) {
   pophelper::is.qlist(qlist)
   if(diff(range(as.integer(pophelper::tabulateQ(qlist)$k)))==0) stop("alignAcrossK: All runs belong to a single K.")
   
-  ql <- suppressWarnings(pophelper:::alignWithinK(qlist))
+  ql <- suppressWarnings(alignWithinK(qlist))
   tq <- pophelper::tabulateQ(ql,sorttable=F)
   kvec <- unique(tq$k)
   
@@ -123,7 +123,7 @@ alignAcrossK <- function(qlist,debug=FALSE) {
     if(debug) cat(paste("Cols of runs of q2 after zeroing: ",paste0(sapply(q2,ncol),collapse=","),"\n"))
     
     qx <- c(q1,q2)
-    qx <- suppressWarnings(pophelper:::alignWithinK(qx))
+    qx <- suppressWarnings(alignWithinK(qx))
     
     qx <- lapply(qx,function(x) {
       g <- grep("TEMP", colnames(x))
@@ -164,13 +164,13 @@ alignAcrossK <- function(qlist,debug=FALSE) {
 #' 
 alignK <- function(qlist,type="auto") {
   pophelper::is.qlist(qlist)
-  if(type=="across") return(pophelper:::alignAcrossK(qlist))
-  if(type=="within") return(pophelper:::alignWithinK(qlist))
+  if(type=="across") return(alignAcrossK(qlist))
+  if(type=="within") return(alignWithinK(qlist))
   if(type=="auto") {
     if(diff(range(as.integer(pophelper::tabulateQ(qlist)$k)))==0) {
-      return(pophelper:::alignWithinK(qlist))
+      return(alignWithinK(qlist))
     } else {
-      return(pophelper:::alignAcrossK(qlist))
+      return(alignAcrossK(qlist))
     }
   }
 }

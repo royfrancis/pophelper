@@ -11,6 +11,7 @@
 #' selected files.
 #' @noRd
 #' @keywords internal
+#' @import utils
 #' 
 checkQ <- function(files=NULL,warn=FALSE)
 {
@@ -71,9 +72,9 @@ checkQ <- function(files=NULL,warn=FALSE)
         k=1
         while(!chk)
         {
-          if(class(try(suppressWarnings(read.table(files[i],header=FALSE,sep=seps[k],nrows=1,quote="",stringsAsFactors=FALSE))))!="try-error")
+          if(class(try(suppressWarnings(utils::read.table(files[i],header=FALSE,sep=seps[k],nrows=1,quote="",stringsAsFactors=FALSE))))!="try-error")
           {
-            df <- read.table(files[i],header=FALSE,sep=seps[k],nrows=1,quote="",stringsAsFactors=FALSE)
+            df <- utils::read.table(files[i],header=FALSE,sep=seps[k],nrows=1,quote="",stringsAsFactors=FALSE)
             if(all(sapply(df,is.numeric))) {
               checkvec[i] <- "BASIC"
               subtype[i] <- subtypes[k]
@@ -211,25 +212,25 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
     # check file
     if(filetype=="auto") 
     {
-      chk <- tolower(pophelper:::checkQ(files[i])$type)
+      chk <- tolower(checkQ(files[i])$type)
       
       if(chk %in% c("structure","tess","baps","basic","clumpp")) 
       {
-        if(chk=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
-        if(chk=="tess") dfr <- pophelper:::readQTess(files[i])
-        if(chk=="basic") dfr <- pophelper:::readQBasic(files[i])
-        if(chk=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
-        if(chk=="baps") dfr <- pophelper:::readQBaps(files[i])
+        if(chk=="structure") dfr <- pophelper::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
+        if(chk=="tess") dfr <- pophelper::readQTess(files[i])
+        if(chk=="basic") dfr <- pophelper::readQBasic(files[i])
+        if(chk=="clumpp") dfr <- pophelper::readQClumpp(files[i])
+        if(chk=="baps") dfr <- pophelper::readQBaps(files[i])
         dlist <- append(dlist,dfr)
       }else{
         warning(paste0("readQ: Input file ",files[i]," was not identified as a STRUCTURE, TESS, BAPS, BASIC or CLUMPP filetype. Specify 'filetype' manually or check input.\n"))
       }
     }else{
-      if(filetype=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
-      if(filetype=="tess") dfr <- pophelper:::readQTess(files[i])
-      if(filetype=="basic") dfr <- pophelper:::readQBasic(files[i])
-      if(filetype=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
-      if(filetype=="baps") dfr <- pophelper:::readQBaps(files[i])
+      if(filetype=="structure") dfr <- pophelper::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
+      if(filetype=="tess") dfr <- pophelper::readQTess(files[i])
+      if(filetype=="basic") dfr <- pophelper::readQBasic(files[i])
+      if(filetype=="clumpp") dfr <- pophelper::readQClumpp(files[i])
+      if(filetype=="baps") dfr <- pophelper::readQBaps(files[i])
       dlist <- append(dlist,dfr)
     }
   }
@@ -270,6 +271,7 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
 #' 
 #' # access names of runs
 #' names(slist)
+#' @import utils
 #' @export
 #' 
 readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
@@ -279,7 +281,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
   flen <- length(files)
   
   #check file
-  if(any(pophelper:::checkQ(files)$type != "STRUCTURE")) stop("readQStructure: Input may be in incorrect format.")
+  if(any(checkQ(files)$type != "STRUCTURE")) stop("readQStructure: Input may be in incorrect format.")
   
   i <- 1
   dlist <- vector("list",length=flen)
@@ -334,7 +336,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
     
     # error check
     tc_file_a <- textConnection(file_a)
-    file_b <- read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
+    file_b <- utils::read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
     close(tc_file_a)
     
     suppressWarnings(
@@ -357,7 +359,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
     }else{
       # using textconnection
       tc_file_a <- textConnection(file_a)
-      file_b <- read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
+      file_b <- utils::read.delim(tc_file_a,header=FALSE,sep="",stringsAsFactors=FALSE)
       close(tc_file_a)
       dframe <- file_b[,as.integer(grep(":",file_b[1,])+1):as.integer(max(grep("^[0-9]|[.]+$",file_b[1,]))),drop=FALSE]
     }
@@ -433,6 +435,7 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
 #' full.names=TRUE)
 #' # create a qlist
 #' tlist <- readQTess(tfiles)
+#' @import utils
 #' @export
 #'
 readQTess <- function(files=NULL)
@@ -442,7 +445,7 @@ readQTess <- function(files=NULL)
   flen <- length(files)
   
   # check file
-  if(any(pophelper:::checkQ(files)$type != "TESS")) warning("readQTess: Input may contain incorrect input format.\n")
+  if(any(checkQ(files)$type != "TESS")) warning("readQTess: Input may contain incorrect input format.\n")
   
   i <- 1
   dlist <- vector("list",length=flen)
@@ -462,7 +465,7 @@ readQTess <- function(files=NULL)
     tc_file1 <- textConnection(file1)
     
     # read as a table
-    file2 <- read.delim(tc_file1,header=FALSE,sep="\t",stringsAsFactors=FALSE)
+    file2 <- utils::read.delim(tc_file1,header=FALSE,sep="\t",stringsAsFactors=FALSE)
     
     # close text connection
     close(tc_file1)
@@ -511,6 +514,7 @@ readQTess <- function(files=NULL)
 #' full.names=TRUE)
 #' # create a qlist
 #' alist <- readQBasic(afiles)
+#' @import utils
 #' @export
 #'
 readQBasic <- function(files=NULL)
@@ -521,7 +525,7 @@ readQBasic <- function(files=NULL)
   flen <- length(files)
   
   # check input file type
-  chk <- pophelper:::checkQ(files)
+  chk <- checkQ(files)
   if(any(chk$type != "BASIC")) warning("readQBasic: Input may be in incorrect format.\n")
   if(any(is.na(chk$subtype))) warning("readQBasic: Input may be in incorrect format.\n")
   
@@ -531,9 +535,9 @@ readQBasic <- function(files=NULL)
   for (i in seq_along(files))
   {
     # read in delimited files
-    if(chk$subtype[i]=="SPACE") dframe <- read.delim(files[i],header=FALSE,sep="",dec=".",stringsAsFactors=FALSE)
-    if(chk$subtype[i]=="TAB") dframe <- read.delim(files[i],header=FALSE,sep="\t",dec=".",stringsAsFactors=FALSE)
-    if(chk$subtype[i]=="COMMA") dframe <- read.delim(files[i],header=FALSE,sep=",",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="SPACE") dframe <- utils::read.delim(files[i],header=FALSE,sep="",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="TAB") dframe <- utils::read.delim(files[i],header=FALSE,sep="\t",dec=".",stringsAsFactors=FALSE)
+    if(chk$subtype[i]=="COMMA") dframe <- utils::read.delim(files[i],header=FALSE,sep=",",dec=".",stringsAsFactors=FALSE)
     
     # error if columns contain non-numeric
     if(!all(sapply(dframe,is.numeric))) stop("readQBasic: One or more columns are not numeric.")
@@ -581,6 +585,7 @@ readQBasic <- function(files=NULL)
 #' clist2 <- readQClumpp(cfiles2)
 #' clist3 <- readQClumpp(cfiles3)
 #' 
+#' @import utils
 #' @export
 #'
 readQClumpp <- function(files=NULL)
@@ -591,7 +596,7 @@ readQClumpp <- function(files=NULL)
   flen <- length(files)
   
   # check file
-  chk <- pophelper:::checkQ(files)
+  chk <- checkQ(files)
   if(any(chk$type != "CLUMPP")) warning("readQClumpp: Input may be in incorrect format.\n")
   
   i <- 1
@@ -602,7 +607,7 @@ readQClumpp <- function(files=NULL)
   {
     fname <- base::gsub(".txt","",basename(files[i]))
     
-    df1 <- read.table(files[i],header=FALSE,sep="",dec=".",quote="",stringsAsFactors=FALSE)
+    df1 <- utils::read.table(files[i],header=FALSE,sep="",dec=".",quote="",stringsAsFactors=FALSE)
     if(class(df1)!="data.frame") stop("readQClumpp: Read error. Check input format.")
     
     df1[,1] <- factor(df1[ ,1])
@@ -662,6 +667,7 @@ readQClumpp <- function(files=NULL)
 #' dataframe.
 #' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
 #' more details.
+#' @import utils
 #' @export
 #' 
 readQTess3 <- function(t3list=NULL,progressbar=FALSE)
@@ -673,12 +679,12 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
   # initialise loop variables
   len <- length(t3list)
   qlist <- vector("list",length=len)
-  if(progressbar) pb <- txtProgressBar(min=0,max=len,style=3)
+  if(progressbar) pb <- utils::txtProgressBar(min=0,max=len,style=3)
   
   # loop to read in data
   for(i in seq_along(t3list))
   {
-    if(progressbar) setTxtProgressBar(pb,i)
+    if(progressbar) utils::setTxtProgressBar(pb,i)
     if(!"tess3.run" %in% names(t3list[[i]])) stop("readQTess3: 'tess3.run' slot not found in list item ",i,".")
     dlist <- t3list[[i]]$tess3.run[[1]]
     dframe <- as.data.frame(dlist$Q,stringsAsFactors=FALSE)
@@ -718,6 +724,7 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
 #' full.names=TRUE)
 #' # create a qlist
 #' blist <- readQBaps(bfiles)
+#' @import utils
 #' @export
 #'
 readQBaps <- function(files=NULL)
@@ -727,7 +734,7 @@ readQBaps <- function(files=NULL)
   flen <- length(files)
   
   # check if file type is BAPS
-  if(any(pophelper:::checkQ(files)$type != "BAPS")) warning("readQBaps: Input may be in incorrect format.\n")
+  if(any(checkQ(files)$type != "BAPS")) warning("readQBaps: Input may be in incorrect format.\n")
   
   i <- 1
   dlist <- vector("list",length=flen)
@@ -741,11 +748,11 @@ readQBaps <- function(files=NULL)
     
     # read table using delimiter : and use column V2
     tc_file1 <- textConnection(file1)
-    file2 <- read.delim(tc_file1,sep=":",header=FALSE,stringsAsFactors=FALSE)$V2
+    file2 <- utils::read.delim(tc_file1,sep=":",header=FALSE,stringsAsFactors=FALSE)$V2
     
     # read table using delimiter space
     tc_file2 <- textConnection(file2)
-    dframe <- read.delim(tc_file2,sep="",header=FALSE,stringsAsFactors=FALSE)
+    dframe <- utils::read.delim(tc_file2,sep="",header=FALSE,stringsAsFactors=FALSE)
     
     # close text connections
     close(tc_file1,tc_file2)

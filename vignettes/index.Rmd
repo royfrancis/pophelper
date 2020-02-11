@@ -1,5 +1,5 @@
 ---
-title: "Pophelper 2.3.0"
+title: "Pophelper 2.3.1"
 output: 
   bookdown::html_document2: 
     code_folding: "none"
@@ -19,7 +19,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-__Roy M Francis__ | `r format(Sys.time(),"%d-%b-%Y")`
+__Roy Francis__ | `r format(Sys.time(),"%d-%b-%Y")`
 
 ```{r,include=FALSE}
 options(rpubs.upload.method="internal")
@@ -1615,7 +1615,7 @@ A custom output file name can be provided using `outputfilename`. When using `im
 
 __Custom font__
 
-Custom fonts can be used for the text in the plot using package `extrafont`. Fonts are rendered well only by pdf imagetype. I have only tried this on Windows OS. Refer to the `extrafont` package for more information.
+Custom fonts can be used for the text in the plot using package `extrafont` or `showtext`. Refer to these packages for more information on loading fonts.
 
 ```{r,echo=TRUE,eval=TRUE,fig.height=2,fig.width=6,fig.showtext=TRUE}
 #library(extrafont)

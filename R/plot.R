@@ -36,14 +36,14 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
       if(!sharedindlab) height <- height+0.5
     }
     
-    if(imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
+    if(imgtype=="pdf") height <- unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height,fromunit="mm",tounit="cm",dpi=dpi)
-    if(units=="px" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height,fromunit="px",tounit="cm",dpi=dpi)
-    if(units=="in" && imgtype != "pdf") height <- pophelper:::unitConverter(value=height,fromunit="in",tounit="cm",dpi=dpi)
-    if(units=="cm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
-    if(units=="mm" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="mm",tounit="in",dpi=dpi)
-    if(units=="px" && imgtype=="pdf") height <- pophelper:::unitConverter(value=height,fromunit="px",tounit="in",dpi=dpi)
+    if(units=="mm" && imgtype != "pdf") height <- unitConverter(value=height,fromunit="mm",tounit="cm",dpi=dpi)
+    if(units=="px" && imgtype != "pdf") height <- unitConverter(value=height,fromunit="px",tounit="cm",dpi=dpi)
+    if(units=="in" && imgtype != "pdf") height <- unitConverter(value=height,fromunit="in",tounit="cm",dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") height <- unitConverter(value=height,fromunit="cm",tounit="in",dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") height <- unitConverter(value=height,fromunit="mm",tounit="in",dpi=dpi)
+    if(units=="px" && imgtype=="pdf") height <- unitConverter(value=height,fromunit="px",tounit="in",dpi=dpi)
   }
   height <- height*plotnum
   if(showindlab) {if(sharedindlab) height <- height+0.5}
@@ -55,14 +55,14 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
     width <- ind*0.020 
     if(width < 5) width <- 5
     if(width > 30) width <- 30
-    if(imgtype=="pdf") width <- pophelper:::unitConverter(value=width,fromunit="cm",tounit="in",dpi=dpi)
+    if(imgtype=="pdf") width <- unitConverter(value=width,fromunit="cm",tounit="in",dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width,fromunit="mm",tounit="cm",dpi=dpi)
-    if(units=="px" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width,fromunit="px",tounit="cm",dpi=dpi)
-    if(units=="in" && imgtype != "pdf") width <- pophelper:::unitConverter(value=width,fromunit="in",tounit="cm",dpi=dpi)
-    if(units=="cm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width,fromunit="cm",tounit="in",dpi=dpi)
-    if(units=="mm" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width,fromunit="mm",tounit="in",dpi=dpi)
-    if(units=="px" && imgtype=="pdf") width <- pophelper:::unitConverter(value=width,fromunit="px",tounit="in",dpi=dpi)
+    if(units=="mm" && imgtype != "pdf") width <- unitConverter(value=width,fromunit="mm",tounit="cm",dpi=dpi)
+    if(units=="px" && imgtype != "pdf") width <- unitConverter(value=width,fromunit="px",tounit="cm",dpi=dpi)
+    if(units=="in" && imgtype != "pdf") width <- unitConverter(value=width,fromunit="in",tounit="cm",dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") width <- unitConverter(value=width,fromunit="cm",tounit="in",dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") width <- unitConverter(value=width,fromunit="mm",tounit="in",dpi=dpi)
+    if(units=="px" && imgtype=="pdf") width <- unitConverter(value=width,fromunit="px",tounit="in",dpi=dpi)
   }
   
   # grplabheight
@@ -71,14 +71,14 @@ getDim <- function(ind=NA,units=NA,height=NA,width=NA,dpi=NA,imgtype=NA,grplabhe
     if(labs==1) grplabheight <- 0.6
     if(labs>1) grplabheight <- 0.5
     grplabheight <- grplabheight * labs
-    if(imgtype=="pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="cm",tounit="in",dpi=dpi)
+    if(imgtype=="pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="cm",tounit="in",dpi=dpi)
   }else{
-    if(units=="mm" && imgtype != "pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="mm",tounit="cm",dpi=dpi)
-    if(units=="in" && imgtype != "pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="in",tounit="cm",dpi=dpi)
-    if(units=="px" && imgtype != "pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="px",tounit="cm",dpi=dpi)
-    if(units=="mm" && imgtype=="pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="mm",tounit="in",dpi=dpi)
-    if(units=="cm" && imgtype=="pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="cm",tounit="in",dpi=dpi)
-    if(units=="px" && imgtype=="pdf") grplabheight <- pophelper:::unitConverter(value=grplabheight,fromunit="px",tounit="in",dpi=dpi)
+    if(units=="mm" && imgtype != "pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="mm",tounit="cm",dpi=dpi)
+    if(units=="in" && imgtype != "pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="in",tounit="cm",dpi=dpi)
+    if(units=="px" && imgtype != "pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="px",tounit="cm",dpi=dpi)
+    if(units=="mm" && imgtype=="pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="mm",tounit="in",dpi=dpi)
+    if(units=="cm" && imgtype=="pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="cm",tounit="in",dpi=dpi)
+    if(units=="px" && imgtype=="pdf") grplabheight <- unitConverter(value=grplabheight,fromunit="px",tounit="in",dpi=dpi)
   }
   
   if(imgtype!="pdf") units1 <- "cm"
@@ -177,6 +177,7 @@ getPlotParams <- function(grplab=NA,plotnum=1,grplabsize=NA,grplabangle=NA,grpla
 #' of original/subsetted/reordered grplab dataframe, grplabpos and linepos.
 #' @noRd
 #' @keywords internal
+#' @import stats
 #' 
 grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALSE,grpmean=FALSE,grplabpos=NA,linepos=NA,indlabwithgrplab=TRUE,indlabsep="_",runid=NULL,corder=NA)
 {
@@ -224,7 +225,7 @@ grpLabels <- function(dframe=NULL,grplab=NA,selgrp=NA,subsetgrp=NA,ordergrp=FALS
   }
   
   # group mean by selgrp
-  if(grpmean) dfwork1 <- as.data.frame(sapply(dfwork1,ave,unlist(grplab1[selgrp])),stringsAsFactors=FALSE)
+  if(grpmean) dfwork1 <- as.data.frame(sapply(dfwork1,stats::ave,unlist(grplab1[selgrp])),stringsAsFactors=FALSE)
   
   # in case of subsetgrp
   if(!any(is.na(subsetgrp)))
@@ -332,7 +333,7 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
     if(is.na(selgrp)) selgrp <- names(grplab)[1]
     if(!is.character(selgrp)) stop("sortInd: Argument 'selgrp' must be a character datatype.")
     if(length(selgrp)>1) stop("sortInd: Argument 'selgrp' must be a character datatype of length 1.")
-    if(!any(selgrp %in% names(grplab))) stop(paste0("sortInd: Argument 'selgrp' contains (",selgrp,") which is not in the 'grplab' titles (",paste0(names(grpla),collapse=", "),")."))
+    if(!any(selgrp %in% names(grplab))) stop(paste0("sortInd: Argument 'selgrp' contains (",selgrp,") which is not in the 'grplab' titles (",paste0(names(grplab),collapse=", "),")."))
   }
   if(all(!is.na(sortind)))
   {
@@ -949,10 +950,13 @@ sortInd <- function(dframe=NULL,grplab=NA,selgrp=NA,ordergrp=FALSE,sortind=NA,gr
 #' Cluster2=c(0.8,0.7,0.4,0.2)))
 #' plotQ(temp)
 #' 
+#' @import ggplot2
+#' @import grDevices
 #' @import gtable
 #' @import grid
 #' @import gridExtra
 #' @import tidyr
+#' @import utils
 #' @export
 #' 
 plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,selgrp=NA,ordergrp=FALSE,subsetgrp=NA,grpmean=FALSE,showgrplab=TRUE,panelspacer=0.1,
@@ -1016,7 +1020,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
   if(grplabpos > 1 || grplabpos < 0) stop("plotQ: Argument 'linepos' is set incorrectly. Set a numeric value between 0 and 1. To further increase space, adjust argument 'grplabheight'.")
   
   # ggplot version
-  ggv <- as.numeric(gsub("\\.","",packageDescription("ggplot2", fields="Version")))
+  ggv <- as.numeric(gsub("\\.","",utils::packageDescription("ggplot2", fields="Version")))
   if(ggv < 220) stop("plotQ: Package ggplot2 must be version 2.2.0 or above.")
   
   # defaults
@@ -1113,7 +1117,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       #ordering grps
       if(grplabcheck)
       {
-        templist <- pophelper:::grpLabels(dframe=df1,grplab=grplabloop,selgrp=selgrp,
+        templist <- grpLabels(dframe=df1,grplab=grplabloop,selgrp=selgrp,
                                           subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
                                           grplabpos=grplabpos,linepos=linepos,
                                           indlabwithgrplab=indlabwithgrplab,
@@ -1128,7 +1132,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       # sorting individuals
       if(!is.na(sortind))
       {
-        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
+        templist <- sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
                                         sortind=sortind,grplabpos=grplabpos,linepos=linepos)
         df1 <- templist$dframe
         grplabloop <- templist$grplab
@@ -1174,11 +1178,11 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       
       # get colours
       coll <- clustercol
-      if(any(is.na(clustercol))) coll <- pophelper:::getColours(as.integer(k))
+      if(any(is.na(clustercol))) coll <- getColours(as.integer(k))
       if(length(coll) < k) stop(paste0("plotQ: Number of colours (",length(coll),") less than number of clusters (",k,")."))
       
       # get dimensions
-      dimtemp <- pophelper:::getDim(ind=Ind,height=height,width=width,dpi=dpi,units=units,imgtype=imgtype,
+      dimtemp <- getDim(ind=Ind,height=height,width=width,dpi=dpi,units=units,imgtype=imgtype,
                                     grplabheight=grplabheight,labs=length(grplabloop),plotnum=1,
                                     showindlab=showindlab)
       height1 <- as.numeric(dimtemp[1])
@@ -1262,12 +1266,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
+          if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
           print(gg_plot_panel)
-          dev.off()
+          grDevices::dev.off()
           if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
           if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
           if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
@@ -1291,12 +1295,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
           if(exportplot)
           {
             if(!quiet) cat("Drawing plot ...\n")
-            if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-            if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-            if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-            if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
+            if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+            if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+            if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+            if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
             print(gg_plot_panel)
-            dev.off()
+            grDevices::dev.off()
             if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
             if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
             if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
@@ -1308,7 +1312,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(showgrplab)
         {
           # bottom panel
-          ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=1,grplabsize=grplabsize,grplabangle=grplabangle,
+          ppar <- getPlotParams(grplab=grplabloop[[1]],plotnum=1,grplabsize=grplabsize,grplabangle=grplabangle,
                                             grplabjust=grplabjust,pointsize=pointsize,linesize=linesize)
           
           # fix facet labels in grplab plot
@@ -1373,13 +1377,13 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
           if(exportplot)
           {
             if(!quiet) cat("Drawing plot ...\n")
-            if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-            if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
-            if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
-            if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
+            if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+            if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
+            if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
+            if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
             
             gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
-            dev.off()
+            grDevices::dev.off()
             
             if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
             if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
@@ -1459,7 +1463,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       # ordering grps
       if(grplabcheck)
       {
-        templist <- pophelper:::grpLabels(dframe=df1,grplab=grplabloop,selgrp=selgrp,
+        templist <- grpLabels(dframe=df1,grplab=grplabloop,selgrp=selgrp,
                                           subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
                                           grplabpos=grplabpos,linepos=linepos,
                                           indlabwithgrplab=indlabwithgrplab,
@@ -1475,7 +1479,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       # sorting individuals
       if(!is.na(sortind))
       {
-        templist <- pophelper:::sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
+        templist <- sortInd(dframe=df1,grplab=grplabloop,selgrp=selgrp,ordergrp=ordergrp,
                                         sortind=sortind,grplabpos=grplabpos,linepos=linepos)
         df1 <- templist$dframe
         grplabloop <- templist$grplab
@@ -1560,7 +1564,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     if(length(legendlab1) != length(levels(factor(as.character(df3$variable))))) stop("plotQ: Length of 'legendlab' is not equal to max number of clusters.")
     
     # get dimensions
-    dimtemp <- pophelper:::getDim(ind=Ind,height=height,width=width,dpi=dpi,units=units,imgtype=imgtype,
+    dimtemp <- getDim(ind=Ind,height=height,width=width,dpi=dpi,units=units,imgtype=imgtype,
                                   grplabheight=grplabheight,labs=length(grplabloop),plotnum=flen,
                                   showindlab=showindlab,sharedindlab=sharedindlab)
     height1 <- as.numeric(dimtemp[1])
@@ -1570,7 +1574,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     
     # get colours
     coll <- clustercol
-    if(any(is.na(clustercol))) coll <- pophelper:::getColours(as.integer(max(kvec)))
+    if(any(is.na(clustercol))) coll <- getColours(as.integer(max(kvec)))
     if(length(coll) < max(kvec)) stop(paste0("plotQ: Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),")."))
     
     ## COMMON PLOT TOP PANEL ----------------------------------------------------
@@ -1668,12 +1672,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(exportplot)
       {
         if(!quiet) cat("Drawing plot ...\n")
-        if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-        if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-        if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-        if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
+        if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+        if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+        if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+        if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
         print(gg_plot_panel)
-        dev.off()
+        grDevices::dev.off()
         if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
         if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
         if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
@@ -1696,12 +1700,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
+          if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height1,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height1,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height1,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height1,width=width1,fonts=font)
           print(gg_plot_panel)
-          dev.off()
+          grDevices::dev.off()
           if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
           if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
           if(imgtype=="jpeg" && !quiet) cat(paste0(exportpath,outname,".jpg exported.\n"))
@@ -1714,7 +1718,7 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       if(showgrplab)
       {
         # plot with grp labels
-        ppar <- pophelper:::getPlotParams(grplab=grplabloop[[1]],plotnum=flen,grplabsize=grplabsize,grplabangle=grplabangle,grplabjust=grplabjust,
+        ppar <- getPlotParams(grplab=grplabloop[[1]],plotnum=flen,grplabsize=grplabsize,grplabangle=grplabangle,grplabjust=grplabjust,
                                           pointsize=pointsize,linesize=linesize)
         
         # fix facet labels in grplab plot
@@ -1778,13 +1782,13 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
         if(exportplot)
         {
           if(!quiet) cat("Drawing plot ...\n")
-          if(imgtype=="tiff") tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
-          if(imgtype=="png") png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
-          if(imgtype=="jpeg") jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
-          if(imgtype=="pdf") pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
+          if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname,".tiff"),height=height2,width=width1,res=dpi,units=units1,compression="lzw",family=font)
+          if(imgtype=="png") grDevices::png(paste0(exportpath,outname,".png"),height=height2,width=width1,res=dpi,units=units1,family=font)
+          if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname,".jpg"),height=height2,width=width1,res=dpi,units=units1,quality=100,family=font)
+          if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname,".pdf"),height=height2,width=width1,fonts=font)
           
           gridExtra::grid.arrange(ggg_plot_panel,ggg_plot_grplab,layout_matrix=matrix(c(rep(1,panelratio[1]*flen),rep(2,panelratio[2]*length(grplabloop))),ncol=1,byrow=TRUE))
-          dev.off()
+          grDevices::dev.off()
           
           if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname,".tiff exported.\n"))
           if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname,".png exported.\n"))
@@ -2084,7 +2088,10 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
 #' 
 #' }
 #' @import tidyr
+#' @import ggplot2
+#' @import grDevices
 #' @import gridExtra
+#' @import stats
 #' @export
 #'
 plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grplab=NA,selgrp=NA,ordergrp=FALSE,subsetgrp=NA,grpmean=FALSE,
@@ -2123,7 +2130,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
   if(barsize<0 || barsize>1) stop("plotQMultiline: Argument 'barsize' must be a value between 0 and 1.")
   
   # ggplot version
-  ggv <- as.numeric(gsub("\\.","",packageDescription("ggplot2", fields="Version")))
+  ggv <- as.numeric(gsub("\\.","",utils::packageDescription("ggplot2", fields="Version")))
   if(ggv < 220) stop("plotQMultiline: Package ggplot2 must be version 2.2.0 or above.")
   
   # check grplabels
@@ -2148,8 +2155,8 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
   #if(is.na (units)) units <- "cm"
   if(is.na (height)) height <- 29.7 
   if(is.na (width)) width <- 21 
-  if(imgtype=="pdf") height <- pophelper:::unitConverter(height,units,"in",dpi)
-  if(imgtype=="pdf") width <- pophelper:::unitConverter(width,units,"in",dpi)
+  if(imgtype=="pdf") height <- unitConverter(height,units,"in",dpi)
+  if(imgtype=="pdf") width <- unitConverter(width,units,"in",dpi)
   
   len1 <- length(qlist)
   
@@ -2209,7 +2216,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     # ordering grps
     if(grplabcheck)
     {
-      templist <- pophelper:::grpLabels(dframe=dff,grplab=grplabloop,selgrp=selgrp,
+      templist <- grpLabels(dframe=dff,grplab=grplabloop,selgrp=selgrp,
                                         subsetgrp=subsetgrp,ordergrp=ordergrp,grpmean=grpmean,
                                         indlabwithgrplab=indlabwithgrplab,indlabsep=indlabsep,runid=i)
       dff <- templist$dframe
@@ -2221,7 +2228,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     # ordering individuals
     if(!is.na(sortind))
     {
-      templist <- pophelper:::sortInd(dframe=dff,grplab=grplabloop,selgrp=selgrp,
+      templist <- sortInd(dframe=dff,grplab=grplabloop,selgrp=selgrp,
                                       ordergrp=ordergrp,sortind=sortind)
       dff <- templist$dframe
       grplabloop <- templist$grplab
@@ -2291,7 +2298,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     
     # get colours
     coll <- clustercol
-    if(any(is.na(clustercol))) coll <- pophelper:::getColours(as.integer(ncol(dff)))
+    if(any(is.na(clustercol))) coll <- getColours(as.integer(ncol(dff)))
     if(length(coll) < ncol(dff)) stop(paste0("plotQMultiline: Number of colours (",length(coll),") is less than the number of clusters (",ncol(dff),")."))
     
     if(any(is.na(legendlab))) legendlab1 <- colnames(dff)
@@ -2346,7 +2353,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
       
       if(grplabcheck) 
       {
-        plist[[j]] <- plist[[j]] + facet_grid(as.formula(paste0("~",paste0(names(grplabloop),collapse="+"))),scales="free_x",space="free_x")+
+        plist[[j]] <- plist[[j]] + facet_grid(stats::as.formula(paste0("~",paste0(names(grplabloop),collapse="+"))),scales="free_x",space="free_x")+
           theme(strip.background=element_rect(fill=grplabbgcol),
                 strip.text=element_text(size=grplabsize,colour=grplabcol))
         if(!showgrplab) plist[[j]] <- plist[[j]] + theme(strip.text=element_blank())
@@ -2418,13 +2425,13 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
       if(exportplot)
       {
         if(!quiet) cat("Drawing plot ...\n")
-        if(imgtype=="tiff") tiff(paste0(exportpath,outname1,".tiff"),height=height,width=width,res=dpi,units=units,compression="lzw",family=font)
-        if(imgtype=="png") png(paste0(exportpath,outname1,".png"),height=height,width=width,res=dpi,units=units,family=font)
-        if(imgtype=="jpeg") jpeg(paste0(exportpath,outname1,".jpg"),height=height,width=width,res=dpi,units=units,quality=100,family=font)
-        if(imgtype=="pdf") pdf(paste0(exportpath,outname1,".pdf"),height=height,width=width,fonts=font)
+        if(imgtype=="tiff") grDevices::tiff(paste0(exportpath,outname1,".tiff"),height=height,width=width,res=dpi,units=units,compression="lzw",family=font)
+        if(imgtype=="png") grDevices::png(paste0(exportpath,outname1,".png"),height=height,width=width,res=dpi,units=units,family=font)
+        if(imgtype=="jpeg") grDevices::jpeg(paste0(exportpath,outname1,".jpg"),height=height,width=width,res=dpi,units=units,quality=100,family=font)
+        if(imgtype=="pdf") grDevices::pdf(paste0(exportpath,outname1,".pdf"),height=height,width=width,fonts=font)
         
         do.call(gridExtra::grid.arrange,alist)
-        dev.off()
+        grDevices::dev.off()
         
         if(imgtype=="tiff" && !quiet) cat(paste0(exportpath,outname1,".tiff exported.\n"))
         if(imgtype=="png" && !quiet) cat(paste0(exportpath,outname1,".png exported.\n"))

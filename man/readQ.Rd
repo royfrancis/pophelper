@@ -4,8 +4,7 @@
 \alias{readQ}
 \title{Convert run files (q-matrices) to qlist.}
 \usage{
-readQ(files = NULL, filetype = "auto", indlabfromfile = FALSE,
-  readci = FALSE)
+readQ(files = NULL, filetype = "auto", indlabfromfile = FALSE, readci = FALSE)
 }
 \arguments{
 \item{files}{A character or character vector of one or more files.}

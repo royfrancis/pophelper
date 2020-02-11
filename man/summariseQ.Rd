@@ -8,10 +8,10 @@
 summariseQ(data = NULL, writetable = FALSE, exportpath = NULL)
 }
 \arguments{
-\item{data}{A dataframe with tabulated runs. An output from \code{tabulateQ()}. 
+\item{data}{A dataframe with tabulated runs. An output from \code{tabulateQ()}.
 Must have minimum 2 columns named k and ind.}
 
-\item{writetable}{A logical indicating if the output table is to be exported 
+\item{writetable}{A logical indicating if the output table is to be exported
 as a tab-delimited text file in the working directory.}
 
 \item{exportpath}{A path to where content must be exported. For example,
@@ -19,18 +19,18 @@ as a tab-delimited text file in the working directory.}
 directory.}
 }
 \value{
-Returns a dataframe with all values of K sorted by K. The table has 
-3 columns namely value of K, number of runs for each K and number of 
+Returns a dataframe with all values of K sorted by K. The table has
+3 columns namely value of K, number of runs for each K and number of
 individuals.
-If the input file is derived from STRUCTURE runs, the table is sorted by loci 
+If the input file is derived from STRUCTURE runs, the table is sorted by loci
 as well. Other columns include elpdmean, elpdsd, elpdmin and elpdmax.
 }
 \description{
-Creates a summary table from a tabulated dataframe of two or 
+Creates a summary table from a tabulated dataframe of two or
 more runs with k, number of runs and individuals.
 }
 \details{
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for
 more details.
 }
 \examples{

@@ -1,3 +1,11 @@
+pophelper 2.3.1
+=================
+* 10-Feb-2020
+* Built on R-3.6.2. Min req R-3.5.0.
+* Error bars in first plot of Evanno method showed max/min rather than SD. Fixed to show SD.
+* Fixed dependency issues
+* Automatic CI testing added
+
 pophelper 2.3.0
 =================
 * 11-Aug-2019

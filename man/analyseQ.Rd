@@ -3,56 +3,64 @@
 \name{analyseQ}
 \alias{analyseQ}
 \alias{analyzeQ}
-\title{Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around 
+\title{Analyse STRUCTURE, TESS, BAPS or BASIC text runs. Wrapper around
 several smaller functions.}
 \usage{
-analyseQ(files = NULL, evannomethod = TRUE, align = TRUE,
-  plotruns = TRUE, imgoutput = "sep", grplab = NA, clustercol = NA,
-  writetable = TRUE, sorttable = TRUE)
+analyseQ(
+  files = NULL,
+  evannomethod = TRUE,
+  align = TRUE,
+  plotruns = TRUE,
+  imgoutput = "sep",
+  grplab = NA,
+  clustercol = NA,
+  writetable = TRUE,
+  sorttable = TRUE
+)
 }
 \arguments{
-\item{files}{A character or character vector of one or more STRUCTURE, TESS, 
-BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose 
+\item{files}{A character or character vector of one or more STRUCTURE, TESS,
+BAPS or BASIC run files. Use \code{choose.files(multi=TRUE)} to choose
 interactively.}
 
-\item{evannomethod}{A logical indicating if evanno method should be 
+\item{evannomethod}{A logical indicating if evanno method should be
 performed. Applies only to STRUCTURE runs.}
 
 \item{align}{A logical indicating if clusters must be aligned within and across K.}
 
-\item{plotruns}{A logical indicating if selected files should be exported as 
+\item{plotruns}{A logical indicating if selected files should be exported as
 barplots.}
 
-\item{imgoutput}{A character indicating if files are plotted as separate 
+\item{imgoutput}{A character indicating if files are plotted as separate
 image files ("sep") or joined into a single image ("join").}
 
-\item{grplab}{A dataframe with one or more columns (group label sets), and 
+\item{grplab}{A dataframe with one or more columns (group label sets), and
 rows equal to the number of individuals.}
 
-\item{clustercol}{A character vector of colours for colouring clusters. If 
-NA, colours are automatically generated. K 1 to 12 are custom unique colours 
+\item{clustercol}{A character vector of colours for colouring clusters. If
+NA, colours are automatically generated. K 1 to 12 are custom unique colours
 while K>12 are coloured by function \code{rich.color()}.}
 
-\item{writetable}{A logical T or F. Setting to TRUE writes the output table 
+\item{writetable}{A logical T or F. Setting to TRUE writes the output table
 to the working directory.}
 
-\item{sorttable}{A logical indicating if the output table must be sorted. 
+\item{sorttable}{A logical indicating if the output table must be sorted.
 Sorts table by loci, ind and K when available.}
 }
 \value{
 A qlist (list of data.frames) is returned.
 }
 \description{
-A single function to analyse STRUCTURE, TESS, BAPS or BASIC 
-text runs. Converts runs to a qlist, tabulates, summarises, runs 
+A single function to analyse STRUCTURE, TESS, BAPS or BASIC
+text runs. Converts runs to a qlist, tabulates, summarises, runs
 evanno method (for STRUCTURE runs), aligns clusters and plots all runs.
 }
 \details{
-The function \code{analyseQ} is a wrapper around several other 
-\code{pophelper} functions. All arguments for all sub-functions are 
+The function \code{analyseQ} is a wrapper around several other
+\code{pophelper} functions. All arguments for all sub-functions are
 not available. If more arguments/options are required, consider running the functions separately.
 
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more
 details.
 }
 \examples{

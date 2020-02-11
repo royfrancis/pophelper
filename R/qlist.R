@@ -83,6 +83,7 @@ is.qlist <- function(qlist=NULL)
 #' is.qlist(q2) # no error
 #' q2
 #' 
+#' @import utils
 #' @export
 #' 
 as.qlist <- function(qlist,debug=FALSE) {
@@ -105,7 +106,7 @@ as.qlist <- function(qlist,debug=FALSE) {
     }
   }
   
-  if(debug) print(str(qlist))
+  if(debug) print(utils::str(qlist))
   #a <- as.data.frame(t(as.matrix(do.call("cbind",))),stringsAsFactors=F)
   #fun2 <- function(x,y) attr(x,"ind") <- y
   #mapply(fun2,x=qlist,y=sapply(qlist,nrow))
@@ -126,7 +127,7 @@ as.qlist <- function(qlist,debug=FALSE) {
 #' @description Custom print function for qlist class. Print a summary of qlist contents.
 #' @param x A qlist class object
 #' @return NULL
-#' @example 
+#' @examples 
 #' 
 #' # STRUCTURE files
 #' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
@@ -298,6 +299,7 @@ splitQ <- function(qlist,by="k") {
 #' names(slist)
 #' names(slist_1)
 #' 
+#' @import utils
 #' @export
 #' 
 # order by more than one by value
@@ -320,7 +322,7 @@ sortQ <- function(qlist,by="k",decreasing=FALSE,debug=FALSE) {
   fun2 <- function(x) if(all(!is.na(as.numeric(as.character(x))))) {return(as.numeric(as.character(x)))}else{return(x)}
   b <- as.data.frame(sapply(b,fun2),stringAsFactors=F)
   
-  if(debug) {print(str(b)); print(b)}
+  if(debug) {print(utils::str(b)); print(b)}
   
   # order
   if(length(by)==1) ord <- order(b[,by,drop=FALSE])
