@@ -1,0 +1,19 @@
+citHeader("To cite the pophelper package, please use:")
+
+bibentry(bibtype = "Article",
+  title = "pophelper: An R package and web app to analyse and visualise population structure",
+  author = person(given="Roy",family="Francis",middle="Mathew",email="roymathewfrancis[at]gmail.com"),
+  year = "2017",
+  journal = "Molecular Ecology Resources",
+  volume = "17",
+  number = "1",
+  pages = "27-32",
+  doi = "10.1111/1755-0998.12509",
+  url = "https://github.com/royfrancis/pophelper",
+  note = "pophelper R package version 2.3.0",
+  textVersion=
+  paste("Francis, R. M. (2017).", 
+  "pophelper: an R package and web app to analyse and visualize population structure.",
+  "Mol Ecol Resour, 17: 27–32. ",
+  "doi:10.1111/1755-0998.12509")
+)
