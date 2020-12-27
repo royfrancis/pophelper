@@ -31,6 +31,9 @@ named by input filenames.
 Takes one or more STRUCTURE run files and converts them to a 
 list of dataframes.
 }
+\details{
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
+}
 \examples{
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
 full.names=TRUE)

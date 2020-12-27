@@ -4,77 +4,99 @@
 \alias{distructExport}
 \title{Generate files for DISTRUCT.}
 \usage{
-distructExport(qlist = NULL, grplabbottom = NA, grplabtop = NA,
-  grpmean = FALSE, overwritedirs = FALSE, printtitle = FALSE,
-  clustercol = NA, grayscale = FALSE, printcolorbrewer = FALSE,
-  sepline = TRUE, seplinewidth = 0.2, borderlinewidth = 1.2,
-  indlinewidth = 0.2, fontsize = 6, topdist = 5, bottomdist = -7,
-  figheight = 36, indwidth = 1, orientation = 0, xorigin = NA,
-  yorigin = NA, xscale = 1, yscale = 1, toplabangle = 60,
-  bottomlabangle = 60, echodata = TRUE, printdata = FALSE,
-  quiet = FALSE, useexe = FALSE)
+distructExport(
+  qlist = NULL,
+  grplabbottom = NA,
+  grplabtop = NA,
+  grpmean = FALSE,
+  overwritedirs = FALSE,
+  printtitle = FALSE,
+  clustercol = NA,
+  grayscale = FALSE,
+  printcolorbrewer = FALSE,
+  sepline = TRUE,
+  seplinewidth = 0.2,
+  borderlinewidth = 1.2,
+  indlinewidth = 0.2,
+  fontsize = 6,
+  topdist = 5,
+  bottomdist = -7,
+  figheight = 36,
+  indwidth = 1,
+  orientation = 0,
+  xorigin = NA,
+  yorigin = NA,
+  xscale = 1,
+  yscale = 1,
+  toplabangle = 60,
+  bottomlabangle = 60,
+  echodata = TRUE,
+  printdata = FALSE,
+  exportpath = NULL,
+  path = NULL
+)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
 
-\item{grplabbottom}{A character vector of group labels to be plotted below 
-the plot. The vector must be the same length as number of individuals. See 
+\item{grplabbottom}{A character vector of group labels to be plotted below
+the plot. The vector must be the same length as number of individuals. See
 details.}
 
-\item{grplabtop}{An optional character vector of group labels to be plotted 
-above the plot. The vector must be the same length as number of individuals. 
+\item{grplabtop}{An optional character vector of group labels to be plotted
+above the plot. The vector must be the same length as number of individuals.
 See details.}
 
-\item{grpmean}{A logical indicating if individual values are to be plotted 
-(F) or group means are to be plotted (T).}
+\item{grpmean}{A logical indicating if individual values are to be plotted
+(FALSE) or group means are to be plotted (TRUE).}
 
-\item{overwritedirs}{A logical indicating if existing directories must be 
-overwritten (T) automatically or not (F).}
+\item{overwritedirs}{A logical indicating if existing directories must be
+overwritten (TRUE) automatically or not (FALSE).}
 
 \item{printtitle}{A logical indicating if the filename must be printed as the
 title on the plot.}
 
-\item{clustercol}{A character vector of colours equal to the number of 
-clusters. Note these are not R colours. Use \code{\link{distructColours}} or refer 
-to DISTRUCT manual for colours.  
-With multiple files, number of colours must equal input file with highest 
+\item{clustercol}{A character vector of colours equal to the number of
+clusters. Note these are not R colours. Use \code{\link{distructColours}} or refer
+to DISTRUCT manual for colours.
+With multiple files, number of colours must equal input file with highest
 number of clusters.}
 
 \item{grayscale}{A logical indicating if clusters must be shown in grayscale.}
 
-\item{printcolorbrewer}{A logical indicating if the colours provided in 
+\item{printcolorbrewer}{A logical indicating if the colours provided in
 \code{clustercol} are ColorBrewer colours. See details.}
 
-\item{sepline}{A logical indicating if divider lines must be drawn between 
-groups (T).}
+\item{sepline}{A logical indicating if divider lines must be drawn between
+groups (TRUE).}
 
 \item{seplinewidth}{A numeric indicating width of sepline.}
 
 \item{borderlinewidth}{A numeric indicating width of border around the plot.}
 
-\item{indlinewidth}{A numeric indicating width of border around individual 
+\item{indlinewidth}{A numeric indicating width of border around individual
 bars and ticks.}
 
 \item{fontsize}{A numeric indicating font size of group labels.}
 
-\item{topdist}{A numeric indicating distance of top labels from the top edge 
+\item{topdist}{A numeric indicating distance of top labels from the top edge
 of the plot.}
 
-\item{bottomdist}{A numeric indicating distance of bottom labels from the 
+\item{bottomdist}{A numeric indicating distance of bottom labels from the
 bottom edge of the plot. Usually a negative number.}
 
 \item{figheight}{A numeric indicating height of the plot.}
 
-\item{indwidth}{A numeric indicating width of each individual bar. The width 
+\item{indwidth}{A numeric indicating width of each individual bar. The width
 of the plot depends on this value.}
 
-\item{orientation}{An integer (0,1,2,3) indicating orientation of the plot. 
+\item{orientation}{An integer (0,1,2,3) indicating orientation of the plot.
 See details.}
 
-\item{xorigin}{A numeric indicating lower left x-coordinate of the plot. See 
+\item{xorigin}{A numeric indicating lower left x-coordinate of the plot. See
 details.}
 
-\item{yorigin}{A numeric indicating lower left y-coordinate of the plot. See 
+\item{yorigin}{A numeric indicating lower left y-coordinate of the plot. See
 details.}
 
 \item{xscale}{A numeric indicating scaling for the x direction.}
@@ -83,45 +105,43 @@ details.}
 
 \item{toplabangle}{A numeric between 0 and 180 indicating angle of top labels.}
 
-\item{bottomlabangle}{A numeric between 0 and 180 indicating angle of bottom 
+\item{bottomlabangle}{A numeric between 0 and 180 indicating angle of bottom
 labels.}
 
 \item{echodata}{A logical. Not really sure what this does.}
 
-\item{printdata}{A logical indicating if head and tail of data must be shown 
+\item{printdata}{A logical indicating if head and tail of data must be shown
 in display on running DISTRUCT.}
 
-\item{quiet}{A logical TRUE or FALSE. Set to TRUE by default to print verbose 
-statements to screen.}
+\item{exportpath}{A character denoting path to export output. To use current working directory, set \code{exportpath=getwd()}.}
 
-\item{useexe}{DEPRECATED. DISTRUCT executable is no longer included from v2.3.0.
-Download and run DISTRUCT manually.}
+\item{path}{Deprecated. Use exportpath.}
 }
 \value{
-This function does not run DISTRUCT. It only generates the files 
-necessary to run DISTRUCT. The DISTRUCT executable can be downloaded from 
-here \url{https://web.stanford.edu/group/rosenberglab/distruct.html}. Please 
+This function does not run DISTRUCT. It only generates the files
+necessary to run DISTRUCT. The DISTRUCT executable can be downloaded from
+here \url{https://web.stanford.edu/group/rosenberglab/distruct.html}. Please
 remember to cite DISTRUCT if this option is used.\cr
 
-The function does not return anything. The function creates 
-directories for each input file and populates it with files necessary to run 
-DISTRUCT. The files are individual q-matrix file (xx-indq.txt), population 
-q-matrix file (xx-popq.txt), a cluster colour file (xx-colours.txt) and 
-drawparams file. If group labels were defined, then (xx-poplab-bottom.txt) or 
-(xx-poplab-top.txt) are also exported. The DISTRUCT executable can be run in this 
-directory to generate an xx.ps file.
+The function does not return anything. The function creates
+directories for each input file and populates it with files necessary to run
+DISTRUCT. The files are individual q-matrix file (xx-indq.txt), population
+q-matrix file (xx-popq.txt), a cluster colour file (xx-colours.txt) and
+drawparams file. If group labels were defined, then (xx-poplab-bottom.txt) or
+(xx-poplab-top.txt) are also exported.\cr
+
+The DISTRUCT executable can be run in this directory to generate an xx.ps file.
 }
 \description{
-Create DISTRUCT input files from a qlist.
+Create input files for DISTRUCT from a qlist.
 }
 \details{
-\cr
 \strong{Orientation} \cr
 0 for horizontal orientation (default) \cr
 1 for vertical orientation \cr
 2 for reverse horizontal orientation \cr
 3 for reverse vertical orientation \cr
-\cr
+
 \strong{Origin} \cr
 Default values of origin for a given orientation: \cr
 orientation, xorigin, yorigin \cr
@@ -129,16 +149,16 @@ orientation, xorigin, yorigin \cr
 1,360,72 \cr
 2,540,504 \cr
 3,288,720 \cr
-If plot exceeds canvas size, consider shifting \code{xorigin} to the left 
+If plot exceeds canvas size, consider shifting \code{xorigin} to the left
 and/or decreasing \code{indwidth}.\cr
-\cr
+
 \strong{Colorbrewer colours} \cr
-Colorbrewer colours are not automatically generated for now. Refer to 
+Colorbrewer colours are not automatically generated for now. Refer to
 DISTRUCT manual for colour names. \cr
-Replace the colour names in xx-colours.txt output file with selected 
+Replace the colour names in xx-colours.txt output file with selected
 colorbrewer colours (ex: Accent_3_qual_1). \cr
-\cr
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more 
+
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#distructexport}{vignette} for more
 details.
 }
 \examples{
@@ -152,16 +172,16 @@ grps2 <- read.delim(system.file("files/structuregrplabels2.txt",
 package="pophelper"),header=FALSE, stringsAsFactor=FALSE)
 
 # plot without labels
-distructExport(slist[1])
+distructExport(slist[1],exportpath=getwd())
 
 # plot with bottom group label
-distructExport(slist[1],grplabbottom=grps1$V1)
+distructExport(slist[1],grplabbottom=grps1$V1,exportpath=getwd())
 
 # plot with top group label
-distructExport(slist[1],grplabtop=grps2$V1)
+distructExport(slist[1],grplabtop=grps2$V1,exportpath=getwd())
 
 # plot group mean values
-distructExport(slist[1],grplabbottom=grps1$V1,grpmean=TRUE)
+distructExport(slist[1],grplabbottom=grps1$V1,grpmean=TRUE,exportpath=getwd())
 
 }
 }

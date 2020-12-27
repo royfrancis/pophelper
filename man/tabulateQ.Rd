@@ -4,42 +4,41 @@
 \alias{tabulateQ}
 \title{Tabulate runs from a qlist}
 \usage{
-tabulateQ(qlist = NULL, writetable = FALSE, sorttable = TRUE,
-  exportpath = NULL)
+tabulateQ(qlist, sorttable = TRUE, writetable = FALSE, exportpath = NULL)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
 
-\item{writetable}{A logical indicating if the output table must be exported 
-as a tab-delimited text file in the working directory.}
-
-\item{sorttable}{A logical indicating if output table is to be sorted. Sorts 
+\item{sorttable}{A logical indicating if output table is to be sorted. Sorts
 table by ind and K.}
 
+\item{writetable}{A logical indicating if the output table must be exported
+as a tab-delimited text file in the working directory.}
+
 \item{exportpath}{A path to where content must be exported. For example,
-\code{"./dir/anotherdir/"}. Defaults to NULL which means current working
+\code{exportpath="./dir/anotherdir"}. To set current working directory, set \code{exportpath=getwd()}.
 directory.}
 }
 \value{
-Returns a dataframe with filenames (if list is not named, then 
-sample1, sample2 etc. is used), K and number of individuals of all runs 
-sorted by ind and K (if \code{sorttable=TRUE}). The row numbers of the output 
-table denotes the file number selected. This is helpful if a particular file 
-from the table needs to be identified in the selection vector. If input files 
-come from STRUCTURE runs, columns loci, burnin, reps, elpd, mvll and vll are 
-also returned. In input files come from TESS3, columns loci, gif, rmse, 
+Returns a dataframe with filenames (if list is not named, then
+sample1, sample2 etc. is used), K and number of individuals of all runs
+sorted by ind and K (if \code{sorttable=TRUE}). The row numbers of the output
+table denotes the file number selected. This is helpful if a particular file
+from the table needs to be identified in the selection vector. If input files
+come from STRUCTURE runs, columns loci, burnin, reps, elpd, mvll and vll are
+also returned. In input files come from TESS3, columns loci, gif, rmse,
 crossentropy and ploidy are included as well.
 }
 \description{
-Takes a qlist of one of more numeric dataframes and creates a 
+Takes a qlist of one of more numeric dataframes and creates a
 table with filenames, K and number of individuals.
 }
 \details{
-The input must be a list of dataframes. If one dataframe is used, 
-then it must be inside a list. If the list items are named, then the item 
+The input must be a list of dataframes. If one dataframe is used,
+then it must be inside a list. If the list items are named, then the item
 name is used as filename, else sample1, sample2 etc. is used.
 
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#tabulateq}{vignette} for more details.
 }
 \examples{
 

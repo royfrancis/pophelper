@@ -25,5 +25,5 @@ slist <- readQ(sfiles)
 is.qlist(slist)
 }
 \seealso{
-\code{\link{as.list}}
+\code{\link{as.qlist}}
 }

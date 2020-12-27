@@ -1,37 +1,30 @@
 Package: pophelper
 Type: Package
-Title: Tabulate, analyse and visualise admixture proportions from STRUCTURE, TESS, BAPS, ADMIXTURE and tab-delimited q-matrices
-    files
-Version: 2.3.0
-Date: 2019-08-15
+Title: Tabulate, Analyse and Visualise Admixture Proportions
+Version: 2.3.1
+Date: 2020-12-28
 Author: Roy Mathew Francis
-Authors@R: person("Roy", "Francis", email = "roy.m.francis@outlook.com",role = c("aut", "cre"))
 Maintainer: Roy Mathew Francis <roy.m.francis@outlook.com>
-Description: A set of useful functions for processing admixture proportion files from the
-    population structure analysis softwares STRUCTURE, TESS, ADMIXTURE, BAPS, fastSTRUCTURE etc. The
-    package contains functions to read runs, tabulate runs, summarise runs, plot runs, estimate
-    K using Evanno method, export clumpp files, export distruct files and generate barplots.
+Description: Process admixture proportion files from the population structure analysis tools such as 'STRUCTURE', 'TESS', 'ADMIXTURE', 'BAPS', 'fastSTRUCTURE' etc. The package contains functions to read runs, tabulate runs, summarise runs, plot runs, estimate K using 'EVANNO' method, export 'CLUMPP' files, export 'DISTRUCT' files and generate barplots.
 URL: https://github.com/royfrancis/pophelper
 Depends:
-    R(>= 3.5.0),
-    ggplot2
+    R(>= 3.5)
 Imports:
+    ggplot2,
+    grDevices,
     grid,
     gridExtra,
-    gtable,
     label.switching,
-    tidyr
+    stats,
+    tidyr,
+    utils
 Suggests:
-    bookdown,
-    curl,
     captioner,
-    showtext,
-    ggpubr,
     knitr,
     rmarkdown,
+    showtext,
     testthat
 License: GPL-3
 Encoding: UTF-8
 BugReports: https://github.com/royfrancis/pophelper/issues
-VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1

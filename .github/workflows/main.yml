@@ -1,16 +1,23 @@
+## GITHUB ACTION FOR R PACKAGE
+## Build, check, test, code coverage
+## Required secrets
+## CODECOV_TOKEN
+## TOKEN
+
 name: build
 on:
+  pull_request:
   push:
     branches:
       - master
 jobs:
   linux:
     name: ubuntu
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        r: [3.5]
+        r: [3.5.3,3.6.3,4.0.0]
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
@@ -21,20 +28,20 @@ jobs:
       - name: Install linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfreetype6-dev libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get install -y libfreetype6-dev libcurl4-openssl-dev libssl-dev libxml2-dev libnlopt-dev
 
       - name: Check R installation
         run: Rscript -e "print('R installation works!')"
 
       - name: Cache R packages
-        id: cache-rp
-        uses: actions/cache@v1
+        id: cache-r-packages
+        uses: actions/cache@v2
         with:
           path: "/home/runner/work/_temp/Library"
-          key: ${{ runner.os }}-cache-rp-$(ls /home/runner/work/_temp/Library/ | sha256sum)
+          key: ${{runner.os}}-${{matrix.r}}-$(ls /home/runner/work/_temp/Library/ | sha256sum)
 
       - name: Install R dependencies
-        if: steps.cache-rp.outputs.cache-hit != 'true'
+        if: steps.cache-r-packages.outputs.cache-hit != 'true'
         run: |
           Rscript -e "install.packages(c('remotes','covr','rcmdcheck'))"
           Rscript -e "remotes::install_deps(pkgdir='.',dependencies=TRUE,repos='https://cran.rstudio.com/')"
@@ -44,6 +51,7 @@ jobs:
           R CMD INSTALL .
 
       - name: Code coverage
+        if: matrix.r == '4.0.0'
         run: Rscript -e 'covr::codecov(token="${{ secrets.CODECOV_TOKEN }}",quiet=FALSE)'
 
   windows:
@@ -51,7 +59,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r: [3.5,3.6]
+        r: [3.5.3,3.6.3,4.0.0]
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@master
@@ -59,14 +67,14 @@ jobs:
           r-version: ${{matrix.r}}
 
       - name: Cache R packages
-        id: cache-rp
-        uses: actions/cache@v1
+        id: cache-r-packages
+        uses: actions/cache@v2
         with:
           path: "C:/R/library"
-          key: ${{ runner.os }}-cache-rp
+          key: ${{runner.os}}-${{matrix.r}}
 
       - name: Install R dependencies
-        if: steps.cache-rp.outputs.cache-hit != 'true'
+        if: steps.cache-r-packages.outputs.cache-hit != 'true'
         run: |
           Rscript -e "install.packages(c('remotes','rcmdcheck','stringi'),lib='C:/R/library')"
           Rscript -e "remotes::install_deps(pkgdir='.',dependencies=TRUE,repos='https://cran.rstudio.com/',lib='C:/R/library')"
@@ -74,63 +82,3 @@ jobs:
       - name: RMD check and install package
         run: |
           Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
-          R CMD INSTALL .
-  pkgdown:
-    needs: [mac, linux, windows]
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v1
-      - uses: r-lib/actions/setup-r@master
-        with:
-          r-version: 3.6.2
-      - uses: r-lib/actions/setup-pandoc@master
-
-      - name: Install linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfreetype6-dev libcurl4-openssl-dev libssl-dev libxml2-dev
-
-      - name: Check R installation
-        run: Rscript -e "print('R installation works!')"
-
-      - name: Cache R packages
-        id: cache-rp
-        uses: actions/cache@v1
-        with:
-          path: "/home/runner/work/_temp/Library"
-          key: ${{ runner.os }}-cache-rp-$(ls /home/runner/work/_temp/Library/ | sha256sum)
-
-      - name: Install R dependencies
-        if: steps.cache-rp.outputs.cache-hit != 'true'
-        run: |
-          Rscript -e "install.packages(c('remotes','rcmdcheck','pkgdown'))"
-          Rscript -e "remotes::install_deps(pkgdir='.',dependencies=TRUE,repos='https://cran.rstudio.com/')"
-
-      - name: RMD check and install package
-        run: |
-          Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
-          R CMD INSTALL .
-
-      - name: Render site, pull repo, copy folder, push repo
-        run: |
-          # Add git info
-          git config --global user.email "do_not_email@example.com"
-          git config --global user.name "gh_action"
-
-          # Render website
-          Rscript -e "pkgdown::build_site()"
-
-          # Clone gh-pages branch
-          git clone --single-branch --branch gh-pages "https://${{ secrets.TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" tmprepo
-          cd tmprepo
-          rm -rf *
-          git add .
-          git commit -m "Old contents deleted."
-          cp -r ../docs/* .
-          echo "Folder contents at $(pwd):"
-          ls -lh
-
-          # Push changes back
-          git add .
-          git commit -m "Updated contents at $(date +%Y%m%d-%H%M%S)"
-          git push origin

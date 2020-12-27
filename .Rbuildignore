@@ -10,3 +10,4 @@ NEWS.md
 .git/
 vignettes/
 vignettes/*
+..Rcheck/
