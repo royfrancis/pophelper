@@ -2,7 +2,7 @@
 
 # pophelper
 
-[![ci_badge](https://github.com/royfrancis/pophelper/workflows/build/badge.svg)](https://github.com/royfrancis/pophelper/actions?workflow=build) [![codecov_.io_badge](https://codecov.io/github/royfrancis/pophelper/coverage.svg?branch=master)](https://codecov.io/github/royfrancis/pophelper?branch=master) [![cran_badge](http://www.r-pkg.org/badges/version/pophelper)](https://cran.r-project.org/package=pophelper) 
+[![ci_badge](https://github.com/royfrancis/pophelper/workflows/build/badge.svg)](https://github.com/royfrancis/pophelper/actions?workflow=build) [![codecov_.io_badge](https://codecov.io/github/royfrancis/pophelper/coverage.svg?branch=master)](https://codecov.io/github/royfrancis/pophelper?branch=master)
 
 `pophelper` is an R package and web app to analyse and visualise population structure. See the [project website](http://royfrancis.github.io/pophelper/) for more details. An interactive version of this package using shiny web framework is available as [pophelperShiny](https://github.com/royfrancis/pophelperShiny).
 
