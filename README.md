@@ -14,4 +14,4 @@ This R package is offered free and without warranty of any kind, either expresse
 
 If you have an comments, suggestions, corrections or ideas on ways to improve or extend this package, feel free to contact me. Submit a report on the [Github issues page](https://github.com/royfrancis/pophelper/issues).  
 
-2020 | Roy M Francis  
+2021 | Roy M Francis  
