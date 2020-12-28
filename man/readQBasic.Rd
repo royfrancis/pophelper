@@ -21,7 +21,7 @@ of them to separate dataframes.
 \details{
 Input files can be Admixture run files, fastStructure meanQ files. 
 or any tab-delimited, space-delimited or comma-delimited tabular data without 
-header.
+header. See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 }
 \examples{
 afiles <- list.files(path=system.file("files/admixture",package="pophelper"),

@@ -1,7 +1,21 @@
+pophelper 2.3.1
+=================
+* 28-Dec-2020
+* Min req R-3.5.
+* Error bars in first plot of Evanno method showed max/min rather than SD. Fixed to show SD.
+* Input and output directories are to be specified explicitly by user as per CRAN guidelines
+* cat and print statements replaced with message or warning
+* Argument 'quiet' removed in all functions
+* Fixed dependency issues
+* Automatic CI testing added
+* Fixed an issue where runs merged using mergeQ() produced a warning about missing attributes.
+* In function clumppExport() and distructExport(), argument 'path' changed to 'exportpath' to be consistent with other functions.
+* Fixed minor errors in documentation.
+
 pophelper 2.3.0
 =================
 * 11-Aug-2019
-* Built on R-3.6.0. Min req R-3.5.0.
+* Min req R-3.5.0.
 * Removed CLUMPP and DISTRUCT executables
 * 'useexe' argument in ClumppExport() deprecated.
 * Added alignK() function for label switching within and between K

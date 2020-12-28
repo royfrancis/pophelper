@@ -10,11 +10,11 @@
 #' full.names=TRUE)
 #' slist <- readQ(sfiles)
 #' is.qlist(slist)
-#' @seealso \code{\link{as.list}}
+#' @seealso \code{\link{as.qlist}}
 #' @export
 #' 
-is.qlist <- function(qlist=NULL)
-{
+is.qlist <- function(qlist=NULL) {
+  
   if(is.null(qlist)) stop("is.qlist: Input is empty.")
   
   # is it a list?
@@ -25,6 +25,9 @@ is.qlist <- function(qlist=NULL)
   
   # any NA?
   if(any(is.na(qlist))) stop("is.qlist: One or more list elements are NA.")
+  
+  # any NAs in dataframe?
+  if(any(unlist(lapply(qlist,sapply,is.na)))) warning("is.qlist: One or more qlist dataframes have NA in data.")
   
   # are dataframes all numeric?
   if(!all(unlist(lapply(qlist,sapply,is.numeric)))) stop("is.qlist: One or more qlist dataframes have non-numeric columns.")
@@ -77,12 +80,13 @@ is.qlist <- function(qlist=NULL)
 #' # create qlist
 #' q1 <- list(df1,df2)
 #' q1
-#' 
 #' # is.qlist(q1) # error because list elements are not named
+#' 
 #' q2 <- as.qlist(q1)
 #' is.qlist(q2) # no error
 #' q2
 #' 
+#' @importFrom utils str
 #' @export
 #' 
 as.qlist <- function(qlist,debug=FALSE) {
@@ -106,14 +110,15 @@ as.qlist <- function(qlist,debug=FALSE) {
   }
   
   if(debug) print(str(qlist))
-  #a <- as.data.frame(t(as.matrix(do.call("cbind",))),stringsAsFactors=F)
+  #a <- as.data.frame(t(as.matrix(do.call("cbind",))),stringsAsFactors=FALSE)
   #fun2 <- function(x,y) attr(x,"ind") <- y
   #mapply(fun2,x=qlist,y=sapply(qlist,nrow))
   
   # if column names do not match format, rename all
   if(any(!unlist(lapply(qlist,function(x) grepl("Cluster[0-9]+",colnames(x)))))) {
+    mk <- max(sapply(qlist,ncol))
     for(i in 1:length(qlist)) {
-      colnames(qlist[[i]]) <- paste0("Cluster",1:ncol(qlist[[i]]))
+      colnames(qlist[[i]]) <- paste0("Cluster",paste0(sprintf(paste0("%0",nchar(mk),"d"),1:ncol(qlist[[i]]))))
     }
   }
   
@@ -126,7 +131,7 @@ as.qlist <- function(qlist,debug=FALSE) {
 #' @description Custom print function for qlist class. Print a summary of qlist contents.
 #' @param x A qlist class object
 #' @return NULL
-#' @example 
+#' @examples 
 #' 
 #' # STRUCTURE files
 #' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
@@ -137,7 +142,7 @@ as.qlist <- function(qlist,debug=FALSE) {
 #' @noRd
 #' 
 print.qlist <- function(x) {
-  cat(paste0("qlist S3 class object\n",
+  message(paste0("qlist S3 class object\n",
              "=====================\n",
              # num of runs
              "Runs: ",length(x),"\n",
@@ -211,8 +216,8 @@ joinQ <- function(...) {
 #' 
 mergeQ <- function(qlist) {
   
-  pophelper::is.qlist(qlist)
-  if(diff(range(as.integer(pophelper::tabulateQ(qlist)$ind)))!=0) stop("mergeQ: Number of individuals differ between runs.")
+  is.qlist(qlist)
+  if(diff(range(as.integer(tabulateQ(qlist)$ind)))!=0) stop("mergeQ: Number of individuals differ between runs.")
   
   # Computes mean cell-wise across dataframes
   # x A list of numeric dataframes
@@ -222,19 +227,19 @@ mergeQ <- function(qlist) {
   }
   
   # if all runs have same K, merge as is
-  if(diff(range(as.integer(pophelper::tabulateQ(qlist)$k)))==0) {
-    labels <- pophelper::summariseQ(pophelper::tabulateQ(qlist))$k
+  if(diff(range(as.integer(tabulateQ(qlist)$k)))==0) {
+    labels <- summariseQ(tabulateQ(qlist))$k
     x <- mergy(qlist)
     names(x) <- labels
   }else{
     # if runs have different K, split them and merge within sublists
-    qlist <- pophelper::sortQ(qlist)
-    labels <- pophelper::summariseQ(pophelper::tabulateQ(qlist,sorttable=F))$k
-    x <- unlist(lapply(pophelper::splitQ(qlist),mergy),recursive=FALSE)
+    qlist <- sortQ(qlist)
+    labels <- summariseQ(tabulateQ(qlist,sorttable=FALSE))$k
+    x <- unlist(lapply(splitQ(qlist),mergy),recursive=FALSE)
     names(x) <- labels
   }
   
-  return(x)
+  return(as.qlist(x))
 }
 
 # splitQ -----------------------------------------------------------------------
@@ -258,7 +263,7 @@ mergeQ <- function(qlist) {
 #' 
 splitQ <- function(qlist,by="k") {
   
-  pophelper::is.qlist(qlist)
+  is.qlist(qlist)
   if(length(by)==0) stop("splitQ: Argument 'by' must not be length zero.")
   if(length(by)>1) stop("splitQ: Argument 'by' must be a single character.")
   if(!is.character(by)) stop("splitQ: Argument 'by' must be a character.")
@@ -288,7 +293,7 @@ splitQ <- function(qlist,by="k") {
 #' See details.
 #' @param decreasing A logical indicating the direction of sorting.
 #' @param debug Logical for internal use
-#' @details Argument 'by' can be any attribute name returned by \code{sapply(qlist,attributes)} except 'names', 'class' and 'row.names'. This is usually similar to \code{tabulateQ(qlist,sorttable=F)}.
+#' @details Argument 'by' can be any attribute name returned by \code{sapply(qlist,attributes)} except 'names', 'class' and 'row.names'. This is usually similar to \code{tabulateQ(qlist,sorttable=FALSE)}.
 #' @return A sorted qlist object
 #' @examples
 #' 
@@ -298,12 +303,13 @@ splitQ <- function(qlist,by="k") {
 #' names(slist)
 #' names(slist_1)
 #' 
+#' @importFrom utils str
 #' @export
 #' 
 # order by more than one by value
 sortQ <- function(qlist,by="k",decreasing=FALSE,debug=FALSE) {
   
-  pophelper::is.qlist(qlist)
+  is.qlist(qlist)
   if(length(by)==0) stop("sortQ: Argument 'by' must not be length zero.")
   if(!is.character(by)) stop("sortQ: Argument 'by' must be a character.")
   if(!is.logical(decreasing)) stop("sortQ: Argument 'decreasing' must be a logical datatype.")
@@ -316,9 +322,9 @@ sortQ <- function(qlist,by="k",decreasing=FALSE,debug=FALSE) {
   }
   
   # get df of attributes
-  b <- as.data.frame(t(as.data.frame(lapply(a,function(x,y) x[y,],by),stringAsFactors=F)),stringsAsFactors=F)
+  b <- as.data.frame(t(as.data.frame(lapply(a,function(x,y) x[y,],by),stringAsFactors=FALSE)),stringsAsFactors=FALSE)
   fun2 <- function(x) if(all(!is.na(as.numeric(as.character(x))))) {return(as.numeric(as.character(x)))}else{return(x)}
-  b <- as.data.frame(sapply(b,fun2),stringAsFactors=F)
+  b <- as.data.frame(sapply(b,fun2),stringAsFactors=FALSE)
   
   if(debug) {print(str(b)); print(b)}
   

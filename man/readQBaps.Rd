@@ -19,8 +19,7 @@ Takes one or more BAPS cluster run files and converts them to a
 list of dataframes.
 }
 \details{
-See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
-more details.
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 }
 \examples{
 bfiles <- list.files(path=system.file("files/baps",package="pophelper"),

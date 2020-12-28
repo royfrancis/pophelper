@@ -19,7 +19,7 @@ Takes one or more TESS cluster run files and converts them to a
 list of dataframes.
 }
 \details{
-Use collectRunsTess() to collect TESS runs into one directory.
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details. Use \code{collectRunsTess()} to collect TESS runs into one directory.
 }
 \examples{
 tfiles <- list.files(path=system.file("files/tess",package="pophelper"),

@@ -11,9 +11,10 @@
 #' selected files.
 #' @noRd
 #' @keywords internal
+#' @importFrom utils read.table
 #' 
-checkQ <- function(files=NULL,warn=FALSE)
-{
+checkQ <- function(files=NULL,warn=FALSE) {
+  
   if(is.null(files)) stop("checkQ: Input is empty.")
   if(class(files) != "list" && class(files) != "character") stop("checkQ: Input is not a character or list datatype.")
   
@@ -131,7 +132,7 @@ checkQ <- function(files=NULL,warn=FALSE)
 #' 
 #' To convert TESS3 R objects to pophelper qlist, see \code{\link{readQTess3}}.
 #' 
-#' See the \href{http://royfrancis.github.io/pophelper/}{vignette} for more details.
+#' See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 #' 
 #' @seealso \code{\link{readQTess3}}
 #' 
@@ -198,8 +199,8 @@ checkQ <- function(files=NULL,warn=FALSE)
 #' 
 #' @export
 #' 
-readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
-{
+readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQ: No input files.")
   if(!is.character(files)) stop("readQ: Argument 'files' is not a character datatype.")
   flen <- length(files)
@@ -211,25 +212,25 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
     # check file
     if(filetype=="auto") 
     {
-      chk <- tolower(pophelper:::checkQ(files[i])$type)
+      chk <- tolower(checkQ(files[i])$type)
       
       if(chk %in% c("structure","tess","baps","basic","clumpp")) 
       {
-        if(chk=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
-        if(chk=="tess") dfr <- pophelper:::readQTess(files[i])
-        if(chk=="basic") dfr <- pophelper:::readQBasic(files[i])
-        if(chk=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
-        if(chk=="baps") dfr <- pophelper:::readQBaps(files[i])
+        if(chk=="structure") dfr <- readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
+        if(chk=="tess") dfr <- readQTess(files[i])
+        if(chk=="basic") dfr <- readQBasic(files[i])
+        if(chk=="clumpp") dfr <- readQClumpp(files[i])
+        if(chk=="baps") dfr <- readQBaps(files[i])
         dlist <- append(dlist,dfr)
       }else{
         warning(paste0("readQ: Input file ",files[i]," was not identified as a STRUCTURE, TESS, BAPS, BASIC or CLUMPP filetype. Specify 'filetype' manually or check input.\n"))
       }
     }else{
-      if(filetype=="structure") dfr <- pophelper:::readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
-      if(filetype=="tess") dfr <- pophelper:::readQTess(files[i])
-      if(filetype=="basic") dfr <- pophelper:::readQBasic(files[i])
-      if(filetype=="clumpp") dfr <- pophelper:::readQClumpp(files[i])
-      if(filetype=="baps") dfr <- pophelper:::readQBaps(files[i])
+      if(filetype=="structure") dfr <- readQStructure(files[i],indlabfromfile=indlabfromfile,readci=readci)
+      if(filetype=="tess") dfr <- readQTess(files[i])
+      if(filetype=="basic") dfr <- readQBasic(files[i])
+      if(filetype=="clumpp") dfr <- readQClumpp(files[i])
+      if(filetype=="baps") dfr <- readQBaps(files[i])
       dlist <- append(dlist,dfr)
     }
   }
@@ -256,6 +257,7 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
 #' as attributes to each dataframe. When \code{readci=TRUE} and if CI data is
 #' available, it is read in and attached as attribute named ci. List items are 
 #' named by input filenames.
+#' @details See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 #' @examples 
 #' sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
 #' full.names=TRUE)
@@ -270,16 +272,17 @@ readQ <- function(files=NULL,filetype="auto",indlabfromfile=FALSE,readci=FALSE)
 #' 
 #' # access names of runs
 #' names(slist)
+#' @importFrom utils read.delim
 #' @export
 #' 
-readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
-{
+readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQStructure: No input files.")
   # number of files selected
   flen <- length(files)
   
   #check file
-  if(any(pophelper:::checkQ(files)$type != "STRUCTURE")) stop("readQStructure: Input may be in incorrect format.")
+  if(any(checkQ(files)$type != "STRUCTURE")) stop("readQStructure: Input may be in incorrect format.")
   
   i <- 1
   dlist <- vector("list",length=flen)
@@ -290,42 +293,42 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
     file1 <- readLines(as.character(files[i]),warn=FALSE)
     
     # find individuals and get number of individuals
-    ind <- as.numeric(as.character(base::gsub("\\D","",grep("\\d individuals",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
-    if(is.na(ind)) cat(paste0("Number of individuals is NA in file: ",fname,"\n"))
+    ind <- as.numeric(as.character(gsub("\\D","",grep("\\d individuals",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
+    if(is.na(ind)) warning(paste0("Number of individuals is NA in file: ",fname,"\n"))
     
     # get value of k & error check
-    k <- as.numeric(as.character(base::gsub("\\D","",grep("\\d populations assumed",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
-    if(is.na(k)) cat(paste0("Value of K is NA in file: ",fname,"\n"))
+    k <- as.numeric(as.character(gsub("\\D","",grep("\\d populations assumed",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
+    if(is.na(k)) warning(paste0("Value of K is NA in file: ",fname,"\n"))
     
     # get number of loci & error check
-    loci <- as.numeric(base::gsub("\\D","",grep("\\d loci",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
-    if(is.na(loci)) cat(paste0("Number of Loci is NA in file: ",files[i],"\n"))
+    loci <- as.numeric(gsub("\\D","",grep("\\d loci",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
+    if(is.na(loci)) warning(paste0("Number of Loci is NA in file: ",files[i],"\n"))
     
     # get burn-in value & error check
-    burnin <- as.numeric(base::gsub("\\D","",grep("\\d Burn-in period",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
-    if(is.na(burnin)) cat(paste0("Burn-in value is NA in file: ",files[i],"\n"))
+    burnin <- as.numeric(gsub("\\D","",grep("\\d Burn-in period",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
+    if(is.na(burnin)) warning(paste0("Burn-in value is NA in file: ",files[i],"\n"))
     
     # get burn-in value & error check
-    reps <- as.numeric(base::gsub("\\D","",grep("\\d Reps",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
-    if(is.na(reps)) cat(paste0("Reps value is NA in file: ",files[i],"\n"))
+    reps <- as.numeric(gsub("\\D","",grep("\\d Reps",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1]))
+    if(is.na(reps)) warning(paste0("Reps value is NA in file: ",files[i],"\n"))
     
     # get est ln prob of data & error check
-    elpd <- as.numeric(base::gsub("=","",base::gsub("Estimated Ln Prob of Data","",grep("Estimated Ln Prob of Data",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
-    if(is.na(elpd)) cat(paste0("Estimated Ln Prob of Data is NA in file: ",files[i],"\n"))
+    elpd <- as.numeric(gsub("=","",gsub("Estimated Ln Prob of Data","",grep("Estimated Ln Prob of Data",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
+    if(is.na(elpd)) warning(paste0("Estimated Ln Prob of Data is NA in file: ",files[i],"\n"))
     
     # get mn value of ln likelihood & error check
-    mvll <- as.numeric(base::gsub("=","",base::gsub("Mean value of ln likelihood","",grep("Mean value of ln likelihood",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
-    if(is.na(mvll)) cat(paste0("Mean value of ln likelihood is NA in file: ",files[i],"\n"))
+    mvll <- as.numeric(gsub("=","",gsub("Mean value of ln likelihood","",grep("Mean value of ln likelihood",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
+    if(is.na(mvll)) warning(paste0("Mean value of ln likelihood is NA in file: ",files[i],"\n"))
     
-    # get Variance of ln likelihood else NA
-    vll <- as.numeric(base::gsub("=","",base::gsub("Variance of ln likelihood","",grep("Variance of ln likelihood",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
-    if(is.na(vll)) cat(paste0("Variance of ln likelihood is NA in file: ",files[i],"\n"))
+    # get variance of ln likelihood else NA
+    vll <- as.numeric(gsub("=","",gsub("Variance of ln likelihood","",grep("Variance of ln likelihood",file1,perl=TRUE,ignore.case=TRUE,value=TRUE)[1])))
+    if(is.na(vll)) warning(paste0("Variance of ln likelihood is NA in file: ",files[i],"\n"))
     
     file1 <- file1[grep(".+\\(\\d+\\).+\\:.+",file1)]
     if(length(file1)==0)
     {
-      cstart <- base::charmatch("Inferred ancestry of individuals",file1)
-      cend <- base::charmatch("Estimated Allele Frequencies in each",file1)
+      cstart <- charmatch("Inferred ancestry of individuals",file1)
+      cend <- charmatch("Estimated Allele Frequencies in each",file1)
       file1 <- file1[(cstart+2):(cend-1)]
     }
     
@@ -347,11 +350,11 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
     if(class(errorcheck)=="try-error")
     {
       # using manual substring
-      file_a <- base::gsub("\\([0-9.,]+\\)","",file_a)
-      file_b <- base::gsub(":  ","",base::substr(file_a,base::regexpr(":\\W+\\d\\.\\d+",file_a),base::nchar(file_a)-1))
-      file_b <- base::sub("\\s+$","",base::sub("^\\s+","",file_b))
+      file_a <- gsub("\\([0-9.,]+\\)","",file_a)
+      file_b <- gsub(":  ","",substr(file_a,regexpr(":\\W+\\d\\.\\d+",file_a),nchar(file_a)-1))
+      file_b <- sub("\\s+$","",sub("^\\s+","",file_b))
       rm(file_a)
-      file_c <- as.vector(as.numeric(as.character(unlist(base::strsplit(file_b," ")))))
+      file_c <- as.vector(as.numeric(as.character(unlist(strsplit(file_b," ")))))
       rm(file_b)
       dframe <- as.data.frame(matrix(file_c,nrow=ind,byrow=TRUE),stringsAsFactors=FALSE)
     }else{
@@ -397,11 +400,11 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
     
     # confidence intervals
     if(readci) {
-      cichk <- base::grep("([0-9.]+,[0-9.]+)",file_b[1,])
+      cichk <- grep("([0-9.]+,[0-9.]+)",file_b[1,])
       if(length(cichk)!=0) {
         file_b <- apply(file_b[,cichk,drop=FALSE],1,paste0,collapse="")
-        file_b <- base::gsub("[()]","",base::gsub(")(",",",file_b,fixed=T))
-        cframe <- as.data.frame(matrix(as.numeric(unlist(base::strsplit(file_b,","))),ncol=ncol(dframe)*2,byrow=TRUE))
+        file_b <- gsub("[()]","",gsub(")(",",",file_b,fixed=TRUE))
+        cframe <- as.data.frame(matrix(as.numeric(unlist(strsplit(file_b,","))),ncol=ncol(dframe)*2,byrow=TRUE))
         colnames(cframe) <- as.vector(t(outer(paste0("Cluster",1:ncol(dframe)),c("L","H"),paste,sep="")))
         row.names(cframe) <- row.names(dframe)
         attr(dframe,"ci") <- cframe
@@ -427,22 +430,23 @@ readQStructure <- function(files=NULL,indlabfromfile=FALSE,readci=FALSE)
 #' files. Use \code{choose.files(multi=TRUE)} to select interactively.
 #' @return A list of lists with dataframes is returned. List items are named by 
 #' input filename.
-#' @details Use collectRunsTess() to collect TESS runs into one directory.
+#' @details See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details. Use \code{collectRunsTess()} to collect TESS runs into one directory.
 #' @examples 
 #' tfiles <- list.files(path=system.file("files/tess",package="pophelper"),
 #' full.names=TRUE)
 #' # create a qlist
 #' tlist <- readQTess(tfiles)
+#' @importFrom utils read.delim
 #' @export
 #'
-readQTess <- function(files=NULL)
-{
+readQTess <- function(files=NULL) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQTess: No input files.")
   # number of files selected
   flen <- length(files)
   
   # check file
-  if(any(pophelper:::checkQ(files)$type != "TESS")) warning("readQTess: Input may contain incorrect input format.\n")
+  if(any(checkQ(files)$type != "TESS")) warning("readQTess: Input may contain incorrect input format.\n")
   
   i <- 1
   dlist <- vector("list",length=flen)
@@ -505,23 +509,24 @@ readQTess <- function(files=NULL)
 #' input filename.
 #' @details Input files can be Admixture run files, fastStructure meanQ files. 
 #' or any tab-delimited, space-delimited or comma-delimited tabular data without 
-#' header.
+#' header. See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 #' @examples 
 #' afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
 #' full.names=TRUE)
 #' # create a qlist
 #' alist <- readQBasic(afiles)
+#' @importFrom utils read.delim
 #' @export
 #'
-readQBasic <- function(files=NULL)
-{
+readQBasic <- function(files=NULL) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQBasic: No input files.")
   
   # number of files selected
   flen <- length(files)
   
   # check input file type
-  chk <- pophelper:::checkQ(files)
+  chk <- checkQ(files)
   if(any(chk$type != "BASIC")) warning("readQBasic: Input may be in incorrect format.\n")
   if(any(is.na(chk$subtype))) warning("readQBasic: Input may be in incorrect format.\n")
   
@@ -569,6 +574,7 @@ readQBasic <- function(files=NULL)
 #' Use \code{choose.files(multi=TRUE)} to select interactively.
 #' @return A list of lists with dataframes is returned. Each list item is named 
 #' by input filename. Multiple runs within one file are suffixed by -1, -2 etc.
+#' @details See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 #' @examples 
 #' cfiles1 <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
 #' cfiles2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",
@@ -581,17 +587,18 @@ readQBasic <- function(files=NULL)
 #' clist2 <- readQClumpp(cfiles2)
 #' clist3 <- readQClumpp(cfiles3)
 #' 
+#' @importFrom utils read.table
 #' @export
 #'
-readQClumpp <- function(files=NULL)
-{
+readQClumpp <- function(files=NULL) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQClumpp: No input files.")
   
   # number of files selected
   flen <- length(files)
   
   # check file
-  chk <- pophelper:::checkQ(files)
+  chk <- checkQ(files)
   if(any(chk$type != "CLUMPP")) warning("readQClumpp: Input may be in incorrect format.\n")
   
   i <- 1
@@ -600,7 +607,7 @@ readQClumpp <- function(files=NULL)
   snames <- vector()
   for (i in seq_along(files))
   {
-    fname <- base::gsub(".txt","",basename(files[i]))
+    fname <- gsub(".txt","",basename(files[i]))
     
     df1 <- read.table(files[i],header=FALSE,sep="",dec=".",quote="",stringsAsFactors=FALSE)
     if(class(df1)!="data.frame") stop("readQClumpp: Read error. Check input format.")
@@ -662,10 +669,11 @@ readQClumpp <- function(files=NULL)
 #' dataframe.
 #' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
 #' more details.
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 #' 
-readQTess3 <- function(t3list=NULL,progressbar=FALSE)
-{
+readQTess3 <- function(t3list=NULL,progressbar=FALSE) {
+  
   if(is.null(t3list)) stop("readQTess3: Input is empty.")
   if(!any("tess3" %in% class(t3list))) warning("readQTess3: Input cannot be identified as a valid tess3 class object.\n")
   length(t3list)
@@ -711,8 +719,7 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
 #' files. Use \code{choose.files(multi=TRUE)} to select interactively.
 #' @return A list of lists with dataframes is returned. List items are named by 
 #' input filename.
-#' @details See the \href{http://royfrancis.github.io/pophelper/}{vignette} for 
-#' more details.
+#' @details See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
 #' @examples 
 #' bfiles <- list.files(path=system.file("files/baps",package="pophelper"),
 #' full.names=TRUE)
@@ -720,14 +727,14 @@ readQTess3 <- function(t3list=NULL,progressbar=FALSE)
 #' blist <- readQBaps(bfiles)
 #' @export
 #'
-readQBaps <- function(files=NULL)
-{
+readQBaps <- function(files=NULL) {
+  
   if(is.null(files) || (length(files)==0)) stop("readQBaps: No input files.")
   # number of files selected
   flen <- length(files)
   
   # check if file type is BAPS
-  if(any(pophelper:::checkQ(files)$type != "BAPS")) warning("readQBaps: Input may be in incorrect format.\n")
+  if(any(checkQ(files)$type != "BAPS")) warning("readQBaps: Input may be in incorrect format.\n")
   
   i <- 1
   dlist <- vector("list",length=flen)

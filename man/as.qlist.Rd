@@ -27,8 +27,8 @@ df2 <- data.frame(A=c(0.3,0.1,0.5,0.6), B=c(0.7,0.9,0.5,0.4))
 # create qlist
 q1 <- list(df1,df2)
 q1
-
 # is.qlist(q1) # error because list elements are not named
+
 q2 <- as.qlist(q1)
 is.qlist(q2) # no error
 q2

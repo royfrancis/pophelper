@@ -4,68 +4,76 @@
 \alias{clumppExport}
 \title{Generate CLUMPP output from a qlist}
 \usage{
-clumppExport(qlist = NULL, prefix = NA, parammode = NA,
-  paramrep = NA, useexe = FALSE)
+clumppExport(
+  qlist = NULL,
+  prefix = NA,
+  parammode = NA,
+  paramrep = NA,
+  exportpath = NULL,
+  path = NULL
+)
 }
 \arguments{
 \item{qlist}{A qlist (list of dataframes). An output from \code{\link{readQ}}.}
 
 \item{prefix}{A character prefix for folder names. By default, set to 'pop'.}
 
-\item{parammode}{A numeric 1, 2 or 3 indicating the algorithm option for 
-CLUMPP paramfile. Calculated automatically by default. Set this value to 3 if 
+\item{parammode}{A numeric 1, 2 or 3 indicating the algorithm option for
+CLUMPP paramfile. Calculated automatically by default. Set this value to 3 if
 CLUMPP runs too long. See details.}
 
-\item{paramrep}{A numeric indicating the number of repeats for CLUMPP 
+\item{paramrep}{A numeric indicating the number of repeats for CLUMPP
 paramfile. Calculated automatically by default. See details.}
 
-\item{useexe}{DEPRECATED. CLUMPP executable is no longer included from v2.3.0. 
-Download and use CLUMPP manually or use the function \code{\link{alignK}}.}
+\item{exportpath}{The path to export output files. To use current working directory, set \code{exportpath=getwd()}.}
+
+\item{path}{Deprecated. Use exportpath.}
 }
 \value{
-The combined file and paramfile are written into respective folders 
+The combined file and paramfile are written into respective folders
 named by K.
 }
 \description{
-Takes a qlist and combines several repeats for each K into a 
-single file along with a parameter file suitable for input to CLUMPP. The two 
-output files are organised into folders by K. The CLUMPP executable file is executed in each directory to generate aligned output files. CLUMPP reorders the clusters for each K.
+Takes a qlist and combines several repeats for each K into a
+single file along with a parameter file suitable for input to CLUMPP. The two
+output files are organised into folders by K. This function only creates the 
+input files for CLUMPP. It does not run CLUMPP.
 }
 \details{
-This function only generates the files needed to run CLUMPP. 
-The CLUMPP executable can be downloaded and run for downstream steps. It can 
+This function only generates the files needed to run CLUMPP.
+The CLUMPP executable can be downloaded and run for downstream steps. It can
 be obtained from \url{https://web.stanford.edu/group/rosenberglab/clumpp.html}.
-Please remember to cite CLUMPP if this option is used.\cr
+Please remember to cite CLUMPP if you use it.\cr
 
-When multiple repeats are run for each K in runs, the order of 
-clusters may be jumbled for each run. Therefore, when plotting multiple runs 
-within each K, the colours cannot be assigned correctly. The software CLUMPP 
-helps to overcome this issue by reordering the clusters correctly. This 
-function \code{clumppExport()} takes multiple runs for each K and combines 
-them into a single file and generates a parameter file for easy use with 
-CLUMPP. Further details for CLUMPP can be found here: Jakobsson, M., and 
-Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program 
-for dealing with label switching and multimodality in analysis of population 
-structure. Bioinformatics, 23(14), 1801-1806.\cr
-\cr
+When multiple repeats are run for each K in runs, the order of
+clusters may be jumbled for each run. Therefore, when plotting multiple runs
+within each K, the colours cannot be assigned correctly. The software CLUMPP
+helps to overcome this issue by reordering the clusters correctly. This
+function \code{clumppExport()} takes multiple runs for each K and combines
+them into a single file and generates a parameter file for easy use with
+CLUMPP. Further details for CLUMPP can be found here: \href{https://academic.oup.com/bioinformatics/article/23/14/1801/188285}{Jakobsson, M., and
+Rosenberg, N. A. (2007). CLUMPP: a cluster matching and permutation program
+for dealing with label switching and multimodality in analysis of population
+structure. Bioinformatics, 23(14), 1801-1806.}\cr
+
 \strong{parammode}\cr
-The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch' 
+The parammode (M) is the type of algorithm used. Option 1 is 'FullSearch'
 (takes the longest time), option 2 is 'Greedy' and option 3 is 'LargeKGreedy'
-(fastest). If clumpp takes more than a few minutes, consider changing 
-parammode to a higher number (ex. from 2 to 3), or open the exported 
+(fastest). If clumpp takes more than a few minutes, consider changing
+parammode to a higher number (ex. from 2 to 3), or open the exported
 paramfile and manually change GREEDY_OPTION to 3.\cr
-\cr
-The parammode and paramrep for CLUMPP paramfile is set based on this 
+
+The parammode and paramrep for CLUMPP paramfile is set based on this
 calculation.
-T <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of 
+X <- factorial(k)*((runs*(runs-1))/2)*k*ind, where k is number of
 populations, runs is number of runs for k and ind is number of individuals.
-If T <= 100000000, then parammode is 2 and paramrep is 20, otherwise 
+If X <= 100000000, then parammode is 2 and paramrep is 20, otherwise
 parammode is 3 and paramrep is set to 500.\cr
-\cr
-To find out more about parammode (algorithm type) and paramrep (repeats), 
+
+To find out more about parammode (algorithm type) and paramrep (repeats),
 refer to CLUMPP documentation.\cr
 
-See the vignette for more details.
+See the \href{https://royfrancis.github.io/pophelper/articles/index.html#clumpp}{vignette} for more details.
 }
 \examples{
 
@@ -74,12 +82,12 @@ See the vignette for more details.
 # generate input files for CLUMPP from STRUCTURE files
 sfiles <- list.files(path=system.file("files/structure",package="pophelper"),
 full.names=TRUE)
-clumppExport(readQ(sfiles))
+clumppExport(readQ(sfiles),exportpath=getwd())
 
 # generate input files for CLUMPP from ADMIXTURE files
 afiles <- list.files(path=system.file("files/admixture",package="pophelper"),
 full.names=TRUE)
-clumppExport(readQ(afiles))
+clumppExport(readQ(afiles),exportpath=getwd())
 
 }
 }

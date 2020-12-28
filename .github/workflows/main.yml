@@ -1,4 +1,3 @@
-
 ## GITHUB ACTION FOR R PACKAGE
 ## Build, check, test, code coverage
 ## Required secrets
@@ -24,7 +23,6 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: ${{matrix.r}}
-      - uses: r-lib/actions/setup-pandoc@master
 
       - name: Install linux dependencies
         run: |

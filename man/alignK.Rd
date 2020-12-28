@@ -16,7 +16,7 @@ or across K. Select 'auto', 'within' or 'across'. Defaults to 'auto'.}
 A qlist object with clusters switched where necessary.
 }
 \description{
-Aligns clusters within or across K.
+Aligns clusters within or across K. This is similar to what CLUMPP does.
 }
 \details{
 When 'within' is selected, clusters are aligned across replicate runs

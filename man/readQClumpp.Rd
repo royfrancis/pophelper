@@ -20,6 +20,9 @@ by input filename. Multiple runs within one file are suffixed by -1, -2 etc.
 Takes one or more CLUMPP format numeric text files and converts
 them to a list of dataframes.
 }
+\details{
+See the \href{http://royfrancis.github.io/pophelper/articles/index.html#readq}{vignette} for more details.
+}
 \examples{
 cfiles1 <- system.file("files/STRUCTUREpop_K4-combined.txt",package="pophelper")
 cfiles2 <- system.file("files/STRUCTUREpop_K4-combined-aligned.txt",

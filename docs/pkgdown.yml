@@ -1,0 +1,10 @@
+pandoc: 2.11.0.1
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  index: index.html
+last_built: 2020-12-27T21:27Z
+urls:
+  reference: https://github.com/royfrancis/pophelper/reference
+  article: https://github.com/royfrancis/pophelper/articles
+

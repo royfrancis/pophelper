@@ -15,6 +15,6 @@ Vector of 90 Distruct colours.
 }
 \examples{
 distructColours();
-distructColours()[1:5]; 
+distructColours()[1:5];
 distructColours()[10:15];
 }

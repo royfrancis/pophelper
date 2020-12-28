@@ -24,7 +24,7 @@ A sorted qlist object
 Sort runs in a qlist based on an attribute
 }
 \details{
-Argument 'by' can be any attribute name returned by \code{sapply(qlist,attributes)} except 'names', 'class' and 'row.names'. This is usually similar to \code{tabulateQ(qlist,sorttable=F)}.
+Argument 'by' can be any attribute name returned by \code{sapply(qlist,attributes)} except 'names', 'class' and 'row.names'. This is usually similar to \code{tabulateQ(qlist,sorttable=FALSE)}.
 }
 \examples{
 

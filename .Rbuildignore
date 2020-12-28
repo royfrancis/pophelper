@@ -9,4 +9,5 @@ NEWS.md
 .github/
 .git/
 vignettes/
-vignettes/*
+..Rcheck/
+Dockerfile
