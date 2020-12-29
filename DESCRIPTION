@@ -19,6 +19,9 @@ Imports:
     tidyr,
     utils
 Suggests:
+    captioner,
+    knitr,
+    rmarkdown,
     showtext,
     testthat
 License: GPL-3
