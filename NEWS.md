@@ -10,6 +10,7 @@
 * Automatic CI testing added
 * Fixed an issue where runs merged using mergeQ() produced a warning about missing attributes.
 * In function clumppExport() and distructExport(), argument 'path' changed to 'exportpath' to be consistent with other functions.
+* Legend is now sorted numerically
 * Fixed minor errors in documentation.
 
 # pophelper 2.3.0

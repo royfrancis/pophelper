@@ -1164,7 +1164,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       # legendlab
       if(any(is.na(legendlab)))
       {
-        legendlab1 <- levels(factor(as.character(df2$variable)))
+        if(all(grepl("Cluster",df2$variable))){
+          legendlab1 <- paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",df2$variable)))))
+        }else{
+          legendlab1 <- levels(factor(as.character(df2$variable)))
+        }
+        
       }else{
         legendlab1 <- legendlab
       }
@@ -1194,7 +1199,12 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
       width1 <- as.numeric(dimtemp[2])
       grplabheight1 <- as.numeric(dimtemp[3])
       units1 <- as.character(dimtemp[4])
-
+      
+      # order legend numerically
+      if(all(grepl("Cluster",df2$variable))){
+        df2$variable <- factor(df2$variable,levels=paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",df2$variable))))))
+      }
+      
       ## COMMON PLOT TOP PANEL ---------------------------------------------------
       # create plot
       gg_plot_panel <- ggplot(data=df2,aes(x=order_ind,y=value,fill=variable))+
@@ -1563,7 +1573,11 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     # legendlab
     if(any(is.na(legendlab)))
     {
-      legendlab1 <- levels(factor(as.character(df3$variable)))
+      if(all(grepl("Cluster",df3$variable))){
+        legendlab1 <- paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",df3$variable)))))
+      }else{
+        legendlab1 <- levels(factor(as.character(df3$variable)))
+      }
     }else{
       legendlab1 <- legendlab
     }
@@ -1582,6 +1596,11 @@ plotQ <- function(qlist=NULL,imgoutput="sep",clustercol=NA,sortind=NA,grplab=NA,
     coll <- clustercol
     if(any(is.na(clustercol))) coll <- getColours(as.integer(max(kvec)))
     if(length(coll) < max(kvec)) stop(paste0("plotQ: Number of colours (",length(coll),") is less than the number of clusters (",max(kvec),")."))
+
+    # order legend numerically
+    if(all(grepl("Cluster",df3$variable))){
+      df3$variable <- factor(df3$variable,levels=paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",df3$variable))))))
+    }
 
     ## COMMON PLOT TOP PANEL ----------------------------------------------------
     # create plot
@@ -2312,6 +2331,7 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
     if(length(coll) < ncol(dff)) stop(paste0("plotQMultiline: Number of colours (",length(coll),") is less than the number of clusters (",ncol(dff),")."))
 
     if(any(is.na(legendlab))) legendlab1 <- colnames(dff)
+    #if(any(is.na(legendlab))) legendlab1 <- paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",dff$variable)))))
 
     dff$ind <- factor(rownames(dff),levels=rownames(dff))
     #dff$ind <- as.character(rownames(dff))
@@ -2325,6 +2345,9 @@ plotQMultiline <- function(qlist=NULL,spl=NA,lpp=NA,clustercol=NA,sortind=NA,grp
       dff[[selgrp]] <- factor(dff[[selgrp]],levels=rle(dff[[selgrp]])$values)
     }
 
+    # order legend numerically
+    #dff$variable <- factor(dff$variable,levels=paste0("Cluster",sort(as.integer(unique(gsub("Cluster","",dff$variable))))))
+    
     # split and plot rows
     dlist <- split(dff,dff$rows)
     plist <- vector("list",length=nr2)
