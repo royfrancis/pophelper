@@ -334,8 +334,7 @@ sortQ <- function(qlist,by="k",decreasing=FALSE,debug=FALSE) {
   
   # order
   if(length(by)==1) {
-    df <- b[, by, drop=FALSE]
-    ord <- df[order(df[, by])]
+    ord <- order(b[,by])
   }
   if(length(by)>1) ord <- do.call(order,b[,by,drop=FALSE])
   if(decreasing) ord <- rev(ord)
