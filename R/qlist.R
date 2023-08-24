@@ -323,13 +323,19 @@ sortQ <- function(qlist,by="k",decreasing=FALSE,debug=FALSE) {
   
   # get df of attributes
   b <- as.data.frame(t(as.data.frame(lapply(a,function(x,y) x[y,],by),stringAsFactors=FALSE)),stringsAsFactors=FALSE)
-  fun2 <- function(x) if(all(!is.na(as.numeric(as.character(x))))) {return(as.numeric(as.character(x)))}else{return(x)}
+  fun2 <- function(x) if(all(!is.na(as.numeric(as.character(x))))) {
+    return(as.numeric(as.character(x)))
+  } else {
+      return(x)
+    }
   b <- as.data.frame(sapply(b,fun2),stringAsFactors=FALSE)
   
   if(debug) {print(str(b)); print(b)}
   
   # order
-  if(length(by)==1) ord <- order(b[,by,drop=FALSE])
+  if(length(by)==1) {
+    ord <- order(b[,by])
+  }
   if(length(by)>1) ord <- do.call(order,b[,by,drop=FALSE])
   if(decreasing) ord <- rev(ord)
   # sort qlist
